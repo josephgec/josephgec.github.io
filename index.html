@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- ══ Primary SEO ══ -->
+  <title>Joseph Thomas | Software Engineer · Data Scientist · AI/ML Researcher</title>
+  <meta name="description" content="Joseph Thomas is a Software Engineer at Google Cloud specialising in GenAI/LLM data quality and large-scale data pipelines. Cornell MEng CS graduate and swarm-intelligence researcher based in Saratoga, CA." />
+  <meta name="keywords" content="Joseph Thomas, Software Engineer, Google Cloud, Data Scientist, Machine Learning, AI, Swarm Intelligence, Cornell, GenAI, LLM, Big Data, CrowdCompute, Amazon DataCraft" />
+  <meta name="author" content="Joseph Thomas" />
+  <meta name="robots" content="index, follow" />
+
+  <!-- ══ Open Graph ══ -->
+  <meta property="og:type" content="profile" />
+  <meta property="og:title" content="Joseph Thomas — Software Engineer · Data Scientist · AI/ML Researcher" />
+  <meta property="og:description" content="SWE at Google Cloud driving GenAI/LLM data quality. Cornell MEng CS. Built 10B-event/day pipelines at Amazon. Swarm-intelligence researcher &amp; published author." />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:site_name" content="Joseph Thomas" />
+  <meta property="profile:first_name" content="Joseph" />
+  <meta property="profile:last_name" content="Thomas" />
+
+  <!-- ══ Twitter Card ══ -->
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Joseph Thomas | Software Engineer · Data Scientist" />
+  <meta name="twitter:description" content="SWE at Google Cloud. Cornell MEng CS. Swarm intelligence researcher. Architected 10B+ events/day data pipelines at Amazon." />
+
+  <!-- ══ JSON-LD Structured Data ══ -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Joseph Thomas",
+    "jobTitle": "Software Engineer",
+    "description": "Software Engineer at Google Cloud specialising in AI/ML data quality, GenAI/LLM systems, and large-scale data pipelines. Published researcher in swarm intelligence and evolutionary computation.",
+    "telephone": "+16072167730",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Saratoga",
+      "addressRegion": "CA",
+      "postalCode": "95070",
+      "addressCountry": "US"
+    },
+    "worksFor": {
+      "@type": "Organization",
+      "name": "Google",
+      "department": "Google Cloud"
+    },
+    "alumniOf": [
+      {
+        "@type": "CollegeOrUniversity",
+        "name": "Cornell University"
+      },
+      {
+        "@type": "CollegeOrUniversity",
+        "name": "Indian Institute of Science, Bangalore"
+      },
+      {
+        "@type": "CollegeOrUniversity",
+        "name": "Government Engineering College, Trichur"
+      }
+    ],
+    "knowsAbout": [
+      "Machine Learning","Artificial Intelligence","Natural Language Processing",
+      "Swarm Intelligence","Glowworm Swarm Optimization","Data Science",
+      "Generative AI","Large Language Models","Big Data Pipelines",
+      "Python","R","SQL","AWS Kinesis","Apache Lambda","Data Quality"
+    ],
+    "award": "21 Google Awards including 5 Spot Bonuses",
+    "sameAs": [
+      "https://scholar.google.com/citations?user=6RHIGk4AAAAJ"
+    ]
+  }
+  </script>
+
+  <!-- ══ Fonts ══ -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ════════════════════════════════════════
+       RESET & TOKENS
+    ════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:        #0f172a;
+      --navy-mid:    #1e3a5f;
+      --teal:        #0e7490;
+      --teal-bright: #06b6d4;
+      --accent-bg:   #ecfeff;
+      --accent-bdr:  #a5f3fc;
+      --text:        #1e293b;
+      --muted:       #64748b;
+      --border:      #e2e8f0;
+      --white:       #ffffff;
+      --bg:          #f1f5f9;
+      --shadow-sm:   0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md:   0 4px 16px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.05);
+      --shadow-lg:   0 12px 32px rgba(0,0,0,0.13), 0 4px 8px rgba(0,0,0,0.06);
+      --radius:      12px;
+      --transition:  0.2s ease;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ════════════════════════════════════════
+       NAV
+    ════════════════════════════════════════ */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(15, 23, 42, 0.96);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .nav-inner {
+      max-width: 1060px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 52px;
+    }
+
+    .nav-name {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--white);
+      letter-spacing: 0.3px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 6px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 500;
+      padding: 5px 12px;
+      border-radius: 6px;
+      transition: background var(--transition), color var(--transition);
+    }
+
+    .nav-links a:hover {
+      background: rgba(255,255,255,0.1);
+      color: var(--white);
+    }
+
+    /* ════════════════════════════════════════
+       HERO
+    ════════════════════════════════════════ */
+    header {
+      background: linear-gradient(140deg, var(--navy) 0%, #1a3a6b 55%, #0a5c6e 100%);
+      color: var(--white);
+      padding: 64px 24px 56px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 70% 50%, rgba(6,182,212,0.15) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      max-width: 1060px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 36px;
+      position: relative;
+    }
+
+    .hero-avatar {
+      flex-shrink: 0;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--teal-bright), #0284c7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: var(--white);
+      border: 3px solid rgba(255,255,255,0.2);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      letter-spacing: -1px;
+    }
+
+    .hero-text h1 {
+      font-size: 2.6rem;
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+
+    .hero-text .tagline {
+      font-size: 1rem;
+      font-weight: 400;
+      opacity: 0.8;
+      margin-bottom: 22px;
+      letter-spacing: 0.2px;
+    }
+
+    .contact-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .contact-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: rgba(255,255,255,0.9);
+      font-size: 0.82rem;
+      font-weight: 500;
+      padding: 6px 14px;
+      border-radius: 30px;
+      text-decoration: none;
+      transition: background var(--transition), border-color var(--transition);
+    }
+
+    .contact-pill:hover {
+      background: rgba(255,255,255,0.18);
+      border-color: rgba(255,255,255,0.35);
+    }
+
+    /* ════════════════════════════════════════
+       PAGE GRID
+    ════════════════════════════════════════ */
+    .page {
+      max-width: 1060px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+      display: grid;
+      grid-template-columns: 1fr 290px;
+      gap: 28px;
+      align-items: start;
+    }
+
+    /* ════════════════════════════════════════
+       SECTION HEADERS
+    ════════════════════════════════════════ */
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 20px;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, var(--border), transparent);
+    }
+
+    section { margin-bottom: 36px; }
+
+    /* ════════════════════════════════════════
+       TIMELINE (EXPERIENCE)
+    ════════════════════════════════════════ */
+    .timeline {
+      position: relative;
+      padding-left: 24px;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 6px;
+      top: 10px;
+      bottom: 10px;
+      width: 2px;
+      background: linear-gradient(to bottom, var(--teal), var(--border));
+      border-radius: 2px;
+    }
+
+    .tl-entry {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .tl-entry::before {
+      content: '';
+      position: absolute;
+      left: -21px;
+      top: 20px;
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: var(--teal);
+      border: 2px solid var(--bg);
+      box-shadow: 0 0 0 2px var(--teal);
+      transition: transform var(--transition);
+    }
+
+    .tl-entry:hover::before { transform: scale(1.3); }
+
+    /* ════════════════════════════════════════
+       CARDS
+    ════════════════════════════════════════ */
+    .card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 22px 24px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+      transition: box-shadow var(--transition), transform var(--transition);
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-bottom: 2px;
+    }
+
+    .card-title {
+      font-weight: 700;
+      font-size: 0.98rem;
+      color: var(--navy);
+      line-height: 1.3;
+    }
+
+    .card-date {
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--white);
+      background: var(--teal);
+      padding: 2px 10px;
+      border-radius: 20px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .card-sub {
+      font-size: 0.84rem;
+      color: var(--teal);
+      font-weight: 600;
+      margin-bottom: 12px;
+      margin-top: 4px;
+    }
+
+    .card ul {
+      padding-left: 18px;
+      font-size: 0.875rem;
+      color: #475569;
+    }
+
+    .card ul li {
+      margin-bottom: 5px;
+      line-height: 1.55;
+    }
+
+    .card p {
+      font-size: 0.875rem;
+      color: #475569;
+      margin-top: 8px;
+      line-height: 1.55;
+    }
+
+    /* ════════════════════════════════════════
+       EDUCATION CARDS
+    ════════════════════════════════════════ */
+    .edu-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      margin-bottom: 14px;
+      transition: box-shadow var(--transition), transform var(--transition);
+    }
+
+    .edu-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .edu-icon {
+      flex-shrink: 0;
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      font-weight: 800;
+    }
+
+    .edu-body { flex: 1; min-width: 0; }
+
+    .edu-degree {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--navy);
+      line-height: 1.3;
+    }
+
+    .edu-school {
+      font-size: 0.82rem;
+      color: var(--teal);
+      font-weight: 600;
+      margin: 2px 0 4px;
+    }
+
+    .edu-detail {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .edu-meta {
+      display: flex;
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 4px;
+      flex-shrink: 0;
+      text-align: right;
+    }
+
+    .edu-date {
+      font-size: 0.75rem;
+      color: var(--muted);
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .edu-gpa {
+      font-size: 0.75rem;
+      font-weight: 700;
+      background: var(--accent-bg);
+      color: var(--teal);
+      border: 1px solid var(--accent-bdr);
+      padding: 2px 8px;
+      border-radius: 20px;
+    }
+
+    /* ════════════════════════════════════════
+       PUBLICATIONS
+    ════════════════════════════════════════ */
+    .scholar-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent-bg);
+      border: 1px solid var(--accent-bdr);
+      color: var(--teal);
+      font-weight: 600;
+      font-size: 0.82rem;
+      padding: 8px 16px;
+      border-radius: 8px;
+      text-decoration: none;
+      margin-bottom: 18px;
+      transition: background var(--transition), box-shadow var(--transition);
+    }
+
+    .scholar-btn:hover {
+      background: #cffafe;
+      box-shadow: 0 2px 8px rgba(6,182,212,0.2);
+    }
+
+    .pub-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .pub-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--teal);
+      transition: box-shadow var(--transition), transform var(--transition);
+    }
+
+    .pub-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .pub-card.patent   { border-left-color: #f59e0b; }
+    .pub-card.thesis   { border-left-color: #8b5cf6; }
+    .pub-card.book     { border-left-color: #10b981; }
+    .pub-card.talk     { border-left-color: #f97316; }
+
+    .pub-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+      gap: 8px;
+    }
+
+    .pub-type-badge {
+      font-size: 0.67rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 2px 9px;
+      border-radius: 20px;
+    }
+
+    .pub-card.conference .pub-type-badge { background: #e0f2fe; color: #0369a1; }
+    .pub-card.patent     .pub-type-badge { background: #fef3c7; color: #92400e; }
+    .pub-card.thesis     .pub-type-badge { background: #ede9fe; color: #5b21b6; }
+    .pub-card.book       .pub-type-badge { background: #d1fae5; color: #065f46; }
+    .pub-card.talk       .pub-type-badge { background: #ffedd5; color: #9a3412; }
+
+    .pub-citations {
+      font-size: 0.72rem;
+      font-weight: 700;
+      background: var(--navy);
+      color: var(--white);
+      border-radius: 20px;
+      padding: 2px 10px;
+      white-space: nowrap;
+    }
+
+    .pub-title {
+      font-weight: 600;
+      font-size: 0.88rem;
+      color: var(--navy);
+      line-height: 1.45;
+      margin-bottom: 4px;
+    }
+
+    .pub-meta {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    a.pub-link {
+      display: block;
+      text-decoration: none;
+      color: var(--navy);
+      transition: color var(--transition);
+    }
+
+    a.pub-link:hover { color: var(--teal); }
+
+    .media-link {
+      color: var(--teal);
+      text-decoration: none;
+      font-size: 0.84rem;
+      transition: color var(--transition);
+    }
+
+    .media-link:hover {
+      color: var(--navy);
+      text-decoration: underline;
+    }
+
+    /* ════════════════════════════════════════
+       SIDEBAR
+    ════════════════════════════════════════ */
+    aside { position: sticky; top: 68px; }
+
+    .s-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+      margin-bottom: 20px;
+    }
+
+    /* ── Stats grid ── */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .stat-box {
+      background: var(--accent-bg);
+      border: 1px solid var(--accent-bdr);
+      border-radius: 10px;
+      padding: 14px 10px;
+      text-align: center;
+    }
+
+    .stat-num {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--navy);
+      line-height: 1;
+    }
+
+    .stat-lbl {
+      font-size: 0.67rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-top: 4px;
+    }
+
+    /* ── Award banner ── */
+    .award-banner {
+      background: linear-gradient(135deg, var(--navy-mid), var(--teal));
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+      color: var(--white);
+      margin-bottom: 14px;
+    }
+
+    .award-banner .num { font-size: 2.2rem; font-weight: 800; line-height: 1; }
+    .award-banner .lbl { font-size: 0.8rem; opacity: 0.85; margin-top: 4px; }
+
+    /* ── Skills ── */
+    .skill-group { margin-bottom: 12px; }
+    .skill-group-name {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 7px;
+    }
+
+    .tag-list { display: flex; flex-wrap: wrap; gap: 6px; }
+
+    .tag {
+      background: var(--accent-bg);
+      color: var(--teal);
+      border: 1px solid var(--accent-bdr);
+      border-radius: 20px;
+      padding: 3px 11px;
+      font-size: 0.77rem;
+      font-weight: 600;
+    }
+
+    /* ── Plain list ── */
+    .list-plain { list-style: none; }
+
+    .list-plain li {
+      padding: 6px 0;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 0.84rem;
+      color: #475569;
+      line-height: 1.4;
+    }
+
+    .list-plain li:last-child { border-bottom: none; }
+
+    .list-plain li::before {
+      content: '›';
+      color: var(--teal);
+      font-weight: 800;
+      font-size: 1rem;
+      flex-shrink: 0;
+      line-height: 1.3;
+    }
+
+    /* ── Sidebar link ── */
+    .s-link {
+      display: block;
+      text-align: center;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--teal);
+      text-decoration: none;
+      margin-top: 12px;
+      padding: 6px;
+      border-radius: 6px;
+      transition: background var(--transition);
+    }
+    .s-link:hover { background: var(--accent-bg); }
+
+    /* ════════════════════════════════════════
+       FOOTER
+    ════════════════════════════════════════ */
+    footer {
+      background: var(--navy);
+      color: rgba(255,255,255,0.5);
+      text-align: center;
+      padding: 24px;
+      font-size: 0.8rem;
+    }
+
+    footer a {
+      color: var(--teal-bright);
+      text-decoration: none;
+    }
+
+    /* ════════════════════════════════════════
+       RESPONSIVE
+    ════════════════════════════════════════ */
+    @media (max-width: 780px) {
+      .page { grid-template-columns: 1fr; }
+      aside { position: static; }
+      .hero-text h1 { font-size: 2rem; }
+      .hero-avatar { width: 76px; height: 76px; font-size: 1.8rem; }
+      .nav-links { display: none; }
+    }
+
+    @media (max-width: 480px) {
+      .hero-inner { flex-direction: column; align-items: flex-start; gap: 18px; }
+      .edu-card { flex-wrap: wrap; }
+      .edu-meta { flex-direction: row; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════
+     STICKY NAV
+════════════════════════════════════════ -->
+<nav aria-label="Site navigation">
+  <div class="nav-inner">
+    <span class="nav-name">Joseph Thomas</span>
+    <ul class="nav-links">
+      <li><a href="#experience">Experience</a></li>
+      <li><a href="#education">Education</a></li>
+      <li><a href="#publications">Research</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ════════════════════════════════════════
+     HERO
+════════════════════════════════════════ -->
+<header>
+  <div class="hero-inner">
+    <div class="hero-avatar" aria-hidden="true">JT</div>
+    <div class="hero-text">
+      <h1>Joseph Thomas</h1>
+      <p class="tagline">Software Engineer &nbsp;·&nbsp; Data Scientist &nbsp;·&nbsp; AI/ML Researcher</p>
+      <div class="contact-pills">
+        <span class="contact-pill">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+          Saratoga, CA 95070
+        </span>
+        <span class="contact-pill">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.06 3.18 2 2 0 012.03 1h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+          (607) 216-7730
+        </span>
+        <a class="contact-pill"
+           href="https://scholar.google.com/citations?user=6RHIGk4AAAAJ&hl=en&oi=sra"
+           target="_blank" rel="noopener noreferrer">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14l9-5-9-5-9 5 9 5z"/><path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+          Google Scholar
+        </a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ════════════════════════════════════════
+     MAIN GRID
+════════════════════════════════════════ -->
+<div class="page">
+
+  <!-- ── MAIN COLUMN ── -->
+  <main>
+
+    <!-- EXPERIENCE -->
+    <section id="experience" aria-labelledby="exp-heading">
+      <h2 class="section-label" id="exp-heading">Work Experience</h2>
+      <div class="timeline">
+
+        <article class="tl-entry">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Software Engineer — Google Cloud</span>
+              <span class="card-date">Oct 2019 – Present</span>
+            </div>
+            <div class="card-sub">Google &nbsp;·&nbsp; Mountain View, CA</div>
+            <ul>
+              <li>Led backend storage &amp; data quality systems within <strong>CrowdCompute</strong>, a human-computation platform for ML and data-integrity tasks.</li>
+              <li>Provided technical leadership to the Crowd Data Platform team, driving AI data-generation tools for <strong>GenAI / LLM</strong> use cases.</li>
+              <li>Improved GenAI model training data quality through quantitative pilot studies and standardised best practices.</li>
+              <li>Created a new metrics dashboard that accelerated data-issue identification across the full collection lifecycle.</li>
+              <li>Received <strong>21 awards</strong> including 5 Spot Bonuses.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="tl-entry">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Software Development Engineer — Big Data Technologies</span>
+              <span class="card-date">Feb 2017 – Sep 2019</span>
+            </div>
+            <div class="card-sub">Amazon &nbsp;·&nbsp; Palo Alto, CA</div>
+            <ul>
+              <li>Architected and launched <strong>DataCraft</strong>, a centralised ingestion platform processing <strong>&gt; 10 billion events daily</strong>.</li>
+              <li>Built resilient, fault-tolerant pipelines using Kinesis, Lambda, and S3, ensuring data integrity into the data lake.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="tl-entry">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Data Scientist</span>
+              <span class="card-date">Feb 2015 – Jan 2017</span>
+            </div>
+            <div class="card-sub">Datanyze &nbsp;·&nbsp; San Mateo, CA</div>
+            <ul>
+              <li>Owned strategy &amp; roadmap for a CRM-integrated product (Salesforce) that analysed clients' most successful customers.</li>
+              <li>Spidered millions of websites daily, identifying technology stacks as "technographic" predictive lead-scoring signals.</li>
+              <li>Beta tests demonstrated measurable increases in qualified opportunities and average deal sizes.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="tl-entry">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Energy Analytics Software Developer</span>
+              <span class="card-date">Jun 2013 – Dec 2014</span>
+            </div>
+            <div class="card-sub">Ascend Analytics &nbsp;·&nbsp; Oakland, CA</div>
+            <ul>
+              <li>Migrated the core energy analytics codebase from SAS to WPS, saving an estimated <strong>$250,000 in annual licensing costs</strong> and improving platform stability.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="tl-entry">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Senior Analyst — R&amp;D</span>
+              <span class="card-date">Jun 2011 – Jul 2012</span>
+            </div>
+            <div class="card-sub">Global Analytics &nbsp;·&nbsp; Chennai, India</div>
+            <ul>
+              <li>Led a 4-member team applying social-media signals to online-lending risk modelling, generating <strong>$1.2M in additional revenue</strong>.</li>
+              <li>Designed key modules in the Automated Modeling Platform (R, Python, MySQL).</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="tl-entry">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Associate — R&amp;D</span>
+              <span class="card-date">Jan 2010 – Jun 2011</span>
+            </div>
+            <div class="card-sub">Idea Research and Development &nbsp;·&nbsp; Pune, India</div>
+            <ul>
+              <li>Developed <strong>SCION</strong>, an evolutionary computational algorithm for maximising supersonic missile intake performance (Matlab, Python, Qt).</li>
+            </ul>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- EDUCATION -->
+    <section id="education" aria-labelledby="edu-heading">
+      <h2 class="section-label" id="edu-heading">Education</h2>
+
+      <div class="edu-card">
+        <div class="edu-icon" style="background:#dbeafe;color:#1d4ed8;">CS</div>
+        <div class="edu-body">
+          <div class="edu-degree">Master of Engineering, Computer Science</div>
+          <div class="edu-school">Cornell University &nbsp;·&nbsp; New York, USA</div>
+          <div class="edu-detail">Machine Learning · AI · NLP · Algorithm Design · Databases</div>
+        </div>
+        <div class="edu-meta">
+          <span class="edu-date">2012 – 2013</span>
+          <span class="edu-gpa">GPA 3.5 / 4.0</span>
+        </div>
+      </div>
+
+      <div class="edu-card">
+        <div class="edu-icon" style="background:#fce7f3;color:#9d174d;">AE</div>
+        <div class="edu-body">
+          <div class="edu-degree">MSc (Eng), Aerospace Engineering</div>
+          <div class="edu-school">Indian Institute of Science &nbsp;·&nbsp; Bangalore, India</div>
+          <div class="edu-detail">Thesis: <em>Odor Source Localization using Swarm Robotics</em></div>
+        </div>
+        <div class="edu-meta">
+          <span class="edu-date">2006 – 2008</span>
+          <span class="edu-gpa">GPA 7.0 / 8.0</span>
+        </div>
+      </div>
+
+      <div class="edu-card">
+        <div class="edu-icon" style="background:#d1fae5;color:#065f46;">EC</div>
+        <div class="edu-body">
+          <div class="edu-degree">BTech, Electronics &amp; Communication Engineering</div>
+          <div class="edu-school">Government Engineering College &nbsp;·&nbsp; Trichur, India</div>
+          <div class="edu-detail">Thesis: <em>Blind Source Separation using Independent Component Analysis</em></div>
+        </div>
+        <div class="edu-meta">
+          <span class="edu-date">2002 – 2006</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- PUBLICATIONS & TALKS -->
+    <section id="publications" aria-labelledby="pub-heading">
+      <h2 class="section-label" id="pub-heading">Patents, Publications &amp; Talks</h2>
+
+      <a class="scholar-btn"
+         href="https://scholar.google.com/citations?user=6RHIGk4AAAAJ&hl=en&oi=sra"
+         target="_blank" rel="noopener noreferrer">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        View Google Scholar Profile
+      </a>
+
+      <div class="pub-grid">
+
+        <div class="pub-card conference">
+          <div class="pub-top">
+            <span class="pub-type-badge">Conference Paper</span>
+            <span class="pub-citations">12 citations</span>
+          </div>
+          <a class="pub-title pub-link" href="https://www.researchgate.net/publication/220888084_Strategies_for_Locating_Multiple_Odor_Sources_using_Glowworm_Swarm_Optimization" target="_blank" rel="noopener noreferrer">Strategies for Locating Multiple Odor Sources using Glowworm Swarm Optimization ↗</a>
+          <div class="pub-meta">J. Thomas, D. Ghose &nbsp;·&nbsp; <em>IICAI</em>, pp. 842–861 &nbsp;·&nbsp; 2009</div>
+        </div>
+
+        <div class="pub-card patent">
+          <div class="pub-top">
+            <span class="pub-type-badge">Patent</span>
+            <span class="pub-citations">11 citations</span>
+          </div>
+          <a class="pub-title pub-link" href="https://patents.google.com/patent/US8838271B2/en" target="_blank" rel="noopener noreferrer">Detection of Nuclear Spills Using Swarm Optimization Algorithms ↗</a>
+          <div class="pub-meta">D. Ghose, J. Thomas, K.N. Krishnanand &nbsp;·&nbsp; <em>US Patent 8,838,271</em> &nbsp;·&nbsp; 2014</div>
+        </div>
+
+        <div class="pub-card thesis">
+          <div class="pub-top">
+            <span class="pub-type-badge">Thesis</span>
+            <span class="pub-citations">3 citations</span>
+          </div>
+          <a class="pub-title pub-link" href="https://www.researchgate.net/publication/44165369_Odor_Source_Localization_Using_Swarm_Robotics" target="_blank" rel="noopener noreferrer">Odor Source Localization using Swarm Robotics ↗</a>
+          <div class="pub-meta">J. Thomas &nbsp;·&nbsp; <em>Master's thesis, Indian Institute of Science, Bangalore</em> &nbsp;·&nbsp; 2008</div>
+        </div>
+
+        <div class="pub-card book">
+          <div class="pub-top">
+            <span class="pub-type-badge">Book Chapter</span>
+            <span class="pub-citations">1 citation</span>
+          </div>
+          <a class="pub-title pub-link" href="https://www.taylorfrancis.com/chapters/edit/10.1201/9781351235426-34/gso-based-swarm-algorithm-odor-source-localization-turbulent-environments-joseph-thomas-debasish-ghose" target="_blank" rel="noopener noreferrer">A GSO-Based Swarm Algorithm for Odor Source Localization in Turbulent Environments ↗</a>
+          <div class="pub-meta">J. Thomas, D. Ghose &nbsp;·&nbsp; <em>Handbook of Approximation Algorithms and Metaheuristics, 2nd Ed.</em>, pp. 711–737 (CRC Press, 2018)</div>
+        </div>
+
+        <div class="pub-card talk">
+          <div class="pub-top">
+            <span class="pub-type-badge">Invited Talk</span>
+          </div>
+          <div class="pub-title">Industry Talk: Data Science Road</div>
+          <div class="pub-meta">University of New Brunswick &nbsp;·&nbsp; March 18, 2022</div>
+        </div>
+
+        <div class="pub-card talk">
+          <div class="pub-top">
+            <span class="pub-type-badge">Invited Talk</span>
+          </div>
+          <div class="pub-title">Odor Source Localization using Swarm Robotics</div>
+          <div class="pub-meta">IDSIA (Istituto Dalle Molle di Studi sull'Intelligenza Artificiale), Switzerland &nbsp;·&nbsp; Nov 20, 2009</div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── SIDEBAR ── -->
+  <aside aria-label="Profile highlights">
+
+    <!-- Awards -->
+    <div class="s-card">
+      <div class="award-banner">
+        <div class="num">21</div>
+        <div class="lbl">Google Awards<br/>(incl. 5 Spot Bonuses)</div>
+      </div>
+    </div>
+
+    <!-- Research impact -->
+    <div class="s-card">
+      <h2 class="section-label" style="margin-bottom:14px;">Research Impact</h2>
+      <div class="stat-grid">
+        <div class="stat-box">
+          <div class="stat-num">27</div>
+          <div class="stat-lbl">Total Citations</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num">4</div>
+          <div class="stat-lbl">Publications</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num">1</div>
+          <div class="stat-lbl">US Patent</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num">2</div>
+          <div class="stat-lbl">Invited Talks</div>
+        </div>
+      </div>
+      <a class="s-link"
+         href="https://scholar.google.com/citations?user=6RHIGk4AAAAJ&hl=en&oi=sra"
+         target="_blank" rel="noopener noreferrer">
+        View Google Scholar →
+      </a>
+    </div>
+
+    <!-- Skills -->
+    <div class="s-card">
+      <h2 class="section-label" style="margin-bottom:14px;">Skills &amp; Tools</h2>
+      <div class="skill-group">
+        <div class="skill-group-name">Languages</div>
+        <div class="tag-list">
+          <span class="tag">Python</span>
+          <span class="tag">R</span>
+          <span class="tag">SQL</span>
+          <span class="tag">Matlab</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <div class="skill-group-name">Cloud &amp; Infrastructure</div>
+        <div class="tag-list">
+          <span class="tag">AWS Kinesis</span>
+          <span class="tag">Lambda</span>
+          <span class="tag">S3</span>
+          <span class="tag">Google Cloud</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <div class="skill-group-name">AI / Data</div>
+        <div class="tag-list">
+          <span class="tag">Machine Learning</span>
+          <span class="tag">NLP</span>
+          <span class="tag">GenAI / LLM</span>
+          <span class="tag">Swarm AI</span>
+          <span class="tag">Data Pipelines</span>
+          <span class="tag">MySQL</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fellowships -->
+    <div class="s-card">
+      <h2 class="section-label" style="margin-bottom:12px;">Fellowships &amp; Memberships</h2>
+      <ul class="list-plain">
+        <li>
+          <a href="https://www.raptors.dev/our-members" target="_blank" rel="noopener noreferrer" class="media-link">
+            Hackaton Raptors Fellowship ↗
+          </a>
+          <span style="font-size:0.75rem;color:var(--muted);display:block;margin-top:1px;">Member #13487</span>
+        </li>
+        <li>BCS Fellowship</li>
+        <li>
+          <a href="https://services24.ieee.org/membership-validator.html" target="_blank" rel="noopener noreferrer" class="media-link">
+            Senior Member, IEEE ↗
+          </a>
+          <span style="font-size:0.75rem;color:var(--muted);display:block;margin-top:1px;">Member #101354449</span>
+        </li>
+        <li>Proctor, IEEEXtreme</li>
+        <li>Govt. of India Scholarship (99th percentile, GATE)</li>
+        <li>Graduate Research Scholarship — Utah State University</li>
+      </ul>
+    </div>
+
+    <!-- Mentorship -->
+    <div class="s-card">
+      <h2 class="section-label" style="margin-bottom:12px;">Mentorship</h2>
+      <ul class="list-plain">
+        <li>Mentor &amp; TA — Google Tech Exchange</li>
+        <li>Mentor — Opportunity Machine (startup incubator)</li>
+        <li>Mentor — Founder Institute</li>
+      </ul>
+    </div>
+
+    <!-- Academic service -->
+    <div class="s-card">
+      <h2 class="section-label" style="margin-bottom:12px;">Academic Service</h2>
+      <ul class="list-plain">
+        <li>Program Committee — Evostar 2026</li>
+        <li>Program Committee — ANTS 2026 (Swarm Intelligence)</li>
+        <li>Reviewer — IEEE ICRA 2026</li>
+        <li>Reviewer — Intl. Journal of Swarm Intelligence Research</li>
+        <li>Reviewer — Intl. Journal of Applied Evolutionary Computation</li>
+        <li>Reviewer — ASME Journal of Computing &amp; Information Science</li>
+      </ul>
+    </div>
+
+    <!-- Media -->
+    <div class="s-card">
+      <h2 class="section-label" style="margin-bottom:12px;">In the Media</h2>
+      <ul class="list-plain">
+        <li><a href="https://venturebeat.com/2015/04/29/datanyze-give-us-your-salesforce-well-fill-your-funnel/" target="_blank" rel="noopener noreferrer" class="media-link">VentureBeat — "Datanyze: Give us your Salesforce, we'll fill your funnel" ↗</a></li>
+        <li><a href="https://www.softwaremag.com/datanyze-unveils-predictive-analytics-solution-to-bolster-b2b-sales-productivity/" target="_blank" rel="noopener noreferrer" class="media-link">SoftwareMag — "Datanyze Unveils Predictive Analytics Solution" ↗</a></li>
+      </ul>
+    </div>
+
+  </aside>
+
+</div><!-- end .page -->
+
+<!-- ════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════ -->
+<footer>
+  <p>Joseph Thomas &nbsp;·&nbsp; Saratoga, CA &nbsp;·&nbsp;
+    <a href="https://scholar.google.com/citations?user=6RHIGk4AAAAJ&hl=en&oi=sra"
+       target="_blank" rel="noopener noreferrer">Google Scholar</a>
+  </p>
+</footer>
+
+</body>
+</html>
