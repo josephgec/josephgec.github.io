@@ -196,19 +196,13 @@
 
     .hero-avatar {
       flex-shrink: 0;
-      width: 100px;
-      height: 100px;
+      width: 110px;
+      height: 110px;
       border-radius: 50%;
-      background: linear-gradient(135deg, var(--teal-bright), #0284c7);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2.4rem;
-      font-weight: 800;
-      color: var(--white);
-      border: 3px solid rgba(255,255,255,0.2);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-      letter-spacing: -1px;
+      object-fit: cover;
+      object-position: center top;
+      border: 3px solid rgba(255,255,255,0.3);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
     }
 
     .hero-text h1 {
@@ -774,7 +768,7 @@
 ════════════════════════════════════════ -->
 <header>
   <div class="hero-inner">
-    <div class="hero-avatar" aria-hidden="true">JT</div>
+    <img class="hero-avatar" src="photo.jpg" alt="Joseph Thomas" />
     <div class="hero-text">
       <h1>Joseph Thomas</h1>
       <p class="tagline">Software Engineer &nbsp;·&nbsp; Data Scientist &nbsp;·&nbsp; AI/ML Researcher</p>
