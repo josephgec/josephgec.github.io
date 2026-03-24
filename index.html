@@ -599,6 +599,79 @@
     }
 
     /* ════════════════════════════════════════
+       PROJECTS
+    ════════════════════════════════════════ */
+    .proj-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .proj-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+      border-top: 3px solid var(--teal);
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      transition: box-shadow var(--transition), transform var(--transition);
+    }
+
+    .proj-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .proj-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .proj-name {
+      font-weight: 700;
+      font-size: 0.92rem;
+      color: var(--navy);
+    }
+
+    .proj-card:hover .proj-name { color: var(--teal); }
+
+    .proj-lang {
+      font-size: 0.67rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      background: var(--accent-bg);
+      color: var(--teal);
+      border: 1px solid var(--accent-bdr);
+      padding: 2px 9px;
+      border-radius: 20px;
+    }
+
+    .proj-desc {
+      font-size: 0.82rem;
+      color: #475569;
+      line-height: 1.5;
+      flex: 1;
+    }
+
+    .proj-footer {
+      margin-top: 10px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--teal);
+    }
+
+    @media (max-width: 780px) {
+      .proj-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ════════════════════════════════════════
        SIDEBAR
     ════════════════════════════════════════ */
     aside { position: sticky; top: 68px; }
@@ -766,6 +839,7 @@
       <li><a href="#experience">Experience</a></li>
       <li><a href="#education">Education</a></li>
       <li><a href="#publications">Research</a></li>
+      <li><a href="#projects">Projects</a></li>
     </ul>
   </div>
 </nav>
@@ -1018,6 +1092,76 @@
           <div class="pub-title">Odor Source Localization using Swarm Robotics</div>
           <div class="pub-meta">IDSIA (Istituto Dalle Molle di Studi sull'Intelligenza Artificiale), Switzerland &nbsp;·&nbsp; Nov 20, 2009</div>
         </div>
+
+      </div>
+    </section>
+
+    <!-- PROJECTS -->
+    <section id="projects" aria-labelledby="proj-heading">
+      <h2 class="section-label" id="proj-heading">Open Source Projects</h2>
+
+      <a class="scholar-btn"
+         href="https://github.com/josephgec"
+         target="_blank" rel="noopener noreferrer">
+        <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844a9.59 9.59 0 012.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+        View All on GitHub
+      </a>
+
+      <div class="proj-grid">
+
+        <a class="proj-card" href="https://github.com/josephgec/arc-agi" target="_blank" rel="noopener noreferrer">
+          <div class="proj-header">
+            <span class="proj-name">arc-agi</span>
+            <span class="proj-lang">Python</span>
+          </div>
+          <div class="proj-desc">Multi-agent systems to tackle the ARC-AGI challenge — pushing the frontier of abstract reasoning in AI.</div>
+          <div class="proj-footer">View Repository →</div>
+        </a>
+
+        <a class="proj-card" href="https://github.com/josephgec/arc-agi-search" target="_blank" rel="noopener noreferrer">
+          <div class="proj-header">
+            <span class="proj-name">arc-agi-search</span>
+            <span class="proj-lang">Python</span>
+          </div>
+          <div class="proj-desc">Swarm-based search algorithms applied to ARC-AGI — bio-inspired optimization for abstract reasoning.</div>
+          <div class="proj-footer">View Repository →</div>
+        </a>
+
+        <a class="proj-card" href="https://github.com/josephgec/recursive-self-improvement" target="_blank" rel="noopener noreferrer">
+          <div class="proj-header">
+            <span class="proj-name">recursive-self-improvement</span>
+            <span class="proj-lang">Python</span>
+          </div>
+          <div class="proj-desc">Recursive self-improvement framework for LLMs — exploring iterative capability enhancement in language models.</div>
+          <div class="proj-footer">View Repository →</div>
+        </a>
+
+        <a class="proj-card" href="https://github.com/josephgec/deepsnake" target="_blank" rel="noopener noreferrer">
+          <div class="proj-header">
+            <span class="proj-name">deepsnake</span>
+            <span class="proj-lang">Python</span>
+          </div>
+          <div class="proj-desc">Deep Q-Network reinforcement learning agent trained to master the classic Snake game through reward optimization.</div>
+          <div class="proj-footer">View Repository →</div>
+        </a>
+
+        <a class="proj-card" href="https://github.com/josephgec/Machine-Learning" target="_blank" rel="noopener noreferrer">
+          <div class="proj-header">
+            <span class="proj-name">Machine-Learning</span>
+            <span class="proj-lang">Python</span>
+          </div>
+          <div class="proj-desc">Collection of ML projects spanning classification, regression, and neural network architectures.</div>
+          <div class="proj-footer">View Repository →</div>
+        </a>
+
+        <a class="proj-card" href="https://github.com/josephgec/mlops-on-gcp" target="_blank" rel="noopener noreferrer">
+          <div class="proj-header">
+            <span class="proj-name">mlops-on-gcp</span>
+            <span class="proj-lang">GCP</span>
+          </div>
+          <div class="proj-desc">MLOps pipelines and infrastructure patterns on Google Cloud Platform — production ML workflow automation.</div>
+          <div class="proj-footer">View Repository →</div>
+        </a>
 
       </div>
     </section>
