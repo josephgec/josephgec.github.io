@@ -1136,7 +1136,7 @@
        SKILLS
     ════════════════════════════════════════ */
     .skills-section {
-      padding: 80px 32px;
+      padding: 60px 32px 40px;
       background: var(--ink);
       border-top: 1px solid var(--ink-border-subtle);
       border-bottom: 1px solid var(--ink-border-subtle);
@@ -1148,6 +1148,15 @@
       gap: 32px;
     }
 
+    .skill-group {
+      padding-left: 16px;
+      border-left: 3px solid var(--ink-border-subtle);
+    }
+
+    .skill-group.sg-ai { border-left-color: var(--cyan); }
+    .skill-group.sg-cloud { border-left-color: var(--amber); }
+    .skill-group.sg-lang { border-left-color: var(--violet); }
+
     .skill-group-name {
       font-family: var(--font-mono);
       font-size: 0.68rem;
@@ -1157,6 +1166,9 @@
       color: var(--cyan-dim);
       margin-bottom: 14px;
     }
+
+    .sg-cloud .skill-group-name { color: var(--amber-dim); }
+    .sg-lang .skill-group-name { color: var(--violet); }
 
     .tag-list { display: flex; flex-wrap: wrap; gap: 8px; }
 
@@ -1169,6 +1181,22 @@
       font-size: 0.78rem;
       font-weight: 500;
       transition: all var(--transition);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tag img {
+      width: 16px;
+      height: 16px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+
+    .tag .tag-icon {
+      font-size: 0.7rem;
+      opacity: 0.5;
+      flex-shrink: 0;
     }
 
     .tag:hover {
@@ -1184,32 +1212,48 @@
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 20px;
+      align-items: stretch;
     }
 
     .sidebar-card {
       background: var(--ink-card);
       border-radius: var(--radius);
       padding: 28px;
-      border: 1px solid var(--ink-border-subtle);
+      border: 1px solid var(--ink-border);
+      box-shadow: 0 4px 16px -4px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
       transition: all var(--transition);
+      display: flex;
+      flex-direction: column;
     }
 
-    .sidebar-card:hover { border-color: var(--ink-border); }
+    .sidebar-card:hover {
+      border-color: var(--cyan-dim);
+      box-shadow: 0 8px 24px -6px rgba(0,0,0,0.1), 0 2px 6px rgba(0,0,0,0.04);
+      transform: translateY(-2px);
+    }
 
     .sidebar-card-title {
       font-family: var(--font-mono);
-      font-size: 0.68rem;
+      font-size: 0.72rem;
       font-weight: 600;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
       color: var(--text-muted);
       margin-bottom: 16px;
       padding-bottom: 12px;
       border-bottom: 1px solid var(--ink-border-subtle);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sidebar-card-title .card-emoji {
+      font-size: 1rem;
     }
 
     .sidebar-list {
       list-style: none;
+      flex: 1;
     }
 
     .sidebar-list li {
@@ -1234,6 +1278,15 @@
       margin-top: 2px;
     }
 
+    .sidebar-list li.highlight {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .sidebar-list li.highlight::before {
+      color: var(--cyan);
+    }
+
     .media-link {
       color: var(--cyan);
       text-decoration: none;
@@ -1244,12 +1297,66 @@
 
     .media-link:hover { color: var(--text-primary); }
 
+    /* Press cards */
+    .press-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 16px;
+      border-radius: 10px;
+      border: 1px solid var(--ink-border-subtle);
+      border-left: 3px solid var(--cyan);
+      transition: all var(--transition);
+      margin-bottom: 10px;
+      background: var(--ink-card);
+    }
+
+    .press-card:last-child { margin-bottom: 0; }
+
+    .press-card:hover {
+      background: var(--cyan-glow);
+      border-left-color: var(--cyan-dim);
+      transform: translateX(3px);
+    }
+
+    .press-logo {
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+
+    .press-logo-text {
+      font-family: var(--font-display);
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      white-space: nowrap;
+      flex-shrink: 0;
+      background: var(--ink-raised);
+      padding: 3px 8px;
+      border-radius: 4px;
+      border: 1px solid var(--ink-border-subtle);
+    }
+
+    .press-link {
+      color: var(--text-primary);
+      text-decoration: none;
+      font-size: 0.84rem;
+      font-weight: 500;
+      transition: color var(--transition);
+      cursor: none;
+    }
+
+    .press-link:hover { color: var(--cyan); }
+
     /* ════════════════════════════════════════
        FOOTER
     ════════════════════════════════════════ */
     footer {
-      background: var(--ink);
-      border-top: 1px solid var(--ink-border-subtle);
+      background: var(--ink-raised);
+      border-top: 2px solid var(--ink-border);
       padding: 48px 32px;
     }
 
@@ -1261,6 +1368,13 @@
       align-items: center;
       flex-wrap: wrap;
       gap: 24px;
+    }
+
+    .footer-cta {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      line-height: 1.4;
     }
 
     .footer-brand {
@@ -1279,28 +1393,33 @@
 
     .footer-links {
       display: flex;
-      gap: 8px;
+      gap: 10px;
     }
 
     .footer-link {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 40px;
-      height: 40px;
-      border-radius: 10px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
       background: rgba(0,0,0,0.03);
-      border: 1px solid var(--ink-border-subtle);
+      border: 1px solid var(--ink-border);
       color: var(--text-muted);
       text-decoration: none;
       transition: all var(--transition);
       cursor: none;
     }
 
+    .footer-link svg {
+      width: 20px;
+      height: 20px;
+    }
+
     .footer-link:hover {
-      background: var(--cyan-glow);
-      border-color: rgba(8, 145, 178, 0.2);
-      color: var(--cyan);
+      background: var(--cyan);
+      border-color: var(--cyan);
+      color: #ffffff;
     }
 
     /* ════════════════════════════════════════
@@ -1757,37 +1876,37 @@
       <div class="section-line"></div>
     </div>
     <div class="skills-grid">
-      <div class="reveal">
+      <div class="skill-group sg-ai reveal">
         <div class="skill-group-name">GenAI &amp; ML</div>
         <div class="tag-list">
-          <span class="tag">Gemini</span>
-          <span class="tag">RAG</span>
-          <span class="tag">RLHF</span>
-          <span class="tag">SFT</span>
-          <span class="tag">LLMOps</span>
-          <span class="tag">Prompt Engineering</span>
-          <span class="tag">Synthetic Data</span>
+          <span class="tag"><img src="https://cdn.simpleicons.org/googlegemini/4285F4" alt=""> Gemini</span>
+          <span class="tag"><span class="tag-icon">&#x2726;</span> RAG</span>
+          <span class="tag"><span class="tag-icon">&#x2726;</span> RLHF</span>
+          <span class="tag"><span class="tag-icon">&#x2726;</span> SFT</span>
+          <span class="tag"><span class="tag-icon">&#x2726;</span> LLMOps</span>
+          <span class="tag"><span class="tag-icon">&#x2726;</span> Prompt Engineering</span>
+          <span class="tag"><span class="tag-icon">&#x2726;</span> Synthetic Data</span>
         </div>
       </div>
-      <div class="reveal reveal-d1">
+      <div class="skill-group sg-cloud reveal reveal-d1">
         <div class="skill-group-name">Cloud &amp; Infrastructure</div>
         <div class="tag-list">
-          <span class="tag">GCP</span>
-          <span class="tag">AWS Kinesis</span>
-          <span class="tag">Lambda</span>
-          <span class="tag">S3</span>
-          <span class="tag">Distributed Systems</span>
-          <span class="tag">Vector Databases</span>
+          <span class="tag"><img src="https://cdn.simpleicons.org/googlecloud/4285F4" alt=""> GCP</span>
+          <span class="tag"><img src="https://cdn.simpleicons.org/amazonaws/FF9900" alt=""> AWS Kinesis</span>
+          <span class="tag"><img src="https://cdn.simpleicons.org/awslambda/FF9900" alt=""> Lambda</span>
+          <span class="tag"><img src="https://cdn.simpleicons.org/amazons3/569A31" alt=""> S3</span>
+          <span class="tag"><span class="tag-icon">&#x2726;</span> Distributed Systems</span>
+          <span class="tag"><span class="tag-icon">&#x2726;</span> Vector Databases</span>
         </div>
       </div>
-      <div class="reveal reveal-d2">
+      <div class="skill-group sg-lang reveal reveal-d2">
         <div class="skill-group-name">Languages &amp; Backend</div>
         <div class="tag-list">
-          <span class="tag">Python</span>
-          <span class="tag">Java</span>
-          <span class="tag">SQL</span>
-          <span class="tag">gRPC</span>
-          <span class="tag">Protobuf</span>
+          <span class="tag"><img src="https://cdn.simpleicons.org/python/3776AB" alt=""> Python</span>
+          <span class="tag"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/java/java-original.svg" alt=""> Java</span>
+          <span class="tag"><img src="https://cdn.simpleicons.org/postgresql/4169E1" alt=""> SQL</span>
+          <span class="tag"><img src="https://cdn.simpleicons.org/grpc/244c5a" alt=""> gRPC</span>
+          <span class="tag"><span class="tag-icon">&#x2726;</span> Protobuf</span>
         </div>
       </div>
     </div>
@@ -1801,25 +1920,25 @@
   <div class="section-inner">
     <div class="sidebar-grid">
       <div class="sidebar-card reveal">
-        <div class="sidebar-card-title">Fellowships &amp; Memberships</div>
+        <div class="sidebar-card-title"><span class="card-emoji">&#127941;</span> Fellowships &amp; Memberships</div>
         <ul class="sidebar-list">
           <li>
             <a href="https://www.raptors.dev/our-members" target="_blank" rel="noopener noreferrer" class="media-link">Hackaton Raptors Fellowship ↗</a>
             <span style="font-size:0.72rem;color:var(--text-muted);display:block;margin-top:2px;">Member #13487</span>
           </li>
           <li>BCS Fellowship</li>
-          <li>
+          <li class="highlight">
             <a href="https://services24.ieee.org/membership-validator.html" target="_blank" rel="noopener noreferrer" class="media-link">Senior Member, IEEE ↗</a>
             <span style="font-size:0.72rem;color:var(--text-muted);display:block;margin-top:2px;">Member #101354449</span>
           </li>
           <li>Proctor, IEEEXtreme</li>
-          <li>Govt. of India Scholarship (99th percentile, GATE)</li>
+          <li class="highlight">Govt. of India Scholarship (99th percentile, GATE)</li>
           <li>Graduate Research Scholarship — Utah State University</li>
         </ul>
       </div>
 
       <div class="sidebar-card reveal reveal-d1">
-        <div class="sidebar-card-title">Mentorship</div>
+        <div class="sidebar-card-title"><span class="card-emoji">&#127891;</span> Mentorship</div>
         <ul class="sidebar-list">
           <li>Mentor &amp; TA — Google Tech Exchange</li>
           <li>Mentor — Opportunity Machine (startup incubator)</li>
@@ -1828,7 +1947,7 @@
       </div>
 
       <div class="sidebar-card reveal reveal-d2">
-        <div class="sidebar-card-title">Academic Service</div>
+        <div class="sidebar-card-title"><span class="card-emoji">&#128300;</span> Academic Service</div>
         <ul class="sidebar-list">
           <li>Program Committee — Evostar 2026</li>
           <li>Program Committee — ANTS 2026 (Swarm Intelligence)</li>
@@ -1842,11 +1961,15 @@
     </div>
 
     <div class="sidebar-card reveal" style="margin-top: 20px;">
-      <div class="sidebar-card-title">In the Media</div>
-      <ul class="sidebar-list">
-        <li><a href="https://venturebeat.com/2015/04/29/datanyze-give-us-your-salesforce-well-fill-your-funnel/" target="_blank" rel="noopener noreferrer" class="media-link">VentureBeat — "Datanyze: Give us your Salesforce, we'll fill your funnel" ↗</a></li>
-        <li><a href="https://www.softwaremag.com/datanyze-unveils-predictive-analytics-solution-to-bolster-b2b-sales-productivity/" target="_blank" rel="noopener noreferrer" class="media-link">SoftwareMag — "Datanyze Unveils Predictive Analytics Solution" ↗</a></li>
-      </ul>
+      <div class="sidebar-card-title"><span class="card-emoji">&#128240;</span> Press &amp; Media</div>
+      <div class="press-card">
+        <img class="press-logo" src="https://logo.clearbit.com/venturebeat.com" alt="VentureBeat" />
+        <a class="press-link" href="https://venturebeat.com/2015/04/29/datanyze-give-us-your-salesforce-well-fill-your-funnel/" target="_blank" rel="noopener noreferrer">"Datanyze: Give us your Salesforce, we'll fill your funnel" ↗</a>
+      </div>
+      <div class="press-card">
+        <span class="press-logo-text">SM</span>
+        <a class="press-link" href="https://www.softwaremag.com/datanyze-unveils-predictive-analytics-solution-to-bolster-b2b-sales-productivity/" target="_blank" rel="noopener noreferrer">"Datanyze Unveils Predictive Analytics Solution" ↗</a>
+      </div>
     </div>
   </div>
 </section>
@@ -1857,6 +1980,7 @@
 <footer>
   <div class="footer-inner">
     <div>
+      <div class="footer-cta">Open to advising, speaking engagements, and research collaborations.</div>
       <div class="footer-brand">Joseph Thomas</div>
       <div class="footer-copy">Saratoga, CA · Software Engineer · Google Cloud</div>
     </div>
