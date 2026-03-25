@@ -132,68 +132,9 @@
       overflow-x: hidden;
     }
 
-    *, *::before, *::after {
-      cursor: none !important;
-    }
-
     ::selection {
       background: var(--cyan);
       color: #ffffff;
-    }
-
-    /* ════════════════════════════════════════
-       CUSTOM CURSOR
-    ════════════════════════════════════════ */
-    #cursor-dot {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 8px;
-      height: 8px;
-      background-color: #0891b2;
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 99999;
-      transform: translate(-50%, -50%);
-      transition: transform 0.05s ease, background-color 0.2s ease;
-      will-change: transform, left, top;
-    }
-
-    #cursor-glow {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 36px;
-      height: 36px;
-      background: radial-gradient(circle, rgba(8, 145, 178, 0.25) 0%, rgba(8, 145, 178, 0) 70%);
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 99998;
-      transform: translate(-50%, -50%);
-      transition: left 0.12s ease, top 0.12s ease, width 0.2s ease, height 0.2s ease, opacity 0.2s ease;
-      will-change: transform, left, top;
-    }
-
-    body.cursor-hover #cursor-dot {
-      background-color: #ffffff;
-      transform: translate(-50%, -50%) scale(1.5);
-    }
-
-    body.cursor-hover #cursor-glow {
-      width: 60px;
-      height: 60px;
-      background: radial-gradient(circle, rgba(8, 145, 178, 0.35) 0%, rgba(8, 145, 178, 0) 70%);
-    }
-
-    @media (hover: none) and (pointer: coarse) {
-      #cursor-dot,
-      #cursor-glow {
-        display: none !important;
-      }
-
-      *, *::before, *::after {
-        cursor: auto !important;
-      }
     }
 
     /* ════════════════════════════════════════
@@ -1204,8 +1145,8 @@
     }
 
     .tag img {
-      width: 16px;
-      height: 16px;
+      width: 18px;
+      height: 18px;
       object-fit: contain;
       flex-shrink: 0;
     }
@@ -1475,10 +1416,6 @@
 
 <!-- Scroll Progress Bar -->
 <div class="scroll-progress" id="scrollProgress"></div>
-
-<!-- Custom Cursor -->
-<div id="cursor-dot"></div>
-<div id="cursor-glow"></div>
 
 <!-- ════════════════════════════════════════
      STICKY NAV
@@ -1909,7 +1846,7 @@
         <div class="skill-group-name">Cloud &amp; Infrastructure</div>
         <div class="tag-list">
           <span class="tag"><img src="https://cdn.simpleicons.org/googlecloud/4285F4" alt=""> GCP</span>
-          <span class="tag"><img src="https://cdn.simpleicons.org/amazonaws/FF9900" alt=""> AWS Kinesis</span>
+          <span class="tag"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/amazonwebservices/amazonwebservices-plain-wordmark.svg" alt=""> AWS Kinesis</span>
           <span class="tag"><img src="https://cdn.simpleicons.org/awslambda/FF9900" alt=""> Lambda</span>
           <span class="tag"><img src="https://cdn.simpleicons.org/amazons3/569A31" alt=""> S3</span>
           <span class="tag"><span class="tag-icon">&#x2726;</span> Distributed Systems</span>
@@ -1921,7 +1858,7 @@
         <div class="tag-list">
           <span class="tag"><img src="https://cdn.simpleicons.org/python/3776AB" alt=""> Python</span>
           <span class="tag"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/java/java-original.svg" alt=""> Java</span>
-          <span class="tag"><img src="https://cdn.simpleicons.org/grpc/244c5a" alt=""> gRPC</span>
+          <span class="tag"><img src="https://grpc.io/img/logos/grpc-icon-color.png" alt=""> gRPC</span>
           <span class="tag"><img src="https://cdn.simpleicons.org/postgresql/4169E1" alt=""> SQL</span>
           <span class="tag"><span class="tag-icon">&#x2726;</span> Protobuf</span>
         </div>
@@ -2059,38 +1996,6 @@ const statsObs = new IntersectionObserver(([e]) => {
   }
 }, { threshold: 0.3 });
 statsObs.observe(document.getElementById('statsRibbon'));
-
-// ── Custom cursor ──
-(function () {
-  const dot = document.getElementById('cursor-dot');
-  const glow = document.getElementById('cursor-glow');
-
-  let mouseX = 0, mouseY = 0;
-
-  document.addEventListener('mousemove', (e) => {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-    dot.style.left = mouseX + 'px';
-    dot.style.top = mouseY + 'px';
-    glow.style.left = mouseX + 'px';
-    glow.style.top = mouseY + 'px';
-  });
-
-  const interactives = document.querySelectorAll('a, button, [role="button"], input, textarea, select, label');
-  interactives.forEach((el) => {
-    el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
-    el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
-  });
-
-  document.addEventListener('mouseleave', () => {
-    dot.style.opacity = '0';
-    glow.style.opacity = '0';
-  });
-  document.addEventListener('mouseenter', () => {
-    dot.style.opacity = '1';
-    glow.style.opacity = '1';
-  });
-})();
 
 // ── Particle Swarm Canvas ──
 (function() {
