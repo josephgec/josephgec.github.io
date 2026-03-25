@@ -203,10 +203,11 @@
       left: 0;
       right: 0;
       z-index: 100;
-      background: rgba(248, 249, 251, 0.8);
+      background: rgba(12, 26, 46, 0.6);
       backdrop-filter: blur(20px) saturate(1.2);
       -webkit-backdrop-filter: blur(20px) saturate(1.2);
-      border-bottom: 1px solid var(--ink-border-subtle);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      transition: background 0.3s ease, border-color 0.3s ease;
     }
 
     .nav-inner {
@@ -223,9 +224,12 @@
       font-family: var(--font-display);
       font-size: 1.05rem;
       font-weight: 700;
-      color: var(--text-primary);
+      color: #ffffff;
       letter-spacing: -0.02em;
+      transition: color 0.3s ease;
     }
+
+    nav.scrolled .nav-name { color: var(--text-primary); }
 
     .nav-links {
       display: flex;
@@ -234,7 +238,7 @@
     }
 
     .nav-links a {
-      color: var(--text-muted);
+      color: rgba(255,255,255,0.7);
       text-decoration: none;
       font-size: 0.82rem;
       font-weight: 500;
@@ -245,7 +249,21 @@
     }
 
     .nav-links a:hover {
-      background: rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.1);
+      color: #ffffff;
+    }
+
+    nav.scrolled {
+      background: rgba(248, 249, 251, 0.9);
+      border-bottom-color: var(--ink-border-subtle);
+    }
+
+    nav.scrolled .nav-links a {
+      color: var(--text-muted);
+    }
+
+    nav.scrolled .nav-links a:hover {
+      background: rgba(0,0,0,0.04);
       color: var(--text-primary);
     }
 
@@ -259,6 +277,8 @@
       align-items: center;
       padding: 120px 32px 80px;
       overflow: hidden;
+      background: linear-gradient(145deg, #0c1a2e 0%, #0f2b4a 35%, #0e3d5e 60%, #0a4f6e 80%, #0e6480 100%);
+      color: #ffffff;
     }
 
     .hero::before {
@@ -266,8 +286,20 @@
       position: absolute;
       inset: 0;
       background:
-        radial-gradient(circle at 70% 30%, rgba(8, 145, 178, 0.07) 0%, transparent 50%),
-        radial-gradient(circle at 20% 80%, rgba(217, 119, 6, 0.05) 0%, transparent 40%);
+        radial-gradient(ellipse at 65% 20%, rgba(34, 211, 238, 0.12) 0%, transparent 55%),
+        radial-gradient(ellipse at 15% 85%, rgba(251, 191, 36, 0.08) 0%, transparent 45%),
+        radial-gradient(ellipse at 90% 80%, rgba(14, 116, 144, 0.1) 0%, transparent 40%);
+      pointer-events: none;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 120px;
+      background: linear-gradient(to top, var(--ink), transparent);
       pointer-events: none;
     }
 
@@ -275,11 +307,11 @@
       position: absolute;
       inset: 0;
       background-image:
-        radial-gradient(circle, var(--ink-border) 1px, transparent 1px);
+        radial-gradient(circle, rgba(255,255,255,0.12) 1px, transparent 1px);
       background-size: 40px 40px;
-      opacity: 0.3;
-      mask-image: radial-gradient(ellipse at 60% 40%, black 20%, transparent 70%);
-      -webkit-mask-image: radial-gradient(ellipse at 60% 40%, black 20%, transparent 70%);
+      opacity: 0.5;
+      mask-image: radial-gradient(ellipse at 60% 40%, black 15%, transparent 65%);
+      -webkit-mask-image: radial-gradient(ellipse at 60% 40%, black 15%, transparent 65%);
       pointer-events: none;
     }
 
@@ -298,7 +330,7 @@
       font-family: var(--font-mono);
       font-size: 0.78rem;
       font-weight: 500;
-      color: var(--cyan);
+      color: #67e8f9;
       letter-spacing: 0.08em;
       text-transform: uppercase;
       margin-bottom: 20px;
@@ -312,7 +344,7 @@
       content: '';
       width: 32px;
       height: 1px;
-      background: var(--cyan);
+      background: #67e8f9;
     }
 
     .hero-name {
@@ -322,11 +354,12 @@
       line-height: 1.0;
       letter-spacing: -0.04em;
       margin-bottom: 12px;
+      color: #ffffff;
       animation: revealUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
     }
 
     .hero-name .gradient-text {
-      background: linear-gradient(135deg, var(--cyan) 0%, #0e7490 40%, var(--amber) 100%);
+      background: linear-gradient(135deg, #22d3ee 0%, #67e8f9 40%, #fbbf24 100%);
       background-size: 200% auto;
       -webkit-background-clip: text;
       background-clip: text;
@@ -337,7 +370,7 @@
     .hero-tagline {
       font-size: 1.15rem;
       font-weight: 400;
-      color: var(--text-secondary);
+      color: rgba(255,255,255,0.7);
       margin-bottom: 32px;
       letter-spacing: 0.01em;
       animation: revealUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both;
@@ -354,9 +387,9 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      background: rgba(0,0,0,0.03);
-      border: 1px solid var(--ink-border);
-      color: var(--text-secondary);
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.8);
       font-size: 0.82rem;
       font-weight: 500;
       padding: 8px 16px;
@@ -366,9 +399,9 @@
     }
 
     .hero-pill:hover {
-      background: rgba(0,0,0,0.06);
-      border-color: var(--cyan-dim);
-      color: var(--text-primary);
+      background: rgba(255,255,255,0.15);
+      border-color: rgba(255,255,255,0.3);
+      color: #ffffff;
     }
 
     .hero-pill svg { flex-shrink: 0; }
@@ -383,14 +416,14 @@
       border-radius: 24px;
       object-fit: cover;
       object-position: center top;
-      border: 2px solid var(--ink-border);
-      box-shadow: var(--shadow-lg), var(--shadow-glow);
+      border: 2px solid rgba(255,255,255,0.15);
+      box-shadow: 0 24px 48px -12px rgba(0,0,0,0.4), 0 0 40px -10px rgba(34, 211, 238, 0.2);
       transition: transform var(--transition), box-shadow var(--transition);
     }
 
     .hero-avatar:hover {
       transform: scale(1.03);
-      box-shadow: var(--shadow-lg), 0 0 60px -10px rgba(34, 211, 238, 0.25);
+      box-shadow: 0 24px 48px -12px rgba(0,0,0,0.5), 0 0 60px -10px rgba(34, 211, 238, 0.3);
     }
 
     /* ════════════════════════════════════════
@@ -1702,5 +1735,14 @@
   </div>
 </footer>
 
+<script>
+const nav = document.querySelector('nav');
+const hero = document.querySelector('.hero');
+const observer = new IntersectionObserver(
+  ([e]) => nav.classList.toggle('scrolled', !e.isIntersecting),
+  { threshold: 0.1 }
+);
+observer.observe(hero);
+</script>
 </body>
 </html>
