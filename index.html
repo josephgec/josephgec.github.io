@@ -130,7 +130,10 @@
       line-height: 1.65;
       -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
-      cursor: none;
+    }
+
+    *, *::before, *::after {
+      cursor: none !important;
     }
 
     ::selection {
@@ -141,43 +144,56 @@
     /* ════════════════════════════════════════
        CUSTOM CURSOR
     ════════════════════════════════════════ */
-    .cursor-glow {
+    #cursor-dot {
       position: fixed;
-      width: 20px;
-      height: 20px;
+      top: 0;
+      left: 0;
+      width: 8px;
+      height: 8px;
+      background-color: #0891b2;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(8,145,178,0.5) 0%, transparent 70%);
       pointer-events: none;
-      z-index: 9999;
+      z-index: 99999;
       transform: translate(-50%, -50%);
-      transition: width 0.2s, height 0.2s, opacity 0.2s;
-      mix-blend-mode: normal;
+      transition: transform 0.05s ease, background-color 0.2s ease;
+      will-change: transform, left, top;
     }
 
-    .cursor-dot {
+    #cursor-glow {
       position: fixed;
-      width: 6px;
-      height: 6px;
+      top: 0;
+      left: 0;
+      width: 36px;
+      height: 36px;
+      background: radial-gradient(circle, rgba(8, 145, 178, 0.25) 0%, rgba(8, 145, 178, 0) 70%);
       border-radius: 50%;
-      background: var(--cyan);
       pointer-events: none;
-      z-index: 10000;
+      z-index: 99998;
       transform: translate(-50%, -50%);
+      transition: left 0.12s ease, top 0.12s ease, width 0.2s ease, height 0.2s ease, opacity 0.2s ease;
+      will-change: transform, left, top;
     }
 
-    .cursor-glow.hero-mode {
-      background: radial-gradient(circle, rgba(34,211,238,0.4) 0%, transparent 70%);
-      width: 40px;
-      height: 40px;
+    body.cursor-hover #cursor-dot {
+      background-color: #ffffff;
+      transform: translate(-50%, -50%) scale(1.5);
     }
 
-    .cursor-dot.hero-mode {
-      background: #22d3ee;
+    body.cursor-hover #cursor-glow {
+      width: 60px;
+      height: 60px;
+      background: radial-gradient(circle, rgba(8, 145, 178, 0.35) 0%, rgba(8, 145, 178, 0) 70%);
     }
 
-    @media (pointer: coarse) {
-      body { cursor: auto; }
-      .cursor-glow, .cursor-dot { display: none; }
+    @media (hover: none) and (pointer: coarse) {
+      #cursor-dot,
+      #cursor-glow {
+        display: none !important;
+      }
+
+      *, *::before, *::after {
+        cursor: auto !important;
+      }
     }
 
     /* ════════════════════════════════════════
@@ -295,7 +311,7 @@
       padding: 6px 14px;
       border-radius: 8px;
       transition: color var(--transition), background var(--transition);
-      cursor: none;
+
     }
 
     .nav-links a:hover {
@@ -429,7 +445,7 @@
       border-radius: 100px;
       text-decoration: none;
       transition: all var(--transition);
-      cursor: none;
+
     }
 
     .hero-pill:hover {
@@ -521,7 +537,7 @@
       text-decoration: none;
       opacity: 0.6;
       transition: opacity var(--transition), color var(--transition);
-      cursor: none;
+
     }
 
     .featured-logo:hover {
@@ -892,7 +908,7 @@
       text-decoration: none;
       margin-bottom: 24px;
       transition: all var(--transition);
-      cursor: none;
+
     }
 
     .scholar-btn:hover {
@@ -978,7 +994,7 @@
       text-decoration: none;
       color: var(--text-primary);
       transition: color var(--transition);
-      cursor: none;
+
     }
 
     a.pub-link:hover { color: var(--cyan); }
@@ -1058,7 +1074,7 @@
       transition: all var(--transition);
       position: relative;
       overflow: hidden;
-      cursor: none;
+
     }
 
     .proj-card::before {
@@ -1292,7 +1308,7 @@
       text-decoration: none;
       font-size: 0.84rem;
       transition: color var(--transition);
-      cursor: none;
+
     }
 
     .media-link:hover { color: var(--text-primary); }
@@ -1349,7 +1365,7 @@
       font-size: 0.84rem;
       font-weight: 500;
       transition: color var(--transition);
-      cursor: none;
+
     }
 
     .press-link:hover { color: var(--cyan); }
@@ -1411,7 +1427,7 @@
       color: var(--text-muted);
       text-decoration: none;
       transition: all var(--transition);
-      cursor: none;
+
     }
 
     .footer-link svg {
@@ -1452,9 +1468,6 @@
       .featured-logos { gap: 16px; }
     }
 
-    @media (pointer: coarse) {
-      body, .nav-links a, .hero-pill, .scholar-btn, a.pub-link, .proj-card, .media-link, .footer-link { cursor: auto; }
-    }
   </style>
 </head>
 <body>
@@ -1463,8 +1476,8 @@
 <div class="scroll-progress" id="scrollProgress"></div>
 
 <!-- Custom Cursor -->
-<div class="cursor-glow" id="cursorGlow"></div>
-<div class="cursor-dot" id="cursorDot"></div>
+<div id="cursor-dot"></div>
+<div id="cursor-glow"></div>
 
 <!-- ════════════════════════════════════════
      STICKY NAV
@@ -2047,25 +2060,35 @@ const statsObs = new IntersectionObserver(([e]) => {
 statsObs.observe(document.getElementById('statsRibbon'));
 
 // ── Custom cursor ──
-const glow = document.getElementById('cursorGlow');
-const dot = document.getElementById('cursorDot');
-let mx = -100, my = -100, gx = -100, gy = -100;
+(function () {
+  const dot = document.getElementById('cursor-dot');
+  const glow = document.getElementById('cursor-glow');
 
-document.addEventListener('mousemove', e => {
-  mx = e.clientX; my = e.clientY;
-  dot.style.left = mx + 'px';
-  dot.style.top = my + 'px';
-  const overHero = e.target.closest('.hero');
-  glow.classList.toggle('hero-mode', !!overHero);
-  dot.classList.toggle('hero-mode', !!overHero);
-});
+  let mouseX = 0, mouseY = 0;
 
-(function glowLoop() {
-  gx += (mx - gx) * 0.15;
-  gy += (my - gy) * 0.15;
-  glow.style.left = gx + 'px';
-  glow.style.top = gy + 'px';
-  requestAnimationFrame(glowLoop);
+  document.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    dot.style.left = mouseX + 'px';
+    dot.style.top = mouseY + 'px';
+    glow.style.left = mouseX + 'px';
+    glow.style.top = mouseY + 'px';
+  });
+
+  const interactives = document.querySelectorAll('a, button, [role="button"], input, textarea, select, label');
+  interactives.forEach((el) => {
+    el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+    el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+  });
+
+  document.addEventListener('mouseleave', () => {
+    dot.style.opacity = '0';
+    glow.style.opacity = '0';
+  });
+  document.addEventListener('mouseenter', () => {
+    dot.style.opacity = '1';
+    glow.style.opacity = '1';
+  });
 })();
 
 // ── Particle Swarm Canvas ──
