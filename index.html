@@ -5,12 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- ══ Primary SEO ══ -->
-  <title>Joseph Thomas | Software Engineer · Data Scientist · AI/ML Researcher</title>
-  <meta name="description" content="Joseph Thomas is a Software Engineer at Google Cloud specialising in Gemini, RAG, RLHF, SFT, LLMOps, and synthetic data generation. Cornell MEng CS graduate and swarm-intelligence researcher based in Saratoga, CA." />
+  <title>Joseph Thomas | Software Engineer · AI/ML · Google</title>
+  <meta name="description" content="Joseph Thomas — Software Engineer at Google Cloud building Gemini AI pipelines, LLMOps, and RLHF datasets. Cornell MEng CS. Swarm-intelligence researcher." />
   <meta name="keywords" content="Joseph Thomas, Software Engineer, Google Cloud, Data Scientist, Machine Learning, AI, Swarm Intelligence, Cornell, GenAI, LLM, Gemini, RAG, RLHF, SFT, LLMOps, DQaaS, CrowdCompute, Amazon DataCraft, gRPC, Vector Databases" />
   <meta name="author" content="Joseph Thomas" />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://jthomas.site/" />
+  <link rel="alternate" hreflang="en" href="https://jthomas.site/" />
+  <meta name="theme-color" content="#0a1628" />
 
   <!-- ══ Open Graph ══ -->
   <meta property="og:type" content="profile" />
@@ -18,6 +20,8 @@
   <meta property="og:title" content="Joseph Thomas — Software Engineer · Data Scientist · AI/ML Researcher" />
   <meta property="og:description" content="SWE at Google Cloud building Gemini-powered synthetic data pipelines, LLMOps platforms, and RLHF/SFT datasets. Cornell MEng CS. Swarm-intelligence researcher &amp; published author." />
   <meta property="og:image" content="https://jthomas.site/photo.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
   <meta property="og:locale" content="en_US" />
   <meta property="og:site_name" content="Joseph Thomas" />
   <meta property="profile:first_name" content="Joseph" />
@@ -38,6 +42,12 @@
     "url": "https://jthomas.site/",
     "image": "https://jthomas.site/photo.jpg",
     "jobTitle": "Software Engineer",
+    "honorificSuffix": "MEng",
+    "hasOccupation": {
+      "@type": "Occupation",
+      "name": "Software Engineer",
+      "occupationalCategory": "15-1252.00"
+    },
     "description": "Software Engineer at Google Cloud specialising in AI/ML data quality, GenAI/LLM systems, and large-scale data pipelines. Published researcher in swarm intelligence and evolutionary computation.",
     "address": {
       "@type": "PostalAddress",
@@ -78,14 +88,22 @@
       "https://scholar.google.com/citations?user=6RHIGk4AAAAJ",
       "https://github.com/josephgec",
       "https://www.linkedin.com/in/joseph-t-a6883013/"
-    ]
+    ],
+    "speakable": {
+      "@type": "SpeakableSpecification",
+      "cssSelector": [".hero-headline", ".hero-tagline"]
+    }
   }
   </script>
 
-  <!-- ══ Fonts ══ -->
+  <!-- ══ Fonts & Resource Hints ══ -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;400;500;600;700;800&family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+  <link rel="dns-prefetch" href="https://cdn.simpleicons.org" />
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;400;500;600;700;800&family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
 
   <style>
     /* ════════════════════════════════════════
@@ -101,7 +119,7 @@
       --ink-border-subtle: #e4e7ec;
       --text-primary: #111827;
       --text-secondary: #4b5563;
-      --text-muted: #6b7280;
+      --text-muted: #566068;
       --cyan: #0891b2;
       --cyan-dim: #0e7490;
       --cyan-glow: rgba(8, 145, 178, 0.08);
@@ -135,6 +153,11 @@
     ::selection {
       background: var(--cyan);
       color: #ffffff;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--cyan);
+      outline-offset: 2px;
     }
 
     /* ════════════════════════════════════════
@@ -476,13 +499,11 @@
       font-size: 0.95rem;
       color: var(--text-muted);
       text-decoration: none;
-      opacity: 0.6;
-      transition: opacity var(--transition), color var(--transition);
+      transition: color var(--transition);
 
     }
 
     .featured-logo:hover {
-      opacity: 1;
       color: var(--text-primary);
     }
 
@@ -841,7 +862,7 @@
       gap: 8px;
       background: var(--cyan-glow);
       border: 1px solid rgba(8, 145, 178, 0.15);
-      color: var(--cyan);
+      color: #0a6b87;
       font-weight: 600;
       font-size: 0.82rem;
       padding: 10px 20px;
@@ -1410,6 +1431,12 @@
       .featured-logos { gap: 16px; }
     }
 
+    @media print {
+      nav, .scroll-progress, .hero-canvas { display: none; }
+      .hero { background: #0a1628; min-height: auto; padding: 40px 20px; }
+      .section, .section-alt { page-break-inside: avoid; }
+    }
+
   </style>
 </head>
 <body>
@@ -1463,11 +1490,12 @@
       </div>
     </div>
     <div class="hero-right">
-      <img class="hero-avatar" src="photo.jpg" alt="Joseph Thomas" />
+      <img class="hero-avatar" src="photo.jpg" alt="Joseph Thomas" fetchpriority="high" />
     </div>
   </div>
 </header>
 
+<main>
 <!-- ════════════════════════════════════════
      FEATURED IN STRIP
 ════════════════════════════════════════ -->
@@ -1833,7 +1861,7 @@
       <div class="skill-group sg-ai reveal">
         <div class="skill-group-name">GenAI &amp; ML</div>
         <div class="tag-list">
-          <span class="tag"><img src="https://cdn.simpleicons.org/googlegemini/4285F4" alt=""> Gemini</span>
+          <span class="tag"><img src="https://cdn.simpleicons.org/googlegemini/4285F4" alt="Gemini icon"> Gemini</span>
           <span class="tag"><span class="tag-icon">&#x2726;</span> RAG</span>
           <span class="tag"><span class="tag-icon">&#x2726;</span> RLHF</span>
           <span class="tag"><span class="tag-icon">&#x2726;</span> SFT</span>
@@ -1845,10 +1873,10 @@
       <div class="skill-group sg-cloud reveal reveal-d1">
         <div class="skill-group-name">Cloud &amp; Infrastructure</div>
         <div class="tag-list">
-          <span class="tag"><img src="https://cdn.simpleicons.org/googlecloud/4285F4" alt=""> GCP</span>
-          <span class="tag"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/amazonwebservices/amazonwebservices-plain-wordmark.svg" alt=""> AWS Kinesis</span>
-          <span class="tag"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/amazonwebservices/amazonwebservices-original-wordmark.svg" alt=""> Lambda</span>
-          <span class="tag"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/amazonwebservices/amazonwebservices-original-wordmark.svg" alt=""> S3</span>
+          <span class="tag"><img src="https://cdn.simpleicons.org/googlecloud/4285F4" alt="Google Cloud icon"> GCP</span>
+          <span class="tag"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/amazonwebservices/amazonwebservices-plain-wordmark.svg" alt="AWS icon"> AWS Kinesis</span>
+          <span class="tag"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/amazonwebservices/amazonwebservices-original-wordmark.svg" alt="AWS Lambda icon"> Lambda</span>
+          <span class="tag"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/amazonwebservices/amazonwebservices-original-wordmark.svg" alt="AWS S3 icon"> S3</span>
           <span class="tag"><span class="tag-icon">&#x2726;</span> Distributed Systems</span>
           <span class="tag"><span class="tag-icon">&#x2726;</span> Vector Databases</span>
         </div>
@@ -1856,10 +1884,10 @@
       <div class="skill-group sg-lang reveal reveal-d2">
         <div class="skill-group-name">Languages &amp; Backend</div>
         <div class="tag-list">
-          <span class="tag"><img src="https://cdn.simpleicons.org/python/3776AB" alt=""> Python</span>
-          <span class="tag"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/java/java-original.svg" alt=""> Java</span>
-          <span class="tag"><img src="https://grpc.io/img/logos/grpc-icon-color.png" alt=""> gRPC</span>
-          <span class="tag"><img src="https://cdn.simpleicons.org/postgresql/4169E1" alt=""> SQL</span>
+          <span class="tag"><img src="https://cdn.simpleicons.org/python/3776AB" alt="Python icon"> Python</span>
+          <span class="tag"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/java/java-original.svg" alt="Java icon"> Java</span>
+          <span class="tag"><img src="https://grpc.io/img/logos/grpc-icon-color.png" alt="gRPC icon"> gRPC</span>
+          <span class="tag"><img src="https://cdn.simpleicons.org/postgresql/4169E1" alt="PostgreSQL icon"> SQL</span>
           <span class="tag"><span class="tag-icon">&#x2726;</span> Protobuf</span>
         </div>
       </div>
@@ -1928,6 +1956,7 @@
   </div>
 </section>
 
+</main>
 <!-- ════════════════════════════════════════
      FOOTER
 ════════════════════════════════════════ -->
@@ -1939,13 +1968,13 @@
       <div class="footer-copy">Saratoga, CA · Software Engineer · Google Cloud</div>
     </div>
     <div class="footer-links">
-      <a class="footer-link" href="https://scholar.google.com/citations?user=6RHIGk4AAAAJ&hl=en&oi=sra" target="_blank" rel="noopener noreferrer" title="Google Scholar">
+      <a class="footer-link" href="https://scholar.google.com/citations?user=6RHIGk4AAAAJ&hl=en&oi=sra" target="_blank" rel="noopener noreferrer" title="Google Scholar" aria-label="Google Scholar">
         <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 14l9-5-9-5-9 5 9 5z"/><path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
       </a>
-      <a class="footer-link" href="https://github.com/josephgec" target="_blank" rel="noopener noreferrer" title="GitHub">
+      <a class="footer-link" href="https://github.com/josephgec" target="_blank" rel="noopener noreferrer" title="GitHub" aria-label="GitHub">
         <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844a9.59 9.59 0 012.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
       </a>
-      <a class="footer-link" href="https://www.linkedin.com/in/joseph-t-a6883013/" target="_blank" rel="noopener noreferrer" title="LinkedIn">
+      <a class="footer-link" href="https://www.linkedin.com/in/joseph-t-a6883013/" target="_blank" rel="noopener noreferrer" title="LinkedIn" aria-label="LinkedIn">
         <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
       </a>
     </div>
@@ -1964,6 +1993,22 @@ const navObs = new IntersectionObserver(
   { threshold: 0.05 }
 );
 navObs.observe(hero);
+
+// ── Active nav section highlight ──
+const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+const sections = Array.from(navLinks).map(a => document.getElementById(a.getAttribute('href').slice(1)));
+const sectionObs = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    const link = document.querySelector('.nav-links a[href="#' + entry.target.id + '"]');
+    if (link) {
+      if (entry.isIntersecting) {
+        navLinks.forEach(l => l.removeAttribute('aria-current'));
+        link.setAttribute('aria-current', 'page');
+      }
+    }
+  });
+}, { threshold: 0.3 });
+sections.forEach(s => { if (s) sectionObs.observe(s); });
 
 // ── Scroll progress bar ──
 const progressBar = document.getElementById('scrollProgress');
