@@ -103,6 +103,7 @@
   <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
   <link rel="dns-prefetch" href="https://cdn.simpleicons.org" />
   <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&display=swap" />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;400;500;600;700;800&family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
 
   <style>
@@ -1451,10 +1452,10 @@
   <div class="nav-inner">
     <span class="nav-name">JT</span>
     <ul class="nav-links">
-      <li><a href="#experience">Experience</a></li>
-      <li><a href="#education">Education</a></li>
-      <li><a href="#publications">Research</a></li>
-      <li><a href="#projects">Projects</a></li>
+      <li><a href="#experience" aria-label="Jump to Experience section">Experience</a></li>
+      <li><a href="#education" aria-label="Jump to Education section">Education</a></li>
+      <li><a href="#publications" aria-label="Jump to Research section">Research</a></li>
+      <li><a href="#projects" aria-label="Jump to Projects section">Projects</a></li>
     </ul>
   </div>
 </nav>
@@ -1490,7 +1491,7 @@
       </div>
     </div>
     <div class="hero-right">
-      <img class="hero-avatar" src="photo.jpg" alt="Joseph Thomas" fetchpriority="high" />
+      <img class="hero-avatar" src="photo.jpg" alt="Joseph Thomas" fetchpriority="high" loading="lazy" width="190" height="190" />
     </div>
   </div>
 </header>
@@ -1522,23 +1523,23 @@
 <div class="stats-ribbon" id="statsRibbon">
   <div class="stats-ribbon-inner">
     <div class="stat-item reveal">
-      <div class="stat-number accent-cyan" data-target="21">0</div>
+      <div class="stat-number accent-cyan" data-target="21">21</div>
       <div class="stat-label">Google Awards</div>
     </div>
     <div class="stat-item reveal reveal-d1">
-      <div class="stat-number" data-target="27">0</div>
+      <div class="stat-number" data-target="27">27</div>
       <div class="stat-label">Citations</div>
     </div>
     <div class="stat-item reveal reveal-d2">
-      <div class="stat-number accent-amber" data-target="1">0</div>
+      <div class="stat-number accent-amber" data-target="1">1</div>
       <div class="stat-label">US Patent</div>
     </div>
     <div class="stat-item reveal reveal-d3">
-      <div class="stat-number" data-target="4">0</div>
+      <div class="stat-number" data-target="4">4</div>
       <div class="stat-label">Publications</div>
     </div>
     <div class="stat-item reveal reveal-d4">
-      <div class="stat-number" data-target="10" data-suffix="B+">0</div>
+      <div class="stat-number" data-target="10" data-suffix="B+">10B+</div>
       <div class="stat-label">Events / Day</div>
     </div>
   </div>
@@ -2027,6 +2028,7 @@ const statsObs = new IntersectionObserver(([e]) => {
     counters.forEach(el => {
       const target = +el.dataset.target;
       const suffix = el.dataset.suffix || '';
+      el.textContent = '0';
       const duration = 1200;
       const start = performance.now();
       const tick = (now) => {

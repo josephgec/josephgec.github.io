@@ -1,4 +1,4 @@
 User-agent: *
-Allow: /
+Disallow:
 
-Sitemap: https://josephgec.github.io/sitemap.xml
+Sitemap: https://jthomas.site/sitemap.xml
