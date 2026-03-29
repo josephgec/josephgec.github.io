@@ -1984,6 +1984,22 @@ const navObs = new IntersectionObserver(
 );
 navObs.observe(hero);
 
+// ── Active nav section highlight ──
+const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+const sections = Array.from(navLinks).map(a => document.getElementById(a.getAttribute('href').slice(1)));
+const sectionObs = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    const link = document.querySelector('.nav-links a[href="#' + entry.target.id + '"]');
+    if (link) {
+      if (entry.isIntersecting) {
+        navLinks.forEach(l => l.removeAttribute('aria-current'));
+        link.setAttribute('aria-current', 'page');
+      }
+    }
+  });
+}, { threshold: 0.3 });
+sections.forEach(s => { if (s) sectionObs.observe(s); });
+
 // ── Scroll progress bar ──
 const progressBar = document.getElementById('scrollProgress');
 window.addEventListener('scroll', () => {
