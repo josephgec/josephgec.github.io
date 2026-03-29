@@ -1427,6 +1427,12 @@
       .featured-logos { gap: 16px; }
     }
 
+    @media print {
+      nav, .scroll-progress, .hero-canvas { display: none; }
+      .hero { background: #0a1628; min-height: auto; padding: 40px 20px; }
+      .section, .section-alt { page-break-inside: avoid; }
+    }
+
   </style>
 </head>
 <body>
