@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- ══ Primary SEO ══ -->
+  <title>Consulting · Joseph Thomas | AI/ML Advisory &amp; Architecture</title>
+  <meta name="description" content="AI/ML consulting for teams building at scale. GenAI strategy, LLMOps, synthetic data, and production ML infrastructure from an engineer with 7+ years at Google and Amazon." />
+  <meta name="keywords" content="AI consulting, ML consulting, GenAI advisory, LLMOps, RAG, RLHF, synthetic data, technical due diligence, Joseph Thomas, Gemini, Cornell, Google Cloud" />
+  <meta name="author" content="Joseph Thomas" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://jthomas.site/consulting" />
+  <link rel="alternate" hreflang="en" href="https://jthomas.site/consulting" />
+  <meta name="theme-color" content="#0a1628" />
+
+  <!-- ══ Open Graph ══ -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://jthomas.site/consulting" />
+  <meta property="og:title" content="Consulting · Joseph Thomas | AI/ML Advisory &amp; Architecture" />
+  <meta property="og:description" content="GenAI strategy, LLMOps, synthetic data, and production ML infrastructure consulting. Advisory calls, embedded retainers, and project sprints." />
+  <meta property="og:image" content="https://jthomas.site/photo.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:site_name" content="Joseph Thomas" />
+
+  <!-- ══ Twitter Card ══ -->
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Consulting · Joseph Thomas | AI/ML Advisory" />
+  <meta name="twitter:description" content="AI/ML consulting for teams building at scale. GenAI, LLMOps, synthetic data, and production ML infrastructure." />
+  <meta name="twitter:image" content="https://jthomas.site/photo.jpg" />
+
+  <!-- ══ JSON-LD Structured Data ══ -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ProfessionalService",
+    "name": "Joseph Thomas — AI/ML Consulting",
+    "url": "https://jthomas.site/consulting",
+    "image": "https://jthomas.site/photo.jpg",
+    "description": "AI/ML consulting for teams building at scale. GenAI strategy, LLMOps, synthetic data, and production ML infrastructure.",
+    "provider": {
+      "@type": "Person",
+      "name": "Joseph Thomas",
+      "url": "https://jthomas.site/",
+      "jobTitle": "Software Engineer",
+      "worksFor": {
+        "@type": "Organization",
+        "name": "Google",
+        "department": "Google Cloud"
+      }
+    },
+    "areaServed": "Worldwide",
+    "serviceType": [
+      "GenAI Strategy &amp; Architecture",
+      "LLMOps &amp; ML Infrastructure",
+      "Synthetic Data &amp; RLHF",
+      "Data Platform &amp; Pipelines",
+      "Technical Due Diligence",
+      "Speaking &amp; Workshops"
+    ],
+    "hasOfferCatalog": {
+      "@type": "OfferCatalog",
+      "name": "Engagement Models",
+      "itemListElement": [
+        {
+          "@type": "Offer",
+          "name": "Advisory Call",
+          "description": "One-time 90-minute focused deep-dive with follow-up summary."
+        },
+        {
+          "@type": "Offer",
+          "name": "Embedded Advisor",
+          "description": "Monthly retainer with weekly sessions and async access."
+        },
+        {
+          "@type": "Offer",
+          "name": "Project Sprint",
+          "description": "Fixed-scope 2–8 week end-to-end delivery with handoff."
+        }
+      ]
+    }
+  }
+  </script>
+
+  <!-- ══ Fonts & Resource Hints ══ -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&display=swap" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;400;500;600;700;800&family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- Scroll Progress Bar -->
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<!-- ════════════════════════════════════════
+     STICKY NAV
+════════════════════════════════════════ -->
+<nav aria-label="Site navigation" id="mainNav">
+  <div class="nav-inner">
+    <a class="nav-name" href="index.html" style="text-decoration:none;">JT</a>
+    <ul class="nav-links">
+      <li><a href="index.html#experience" aria-label="View Experience on homepage">Experience</a></li>
+      <li><a href="index.html#education" aria-label="View Education on homepage">Education</a></li>
+      <li><a href="index.html#publications" aria-label="View Research on homepage">Research</a></li>
+      <li><a href="index.html#projects" aria-label="View Projects on homepage">Projects</a></li>
+      <li><a href="consulting.html" aria-label="Consulting services" aria-current="page">Consulting</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ════════════════════════════════════════
+     HERO — Particle Swarm Canvas
+════════════════════════════════════════ -->
+<header class="hero" id="hero">
+  <canvas class="hero-canvas" id="swarmCanvas"></canvas>
+  <div class="hero-inner" style="grid-template-columns: 1fr;">
+    <div>
+      <div class="hero-eyebrow">Consulting · AI/ML Advisory</div>
+      <h1 class="hero-headline">AI &amp; ML Consulting<br/>for teams building at <span class="gradient-text">scale.</span></h1>
+      <p class="hero-sub">7+ years shipping AI infrastructure at Google, Amazon, and high-growth startups.</p>
+      <p class="hero-tagline">From GenAI strategy to production LLMOps — I help engineering teams solve hard problems faster. Advisory, embedded, or project-based engagements.</p>
+      <div class="hero-actions">
+        <span class="hero-pill status">
+          <span class="status-dot"></span>
+          Accepting select engagements
+        </span>
+        <a class="hero-pill" href="mailto:josephgec@gmail.com?subject=Consulting%20inquiry">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Start a conversation →
+        </a>
+        <a class="hero-pill" href="https://www.linkedin.com/in/joseph-t-a6883013/" target="_blank" rel="noopener noreferrer">
+          <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          LinkedIn
+        </a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- ════════════════════════════════════════
+     CREDENTIALS (Stats Ribbon)
+════════════════════════════════════════ -->
+<div class="stats-ribbon" id="statsRibbon">
+  <div class="stats-ribbon-inner" style="grid-template-columns: repeat(4, 1fr);">
+    <div class="stat-item reveal">
+      <div class="stat-number accent-cyan" data-target="7" data-suffix="+">7+</div>
+      <div class="stat-label">Years Google &amp; Amazon</div>
+    </div>
+    <div class="stat-item reveal reveal-d1">
+      <div class="stat-number" data-target="10" data-suffix="B+">10B+</div>
+      <div class="stat-label">Events / Day at Scale</div>
+    </div>
+    <div class="stat-item reveal reveal-d2">
+      <div class="stat-number accent-amber" data-target="1">1</div>
+      <div class="stat-label">US Patent · Swarm AI</div>
+    </div>
+    <div class="stat-item reveal reveal-d3">
+      <div class="stat-number" data-target="27">27</div>
+      <div class="stat-label">Academic Citations</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     SERVICES
+════════════════════════════════════════ -->
+<section class="section" id="services">
+  <div class="section-inner">
+    <div class="section-header">
+      <h2 class="section-title">Services</h2>
+      <div class="section-line"></div>
+      <span class="section-count">06 offerings</span>
+    </div>
+
+    <div class="proj-grid">
+      <div class="proj-card reveal">
+        <div class="proj-header">
+          <span class="proj-name">GenAI Strategy &amp; Architecture</span>
+          <span class="proj-lang">Strategy</span>
+        </div>
+        <div class="proj-desc">End-to-end guidance on adopting LLMs, RAG pipelines, and agentic workflows. Technical architecture reviews and build-vs-buy analysis for teams moving from prototype to production.</div>
+        <div class="proj-footer">LLM Selection · RAG Design · Cost Optimization · Roadmap</div>
+      </div>
+
+      <div class="proj-card reveal reveal-d1">
+        <div class="proj-header">
+          <span class="proj-name">LLMOps &amp; ML Infrastructure</span>
+          <span class="proj-lang">Platform</span>
+        </div>
+        <div class="proj-desc">Production-grade ML platforms: prompt versioning, evaluation frameworks, model serving, and continuous fine-tuning pipelines. Hardened patterns drawn from Google's own internal stack.</div>
+        <div class="proj-footer">LLMOps · gRPC/Protobuf · Evaluation · CI/CD</div>
+      </div>
+
+      <div class="proj-card reveal reveal-d2">
+        <div class="proj-header">
+          <span class="proj-name">Synthetic Data &amp; RLHF</span>
+          <span class="proj-lang">Data</span>
+        </div>
+        <div class="proj-desc">High-fidelity data generation pipelines for instruction tuning and alignment. Gemini-powered workflows for SFT and RLHF — the same techniques used at scale inside Google Cloud AI.</div>
+        <div class="proj-footer">Gemini · SFT · RLHF · Data Quality</div>
+      </div>
+
+      <div class="proj-card reveal reveal-d3">
+        <div class="proj-header">
+          <span class="proj-name">Data Platform &amp; Pipelines</span>
+          <span class="proj-lang">Infra</span>
+        </div>
+        <div class="proj-desc">Scalable data ingestion and real-time event streaming, data lake design, and warehouse architecture. Battle-tested patterns from building systems processing 10B+ events/day.</div>
+        <div class="proj-footer">Kinesis · GCP · AWS · Distributed Systems</div>
+      </div>
+
+      <div class="proj-card reveal reveal-d4">
+        <div class="proj-header">
+          <span class="proj-name">Technical Due Diligence</span>
+          <span class="proj-lang">Diligence</span>
+        </div>
+        <div class="proj-desc">AI/ML technical assessments for investors and acquirers. Architecture reviews, risk analysis, team and codebase health, and competitive benchmarking with clear written deliverables.</div>
+        <div class="proj-footer">Assessment · Risk Analysis · Benchmarking</div>
+      </div>
+
+      <div class="proj-card reveal reveal-d5">
+        <div class="proj-header">
+          <span class="proj-name">Speaking &amp; Workshops</span>
+          <span class="proj-lang">Speaking</span>
+        </div>
+        <div class="proj-desc">Keynotes, technical talks, and hands-on workshops on GenAI, swarm intelligence, and building AI at scale. Previous venues include IDSIA (Switzerland) and the University of New Brunswick.</div>
+        <div class="proj-footer">Keynotes · Workshops · Team Training</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════
+     ENGAGEMENT MODELS
+════════════════════════════════════════ -->
+<section class="section section-alt" id="engagement">
+  <div class="section-inner">
+    <div class="section-header">
+      <h2 class="section-title">Engagement Models</h2>
+      <div class="section-line"></div>
+      <span class="section-count">03 formats</span>
+    </div>
+
+    <div class="edu-grid">
+      <div class="edu-card reveal">
+        <div class="edu-icon" style="background:rgba(8,145,178,0.1);color:var(--cyan);">90m</div>
+        <div class="edu-degree">Advisory Call</div>
+        <div class="edu-school">One-time · 90 minutes</div>
+        <div class="edu-detail">Focused deep-dive into your architecture, roadmap, or a specific technical problem. Includes a follow-up written summary with actionable recommendations.</div>
+        <div class="edu-meta">
+          <span class="edu-date">Deep dive</span>
+        </div>
+      </div>
+
+      <div class="edu-card reveal reveal-d1">
+        <div class="edu-icon" style="background:rgba(217,119,6,0.1);color:var(--amber);">∞</div>
+        <div class="edu-degree">Embedded Advisor</div>
+        <div class="edu-school">Monthly retainer · Ongoing</div>
+        <div class="edu-detail">Weekly sessions plus async access for architecture reviews, code reviews, and hands-on prototyping. Deep integration with your team's existing workflow and tools.</div>
+        <div class="edu-meta">
+          <span class="edu-date">Ongoing</span>
+          <span class="edu-gpa">POPULAR</span>
+        </div>
+      </div>
+
+      <div class="edu-card reveal reveal-d2">
+        <div class="edu-icon" style="background:rgba(124,58,237,0.1);color:var(--violet);">2–8w</div>
+        <div class="edu-degree">Project Sprint</div>
+        <div class="edu-school">Fixed scope · 2–8 weeks</div>
+        <div class="edu-detail">End-to-end delivery for a bounded problem — architecture, implementation, documentation, and knowledge transfer to your team. Fixed scope, fixed timeline, fixed price.</div>
+        <div class="edu-meta">
+          <span class="edu-date">Delivery</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════
+     PROCESS
+════════════════════════════════════════ -->
+<section class="section" id="process">
+  <div class="section-inner">
+    <div class="section-header">
+      <h2 class="section-title">How We Work Together</h2>
+      <div class="section-line"></div>
+      <span class="section-count">04 steps</span>
+    </div>
+
+    <div class="timeline">
+      <article class="tl-entry reveal">
+        <div class="tl-card">
+          <div class="tl-card-header">
+            <span class="tl-card-title">01 — Discovery Call</span>
+            <span class="tl-card-date">30 min · Free</span>
+          </div>
+          <div class="tl-card-sub">No prep needed — bring whatever is top of mind</div>
+          <ul>
+            <li>Quick introduction and overview of your current challenge or goal</li>
+            <li>High-level assessment and initial thoughts on approach</li>
+            <li>Determine if there's a mutual fit for a deeper engagement</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="tl-entry reveal">
+        <div class="tl-card">
+          <div class="tl-card-header">
+            <span class="tl-card-title">02 — Proposal &amp; Scoping</span>
+            <span class="tl-card-date">Within 48 hrs</span>
+          </div>
+          <div class="tl-card-sub">Clear scope, transparent pricing</div>
+          <ul>
+            <li>Written proposal with objectives, deliverables, and milestones</li>
+            <li>Pricing options — fixed scope, hourly, or monthly retainer</li>
+            <li>Revision cycle until we both feel confident in the plan</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="tl-entry reveal">
+        <div class="tl-card">
+          <div class="tl-card-header">
+            <span class="tl-card-title">03 — Execute &amp; Deliver</span>
+            <span class="tl-card-date">Duration varies</span>
+          </div>
+          <div class="tl-card-sub">Hands-on work, async-first collaboration</div>
+          <ul>
+            <li>Regular check-ins via your existing tools (Slack, GitHub, Jira, Linear)</li>
+            <li>Iterative delivery with weekly demos and progress reports</li>
+            <li>Code reviews, pair programming, and architecture guidance as needed</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="tl-entry reveal">
+        <div class="tl-card">
+          <div class="tl-card-header">
+            <span class="tl-card-title">04 — Handoff &amp; Support</span>
+            <span class="tl-card-date">+2 weeks</span>
+          </div>
+          <div class="tl-card-sub">Knowledge stays with your team</div>
+          <ul>
+            <li>Full documentation, runbooks, and architecture decision records</li>
+            <li>Team walkthroughs and Q&amp;A sessions on the delivered work</li>
+            <li>Two weeks of post-engagement support included at no additional cost</li>
+          </ul>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════
+     CTA
+════════════════════════════════════════ -->
+<div class="pullquote-section" id="contact">
+  <div class="pullquote-inner reveal">
+    <blockquote class="pullquote">Let's build something remarkable.</blockquote>
+    <div class="pullquote-attr">Working with teams shipping to production · limited availability</div>
+    <div class="hero-actions" style="justify-content:center;margin-top:28px;">
+      <a class="scholar-btn" href="mailto:josephgec@gmail.com?subject=Consulting%20inquiry" style="margin-bottom:0;">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Get in touch →
+      </a>
+      <a class="scholar-btn" href="https://www.linkedin.com/in/joseph-t-a6883013/" target="_blank" rel="noopener noreferrer" style="margin-bottom:0;">
+        <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        Connect on LinkedIn
+      </a>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- ════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════ -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-cta">Open to advising, speaking engagements, and research collaborations.</div>
+      <div class="footer-brand">Joseph Thomas</div>
+      <div class="footer-copy">Saratoga, CA · Software Engineer · Google Cloud</div>
+    </div>
+    <div class="footer-links">
+      <a class="footer-link" href="https://scholar.google.com/citations?user=6RHIGk4AAAAJ&hl=en&oi=sra" target="_blank" rel="noopener noreferrer" title="Google Scholar" aria-label="Google Scholar">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 14l9-5-9-5-9 5 9 5z"/><path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+      </a>
+      <a class="footer-link" href="https://github.com/josephgec" target="_blank" rel="noopener noreferrer" title="GitHub" aria-label="GitHub">
+        <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844a9.59 9.59 0 012.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+      </a>
+      <a class="footer-link" href="https://www.linkedin.com/in/joseph-t-a6883013/" target="_blank" rel="noopener noreferrer" title="LinkedIn" aria-label="LinkedIn">
+        <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+      </a>
+    </div>
+  </div>
+</footer>
+
+<!-- ════════════════════════════════════════
+     SCRIPTS
+════════════════════════════════════════ -->
+<script>
+// ── Nav scroll transition ──
+const nav = document.getElementById('mainNav');
+const hero = document.getElementById('hero');
+const navObs = new IntersectionObserver(
+  ([e]) => nav.classList.toggle('scrolled', !e.isIntersecting),
+  { threshold: 0.05 }
+);
+navObs.observe(hero);
+
+// ── Active nav section highlight ──
+const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+const sections = Array.from(navLinks).map(a => document.getElementById(a.getAttribute('href').slice(1)));
+const sectionObs = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    const link = document.querySelector('.nav-links a[href="#' + entry.target.id + '"]');
+    if (link) {
+      if (entry.isIntersecting) {
+        navLinks.forEach(l => l.removeAttribute('aria-current'));
+        link.setAttribute('aria-current', 'page');
+      }
+    }
+  });
+}, { threshold: 0.3 });
+sections.forEach(s => { if (s) sectionObs.observe(s); });
+
+// ── Scroll progress bar ──
+const progressBar = document.getElementById('scrollProgress');
+window.addEventListener('scroll', () => {
+  const h = document.documentElement;
+  const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+  progressBar.style.width = pct + '%';
+}, { passive: true });
+
+// ── Animated count-up numbers ──
+const counters = document.querySelectorAll('[data-target]');
+let counted = false;
+const statsRibbon = document.getElementById('statsRibbon');
+if (statsRibbon) {
+  const statsObs = new IntersectionObserver(([e]) => {
+    if (e.isIntersecting && !counted) {
+      counted = true;
+      counters.forEach(el => {
+        const target = +el.dataset.target;
+        const suffix = el.dataset.suffix || '';
+        el.textContent = '0';
+        const duration = 1200;
+        const start = performance.now();
+        const tick = (now) => {
+          const t = Math.min((now - start) / duration, 1);
+          const ease = 1 - Math.pow(1 - t, 3);
+          const val = Math.round(ease * target);
+          el.textContent = val + (t >= 1 ? suffix : '');
+          if (t < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      });
+    }
+  }, { threshold: 0.3 });
+  statsObs.observe(statsRibbon);
+}
+
+// ── Particle Swarm Canvas ──
+(function() {
+  const canvas = document.getElementById('swarmCanvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, mouse = { x: -9999, y: -9999 };
+  const particles = [];
+  const COUNT = 80;
+  const CONNECT_DIST = 140;
+
+  function resize() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    W = canvas.width = rect.width;
+    H = canvas.height = rect.height;
+  }
+
+  function Particle() {
+    this.x = Math.random() * W;
+    this.y = Math.random() * H;
+    this.vx = (Math.random() - 0.5) * 0.6;
+    this.vy = (Math.random() - 0.5) * 0.6;
+    this.r = Math.random() * 2 + 1;
+  }
+
+  Particle.prototype.update = function() {
+    const dx = mouse.x - this.x;
+    const dy = mouse.y - this.y;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    if (dist < 300 && dist > 1) {
+      const force = 0.0003 * (300 - dist);
+      this.vx += (dx / dist) * force;
+      this.vy += (dy / dist) * force;
+    }
+    this.vx *= 0.995;
+    this.vy *= 0.995;
+    this.x += this.vx;
+    this.y += this.vy;
+    if (this.x < 0) this.x = W;
+    if (this.x > W) this.x = 0;
+    if (this.y < 0) this.y = H;
+    if (this.y > H) this.y = 0;
+  };
+
+  function init() {
+    resize();
+    for (let i = 0; i < COUNT; i++) particles.push(new Particle());
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const d = Math.sqrt(dx*dx + dy*dy);
+        if (d < CONNECT_DIST) {
+          const alpha = (1 - d / CONNECT_DIST) * 0.15;
+          ctx.strokeStyle = 'rgba(103, 232, 249,' + alpha + ')';
+          ctx.lineWidth = 0.8;
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+    for (const p of particles) {
+      p.update();
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(103, 232, 249, 0.6)';
+      ctx.fill();
+    }
+    requestAnimationFrame(draw);
+  }
+
+  hero.addEventListener('mousemove', e => {
+    const rect = canvas.getBoundingClientRect();
+    mouse.x = e.clientX - rect.left;
+    mouse.y = e.clientY - rect.top;
+  });
+
+  hero.addEventListener('mouseleave', () => {
+    mouse.x = -9999;
+    mouse.y = -9999;
+  });
+
+  window.addEventListener('resize', resize);
+  init();
+  draw();
+})();
+</script>
+
+</body>
+</html>
