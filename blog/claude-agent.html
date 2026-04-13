@@ -87,7 +87,7 @@
       <div class="post-meta">
         <span class="writing-date">April 2026</span>
         <span class="proj-lang">AI Agents</span>
-        <span class="writing-read-time">11 min read</span>
+        <span class="writing-read-time">12 min read</span>
       </div>
       <h1 class="post-title">Two AIs, One Loop — Building a Self-Improving Code Agent</h1>
       <p class="post-lede">A well-designed two-agent architecture — one LLM planning, another implementing, with git diffs and test results flowing between them — captures most of the value of multi-agent coding systems while avoiding their complexity. Here's what I built, and what the research literature says about why it works.</p>
@@ -96,6 +96,8 @@
 
   <div class="post-body">
     <p>LLMs are remarkable at taking a bounded request and producing code. But real software engineering isn't bounded. Building a feature means planning, coding, testing, discovering you got it wrong, and trying again. It's iterative by nature.</p>
+
+    <p>Tools like Claude Code already iterate internally — gather context, take action, verify, repeat. But they mix planning and coding in a single context window. When one instance does both, there's a strong bias toward jumping to code even when the right move is to stop and think. What if you could split the roles and give each one room to do its job fully?</p>
 
     <p>I wanted to see what would happen if I closed the loop myself. Not a fancy multi-agent framework. Not a task tree. Just two Claude Code instances wired together in a cycle, with an orchestrator forwarding context, diffs, and test results between them until the job is done.</p>
 
@@ -126,6 +128,8 @@
 
     <p>Anthropic's own "Building Effective Agents" post (December 2024) names two of its five recommended patterns directly: <strong>Orchestrator-Workers</strong> and <strong>Evaluator-Optimizer</strong>. A Planner/Implementer loop is exactly the Evaluator-Optimizer pattern with a small twist — the evaluator and the planner are the same agent, holding the long-running plan in its head while reviewing each implementation step. As Anthropic put it: <em>"the most successful implementations weren't using complex frameworks... they were building with simple, composable patterns."</em></p>
 
+    <p>The dual-process framing from cognitive science maps cleanly onto the two roles. The Implementer is System 1 — fast, reactive, focused on execution. The Planner is System 2 — slower, deliberate, focused on what should happen next and why. The split isn't strictly necessary, but it's recognizably useful, and the research above suggests the small extra latency is worth it.</p>
+
     <p>There's also a practical reason. A single Claude instance asked to both plan and code has a strong bias toward writing code, even when the right move is to stop and think. Splitting the roles forces each instance to do its job fully before handing off. I noticed this within an hour of testing — the moment I gave one model both jobs, it stopped reasoning about whether the previous step was actually correct.</p>
 
     <h2>Two Roles, One Goal</h2>
@@ -138,33 +142,55 @@
     <h2>Architecture</h2>
     <p>The orchestrator is a thin Python shim. It holds the conversation state for each role, captures git diffs and test output between rounds, and forwards a curated context packet to each Planner turn.</p>
 
-    <div class="arch-diagram" aria-label="Architecture diagram">
-      <div class="arch-node arch-input">
-        <div class="arch-label">User Goal</div>
-        <div class="arch-sub">one-sentence request</div>
-      </div>
-      <div class="arch-arrow"></div>
-      <div class="arch-node">
-        <div class="arch-label">Orchestrator</div>
-        <div class="arch-sub">gather context · forward diffs &amp; tests</div>
-      </div>
-      <div class="arch-arrow"></div>
-      <div class="arch-node arch-planner">
-        <div class="arch-label">Planner</div>
-        <div class="arch-sub">decide the next step</div>
-      </div>
-      <div class="arch-arrow"></div>
-      <div class="arch-node arch-impl">
-        <div class="arch-label">Implementer</div>
-        <div class="arch-sub">make the changes</div>
-      </div>
-      <div class="arch-arrow"></div>
-      <div class="arch-node">
-        <div class="arch-label">Feedback</div>
-        <div class="arch-sub">git diff · test results · output</div>
-      </div>
-      <div class="arch-loop">↺ back to Planner — or GOAL COMPLETE</div>
-    </div>
+    <figure class="svg-figure">
+      <svg viewBox="0 0 680 460" width="100%" role="img" aria-label="Architecture diagram showing the cyclic Planner / Implementer feedback loop">
+        <defs>
+          <marker id="arrow-arch" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6 z" fill="#566068"/>
+          </marker>
+          <marker id="arrow-loop" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6 z" fill="#0891b2"/>
+          </marker>
+        </defs>
+
+        <rect x="270" y="20" width="140" height="48" rx="10" fill="#f0f2f5" stroke="#d4d8e0" stroke-width="1.5"/>
+        <text x="340" y="50" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="14" fill="#111827">User Goal</text>
+
+        <line x1="340" y1="68" x2="340" y2="108" stroke="#566068" stroke-width="1.5" marker-end="url(#arrow-arch)"/>
+
+        <rect x="100" y="115" width="480" height="64" rx="10" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.5"/>
+        <text x="340" y="143" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="15" fill="#5b21b6">Orchestrator</text>
+        <text x="340" y="161" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#7c3aed">gather context · forward diffs &amp; tests</text>
+
+        <path d="M260,179 Q200,205 175,228" stroke="#566068" stroke-width="1.5" fill="none" marker-end="url(#arrow-arch)"/>
+        <text x="148" y="208" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068">context packet</text>
+
+        <rect x="60" y="232" width="220" height="72" rx="10" fill="#ecfeff" stroke="#67e8f9" stroke-width="1.5"/>
+        <text x="170" y="263" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="15" fill="#0e7490">Planner</text>
+        <text x="170" y="282" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#0891b2">decide the next step</text>
+
+        <line x1="285" y1="268" x2="395" y2="268" stroke="#566068" stroke-width="1.5" marker-end="url(#arrow-arch)"/>
+        <text x="340" y="262" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068">directive</text>
+
+        <rect x="400" y="232" width="220" height="72" rx="10" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.5"/>
+        <text x="510" y="263" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="15" fill="#92400e">Implementer</text>
+        <text x="510" y="282" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#d97706">make the changes</text>
+
+        <path d="M500,308 Q450,335 425,360" stroke="#566068" stroke-width="1.5" fill="none" marker-end="url(#arrow-arch)"/>
+
+        <rect x="240" y="362" width="220" height="60" rx="10" fill="#f0f2f5" stroke="#d4d8e0" stroke-width="1.5"/>
+        <text x="350" y="388" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="14" fill="#111827">Feedback</text>
+        <text x="350" y="406" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068">git diff · test results · output</text>
+
+        <path d="M240,392 C 50,392 18,300 60,268" stroke="#0891b2" stroke-width="1.5" stroke-dasharray="4 3" fill="none" marker-end="url(#arrow-loop)"/>
+        <text x="20" y="335" font-family="JetBrains Mono, monospace" font-size="10" fill="#0891b2">next</text>
+        <text x="20" y="348" font-family="JetBrains Mono, monospace" font-size="10" fill="#0891b2">iteration</text>
+
+        <text x="475" y="395" font-family="JetBrains Mono, monospace" font-size="10" fill="#059669">— or</text>
+        <text x="475" y="409" font-family="JetBrains Mono, monospace" font-size="10" fill="#059669" font-weight="700">GOAL COMPLETE → exit</text>
+      </svg>
+      <figcaption>The cycle. Each pass produces a diff and a fresh test result, both of which feed the next Planner turn.</figcaption>
+    </figure>
 
     <h2>Context Engineering</h2>
     <p>Context management turned out to be the single most important engineering decision. Bigger context windows do not automatically mean better results — the <strong>"lost in the middle"</strong> effect (Liu et al., Stanford, TACL 2024) shows models drop <strong>30%+ accuracy on content in the middle of long contexts</strong>, even with 1M-token windows.</p>
@@ -177,6 +203,48 @@
       <li><strong>Previous diff</strong> — the unified diff the Implementer just produced.</li>
       <li><strong>Test output</strong> — pass/fail counts and failure traces, captured from running the project's test command after the previous Implementer turn.</li>
     </ul>
+
+    <figure class="svg-figure">
+      <svg viewBox="0 0 680 380" width="100%" role="img" aria-label="Context packet structure with three slow-changing slices and one feedback signal">
+        <defs>
+          <marker id="arrow-ctx" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6 z" fill="#566068"/>
+          </marker>
+        </defs>
+
+        <rect x="20" y="20" width="640" height="280" rx="12" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.5"/>
+        <text x="40" y="50" font-family="Syne, sans-serif" font-weight="700" font-size="14" fill="#5b21b6">Context packet</text>
+        <text x="146" y="50" font-family="JetBrains Mono, monospace" font-size="11" fill="#7c3aed">built fresh each iteration</text>
+
+        <text x="40" y="84" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068" letter-spacing="1.2">STATIC CONTEXT — changes slowly</text>
+
+        <rect x="40" y="96" width="195" height="58" rx="8" fill="#ecfeff" stroke="#67e8f9" stroke-width="1.2"/>
+        <text x="137" y="122" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="13" fill="#0e7490">File tree</text>
+        <text x="137" y="140" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#0891b2">repo structure</text>
+
+        <rect x="245" y="96" width="190" height="58" rx="8" fill="#ecfeff" stroke="#67e8f9" stroke-width="1.2"/>
+        <text x="340" y="122" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="13" fill="#0e7490">Git log</text>
+        <text x="340" y="140" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#0891b2">last 15 commits</text>
+
+        <rect x="445" y="96" width="195" height="58" rx="8" fill="#ecfeff" stroke="#67e8f9" stroke-width="1.2"/>
+        <text x="542" y="122" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="13" fill="#0e7490">README</text>
+        <text x="542" y="140" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#0891b2">project intent</text>
+
+        <text x="40" y="190" font-family="JetBrains Mono, monospace" font-size="10" fill="#92400e" letter-spacing="1.2">FEEDBACK SIGNAL — plan vs. reality</text>
+
+        <rect x="40" y="202" width="600" height="74" rx="8" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.5"/>
+        <text x="340" y="232" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="14" fill="#92400e">Previous diff + test output</text>
+        <text x="340" y="252" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#d97706">what changed last round · what passed · what failed</text>
+
+        <line x1="340" y1="304" x2="340" y2="332" stroke="#566068" stroke-width="1.5" marker-end="url(#arrow-ctx)"/>
+
+        <rect x="280" y="334" width="120" height="36" rx="8" fill="#ecfeff" stroke="#67e8f9" stroke-width="1.5"/>
+        <text x="340" y="357" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="13" fill="#0e7490">Planner</text>
+      </svg>
+      <figcaption>Three slow-changing slices plus one dynamic feedback signal — built fresh every iteration.</figcaption>
+    </figure>
+
+    <p>What you <em>exclude</em> matters as much as what you include. The packet deliberately omits full file contents, dependency trees, and generated documentation. Recent research on AGENTS.md-style context files (early 2026) found that LLM-generated context actually <em>decreased</em> agent success rates and increased inference costs by over 20%. The shallow packet keeps the Planner focused on the delta — what changed and what to do next — rather than drowning it in static detail.</p>
 
     <p>The test output is the part that took me the longest to get right, and it's also the part I'm most certain about. <strong>AlphaCodium</strong> (Ridnik et al., 2024) reported an unexpected negative result: <em>"injecting the last git patch diff to the prompt: no improvement was seen."</em> Raw diffs alone are not a useful feedback signal — the Planner has no way to know whether the diff was actually <em>correct</em>. Diffs paired with test results are a different story. The diff says what changed; the test results say whether it worked.</p>
 
@@ -194,6 +262,51 @@
     <p>But the same literature contains a sharp warning: <strong>intrinsic self-correction without external feedback degrades performance</strong>. "Large Language Models Cannot Self-Correct Reasoning Yet" (Huang et al., ICLR 2024) showed LLMs sometimes change correct answers to wrong ones when asked to self-evaluate without grounding. A TACL 2024 survey (Kamoi et al.) concluded that <em>"no prior work demonstrates successful self-correction with feedback from prompted LLMs"</em> — only with grounded signals like code execution.</p>
 
     <p>The implication for any Planner/Implementer architecture is direct: <strong>the feedback loop is only as good as the external signals you wire into it</strong>. Diffs without tests are just opinion. Tests without diffs are missing the cause. You need both.</p>
+
+    <figure class="svg-figure">
+      <svg viewBox="0 0 680 340" width="100%" role="img" aria-label="Iteration timeline showing scope of changes shrinking across three rounds before GOAL COMPLETE">
+        <defs>
+          <marker id="arrow-iter" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6 z" fill="#566068"/>
+          </marker>
+        </defs>
+
+        <text x="100" y="32" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="600" fill="#566068" letter-spacing="1.2">ITERATION 1</text>
+        <rect x="30" y="48" width="140" height="46" rx="8" fill="#ecfeff" stroke="#67e8f9" stroke-width="1.2"/>
+        <text x="100" y="70" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="12" fill="#0e7490">Plan: scaffold</text>
+        <text x="100" y="86" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#0891b2">routes + middleware</text>
+        <line x1="100" y1="100" x2="100" y2="118" stroke="#566068" stroke-width="1.2" marker-end="url(#arrow-iter)"/>
+        <rect x="20" y="124" width="160" height="86" rx="8" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.5"/>
+        <text x="100" y="152" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="12" fill="#92400e">Implement</text>
+        <text x="100" y="172" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#d97706">+4 files</text>
+        <text x="100" y="188" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#d97706">+180 lines</text>
+
+        <text x="340" y="32" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="600" fill="#566068" letter-spacing="1.2">ITERATION 2</text>
+        <rect x="270" y="48" width="140" height="46" rx="8" fill="#ecfeff" stroke="#67e8f9" stroke-width="1.2"/>
+        <text x="340" y="70" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="12" fill="#0e7490">Plan: fix gaps</text>
+        <text x="340" y="86" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#0891b2">wire router + tests</text>
+        <line x1="340" y1="100" x2="340" y2="118" stroke="#566068" stroke-width="1.2" marker-end="url(#arrow-iter)"/>
+        <rect x="280" y="138" width="120" height="60" rx="8" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.5"/>
+        <text x="340" y="162" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="12" fill="#92400e">Implement</text>
+        <text x="340" y="180" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#d97706">+2 files, +60 lines</text>
+
+        <text x="580" y="32" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="600" fill="#566068" letter-spacing="1.2">ITERATION 3</text>
+        <rect x="510" y="48" width="140" height="46" rx="8" fill="#ecfeff" stroke="#67e8f9" stroke-width="1.2"/>
+        <text x="580" y="70" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="12" fill="#0e7490">Plan: polish</text>
+        <text x="580" y="86" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#0891b2">edge case + cleanup</text>
+        <line x1="580" y1="100" x2="580" y2="118" stroke="#566068" stroke-width="1.2" marker-end="url(#arrow-iter)"/>
+        <rect x="535" y="148" width="90" height="40" rx="8" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.5"/>
+        <text x="580" y="166" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="12" fill="#92400e">Implement</text>
+        <text x="580" y="180" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#d97706">~20 lines</text>
+
+        <text x="340" y="244" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#0891b2" font-style="italic">scope of changes narrows each round</text>
+        <path d="M30,260 Q340,288 650,260" stroke="#0891b2" stroke-width="1.5" stroke-dasharray="4 3" fill="none"/>
+
+        <rect x="280" y="295" width="120" height="32" rx="16" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+        <text x="340" y="316" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="12" fill="#065f46">✓ GOAL COMPLETE</text>
+      </svg>
+      <figcaption>A typical 3-iteration run. Each round produces a smaller diff than the last as the Planner converges on the goal.</figcaption>
+    </figure>
 
     <h2>Running It</h2>
     <p>A full run looks like this:</p>
@@ -231,10 +344,16 @@
       <li><strong>Iteration cap.</strong> Set with <code>--max-iterations</code>, default 5. The escape hatch for runs stuck in a local minimum.</li>
     </ol>
 
-    <p>In practice, the first two mechanisms handle roughly 80% of completed runs. The cap catches the pathological cases. Recent theoretical work on <strong>Markovian Generation Chains</strong> formalizes this — under greedy decoding, iterative LLM output rapidly converges to fixed points or short cycles. That's both an explanation for why early termination works and a warning about why long runs don't help.</p>
+    <p>In practice, the first two mechanisms handle roughly 80% of completed runs. The cap catches the pathological cases.</p>
+
+    <p>The other 20% usually fails in a more subtle way: the Planner emits <code>GOAL COMPLETE</code> because the tests pass, but the feature is quietly incomplete — an edge case unhandled, an error path uncovered, a refactor that left dead code behind. A more principled termination check might dispatch a verification prompt to a third Claude instance, asking it to grade the final state against the original goal — though that adds the kind of complexity I deliberately tried to avoid.</p>
+
+    <p>Recent theoretical work on <strong>Markovian Generation Chains</strong> formalizes the intuition behind early termination — under greedy decoding, iterative LLM output rapidly converges to fixed points or short cycles. That's both an explanation for why three iterations is usually enough and a warning about why long runs don't help.</p>
 
     <h2>What You Can Build</h2>
     <p>I've used the loop on a range of tasks. Some it handles cleanly, others reveal the seams.</p>
+
+    <p><strong>Typical runs by the numbers.</strong> A well-scoped bug fix completes in 2–3 iterations and costs roughly $0.50–$2.00 in API usage. A full feature like adding JWT auth runs 4–6 iterations at $3–$8. Test coverage campaigns are the most iteration-heavy — sometimes 8–10 rounds — but each round is cheap because the Implementer is mostly writing straightforward test code. Token usage scales roughly linearly with iteration count: about 15K–25K tokens per round for the Planner and 20K–40K for the Implementer.</p>
 
     <h3>Works well</h3>
     <ul>

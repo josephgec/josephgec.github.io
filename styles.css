@@ -1982,3 +1982,33 @@
       border-bottom: 1px solid var(--cyan);
     }
 
+    /* ════════════════════════════════════════
+       SVG figures inside post body
+    ════════════════════════════════════════ */
+    .post-body figure.svg-figure {
+      margin: 36px 0 40px;
+      padding: 0;
+    }
+
+    .post-body figure.svg-figure svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-width: 100%;
+      background: var(--ink-card);
+      border: 1px solid var(--ink-border-subtle);
+      border-radius: var(--radius);
+      padding: 8px;
+    }
+
+    .post-body figure.svg-figure figcaption {
+      margin-top: 14px;
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      text-align: center;
+      letter-spacing: 0.02em;
+      line-height: 1.5;
+      padding: 0 12px;
+    }
+
