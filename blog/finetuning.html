@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Stop Wrestling with Boilerplate — Local Tinker Gives You a Clean API for Local LLM Fine-Tuning · Joseph Thomas</title>
+  <meta name="description" content="Local Tinker is a Tinker-style API for LoRA fine-tuning of 1B–13B LLMs on your own GPU. Clean training loops for SFT, PPO, DPO, and GRPO with no CUDA memory gymnastics." />
+  <meta name="keywords" content="LLM, fine-tuning, LoRA, QLoRA, PEFT, bitsandbytes, PyTorch, HuggingFace, Tinker, PPO, DPO, GRPO, Llama, Qwen, Mistral, Joseph Thomas" />
+  <meta name="author" content="Joseph Thomas" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://jthomas.site/blog/finetuning" />
+  <meta name="theme-color" content="#0a1628" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://jthomas.site/blog/finetuning" />
+  <meta property="og:title" content="Stop Wrestling with Boilerplate — Local Tinker Gives You a Clean API for Local LLM Fine-Tuning" />
+  <meta property="og:description" content="A Tinker-style API that runs on your own GPU. Write clean training loops for SFT, PPO, DPO, and GRPO without managing a single CUDA memory allocation." />
+  <meta property="og:image" content="https://jthomas.site/photo.jpg" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:site_name" content="Joseph Thomas" />
+  <meta property="article:published_time" content="2026-04-13" />
+  <meta property="article:author" content="Joseph Thomas" />
+  <meta property="article:tag" content="Fine-Tuning" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Local Tinker — A Clean API for Local LLM Fine-Tuning" />
+  <meta name="twitter:description" content="A Tinker-style API for LoRA fine-tuning on your own GPU. SFT, DPO, PPO, GRPO — without the boilerplate." />
+  <meta name="twitter:image" content="https://jthomas.site/photo.jpg" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "Stop Wrestling with Boilerplate — Local Tinker Gives You a Clean API for Local LLM Fine-Tuning",
+    "description": "Local Tinker is a Tinker-style API for LoRA fine-tuning of 1B–13B LLMs on your own GPU — SFT, DPO, PPO, and GRPO without managing CUDA memory or gradient-accumulation plumbing.",
+    "datePublished": "2026-04-13",
+    "url": "https://jthomas.site/blog/finetuning",
+    "author": {
+      "@type": "Person",
+      "name": "Joseph Thomas",
+      "url": "https://jthomas.site/"
+    },
+    "publisher": {
+      "@type": "Person",
+      "name": "Joseph Thomas",
+      "url": "https://jthomas.site/"
+    },
+    "mainEntityOfPage": "https://jthomas.site/blog/finetuning",
+    "keywords": ["Fine-Tuning", "LoRA", "QLoRA", "PEFT", "RLHF", "DPO", "PPO", "GRPO"]
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&display=swap" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;400;500;600;700;800&family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+
+  <link rel="stylesheet" href="../styles.css" />
+</head>
+<body class="blog-page">
+
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<nav aria-label="Site navigation" id="mainNav">
+  <div class="nav-inner">
+    <a class="nav-name" href="../index.html" style="text-decoration:none;">JT</a>
+    <ul class="nav-links">
+      <li><a href="../index.html#experience" aria-label="View Experience on homepage">Experience</a></li>
+      <li><a href="../index.html#education" aria-label="View Education on homepage">Education</a></li>
+      <li><a href="../index.html#publications" aria-label="View Research on homepage">Research</a></li>
+      <li><a href="../index.html#projects" aria-label="View Projects on homepage">Projects</a></li>
+      <li><a href="index.html" aria-label="Writing — blog" aria-current="page">Writing</a></li>
+      <li><a href="../consulting.html" aria-label="View Consulting services">Consulting</a></li>
+    </ul>
+  </div>
+</nav>
+
+<article class="post">
+  <header class="post-header" id="hero">
+    <canvas class="hero-canvas" id="swarmCanvas"></canvas>
+    <div class="post-header-inner">
+      <a class="writing-back post-back" href="index.html">
+        <span class="writing-back-arrow">←</span>
+        Back to Writing
+      </a>
+      <div class="post-meta">
+        <span class="writing-date">April 2026</span>
+        <span class="proj-lang">Fine-Tuning</span>
+        <span class="writing-read-time">8 min read</span>
+      </div>
+      <h1 class="post-title">Stop Wrestling with Boilerplate — Local Tinker Gives You a Clean API for Local LLM Fine-Tuning</h1>
+      <p class="post-lede">A Tinker-style API that runs on your own GPU. Write clean training loops for SFT, PPO, DPO, and GRPO without managing a single CUDA memory allocation.</p>
+    </div>
+  </header>
+
+  <div class="post-body">
+    <p>The boilerplate for local fine-tuning is a lot. Wire up HuggingFace Transformers, bolt on PEFT for LoRA, pick a tokenizer, manage your own gradient accumulation, configure mixed-precision training, fight with bitsandbytes quantization flags, handle checkpointing, and hope your VRAM math was right. By the time the actual training loop runs, you've written three hundred lines of glue code that have nothing to do with your experiment.</p>
+
+    <p><a href="https://github.com/josephgec/finetuning" target="_blank" rel="noopener noreferrer">Local Tinker</a> is an attempt to collapse all of that into four primitives. It's a high-level, Tinker-style API for LoRA fine-tuning of small LLMs on your own GPU. You bring the model name, the dataset, and the training loop you actually care about. Everything else — quantization, LoRA adapter attachment, optimizer state, checkpointing, memory management — is handled.</p>
+
+    <p>It's designed for the <strong>1B–13B</strong> class of models: Llama-3, Qwen, Mistral, and the other open-weight families that fit on a single consumer or prosumer GPU. If you have a 3090, a 4090, an A6000, or an H100, you're in scope. If you're training a 70B model, you want something else.</p>
+
+    <h2>Why Another Fine-Tuning Tool?</h2>
+    <p>Thinking Machines Lab's <strong>Tinker</strong> API made a convincing case that the right abstraction for fine-tuning is very small: <code>forward_backward</code>, <code>optim_step</code>, and <code>sample</code>. Those three calls plus a client object cover supervised learning, reinforcement learning, and everything in between. It's elegant.</p>
+
+    <p>The catch is that Tinker is a hosted cloud service. That's the right call for large models where most users don't have the hardware. But for the 1B–13B range, I <em>already have</em> the hardware. I'd rather run the same clean API against my own GPU, with my own data, without uploading anything or paying per token.</p>
+
+    <p>Local Tinker takes the mental model and the surface area of Tinker's API and maps it onto local hardware. Same primitives, same training loop shape, your machine.</p>
+
+    <h2>The Core Primitives</h2>
+    <p>The API exposes three client objects:</p>
+
+    <p><strong>ServiceClient</strong> is the entry point. It discovers which models are available locally, checks your GPU, and hands out training and sampling clients. You instantiate it once.</p>
+
+    <p><strong>TrainingClient</strong> is where fine-tuning happens. It wraps a quantized base model and a LoRA adapter, exposes <code>forward_backward</code> for loss computation and gradient accumulation, and <code>optim_step</code> for applying the accumulated update. Hundreds of lines of HuggingFace + PEFT + bitsandbytes wiring collapse into those two calls.</p>
+
+    <p><strong>SamplingClient</strong> generates completions from the current (or a saved) checkpoint. It's what you reach for in the middle of an RL loop when you need to roll out trajectories from the current policy, or at the end of training when you want to verify the model actually learned what you told it to.</p>
+
+    <p>A minimal SFT loop looks like this:</p>
+
+    <pre class="codeblock"><code><span class="ck-cmd">from</span> local_tinker <span class="ck-cmd">import</span> ServiceClient
+
+service = ServiceClient()
+trainer = service.create_lora_training_client(
+    base_model=<span class="ck-str">"meta-llama/Llama-3.2-3B"</span>,
+    rank=<span class="ck-flag">32</span>,
+    quantize=<span class="ck-str">"4bit"</span>,
+)
+
+<span class="ck-cmd">for</span> batch <span class="ck-cmd">in</span> dataloader:
+    loss = trainer.forward_backward(batch)
+    trainer.optim_step()
+    <span class="ck-cmd">print</span>(<span class="ck-str">f"loss: {loss:.4f}"</span>)
+
+sampler = trainer.save_weights_and_get_sampling_client()
+output = sampler.sample(<span class="ck-str">"Explain gradient descent simply:"</span>)</code></pre>
+
+    <p>Three imports, one loop, one optim step, one sampling call at the end. That's the whole thing.</p>
+
+    <h2>Two-Phase Design: Gradient Accumulation and LoRA</h2>
+    <p>Why two phases? The reason is memory.</p>
+
+    <p>Fine-tuning a 7B model with LoRA means loading the base model in 4-bit quantized form (frozen), attaching a small LoRA adapter in bf16 or fp16 (trainable), and keeping the optimizer state in fp32. Even with that arrangement, the gradients for the LoRA adapter can be substantial, and you usually want to accumulate several micro-batches before applying an update to get a reasonable effective batch size.</p>
+
+    <p><strong>Phase 1 — <code>forward_backward</code></strong> — runs a single micro-batch through the model, computes the loss, and backprops through the LoRA adapter only. Gradients accumulate in place. You can call it many times in a row without ever calling <code>optim_step</code>.</p>
+
+    <p><strong>Phase 2 — <code>optim_step</code></strong> — applies the accumulated gradients, clips them, and advances the optimizer state. You call this once per effective batch.</p>
+
+    <figure class="svg-figure">
+      <svg viewBox="0 0 680 480" width="100%" role="img" aria-label="Local Tinker architecture diagram: ServiceClient creates a TrainingClient, which exposes two phases (forward_backward and optim_step), and a SamplingClient for generation">
+        <defs>
+          <marker id="arrow-ft" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6 z" fill="#566068"/>
+          </marker>
+          <marker id="arrow-ft-cyan" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6 z" fill="#0891b2"/>
+          </marker>
+        </defs>
+
+        <!-- ServiceClient -->
+        <rect x="240" y="20" width="200" height="58" rx="10" fill="#ecfeff" stroke="#67e8f9" stroke-width="1.5"/>
+        <text x="340" y="46" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="14" fill="#0e7490">ServiceClient</text>
+        <text x="340" y="64" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#0891b2">entry point · hardware discovery</text>
+
+        <line x1="340" y1="80" x2="340" y2="112" stroke="#566068" stroke-width="1.5" marker-end="url(#arrow-ft)"/>
+        <text x="352" y="100" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068">creates</text>
+
+        <!-- TrainingClient -->
+        <rect x="160" y="118" width="360" height="62" rx="10" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.5"/>
+        <text x="340" y="146" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="14" fill="#5b21b6">TrainingClient</text>
+        <text x="340" y="164" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#7c3aed">LoRA adapter on a frozen quantized base</text>
+
+        <!-- Split arrows to phases -->
+        <path d="M230,180 L180,226" stroke="#566068" stroke-width="1.5" fill="none" marker-end="url(#arrow-ft)"/>
+        <path d="M450,180 L500,226" stroke="#566068" stroke-width="1.5" fill="none" marker-end="url(#arrow-ft)"/>
+
+        <!-- Phase 1 -->
+        <rect x="60" y="232" width="240" height="122" rx="10" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.5"/>
+        <text x="180" y="258" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="600" fill="#92400e" letter-spacing="1.2">PHASE 1</text>
+        <text x="180" y="282" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="14" fill="#92400e">forward_backward()</text>
+        <text x="180" y="306" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#d97706">compute loss</text>
+        <text x="180" y="322" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#d97706">accumulate LoRA grads</text>
+        <text x="180" y="340" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#d97706">call N times per batch</text>
+
+        <!-- Phase 2 -->
+        <rect x="380" y="232" width="240" height="122" rx="10" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.5"/>
+        <text x="500" y="258" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="600" fill="#92400e" letter-spacing="1.2">PHASE 2</text>
+        <text x="500" y="282" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="14" fill="#92400e">optim_step()</text>
+        <text x="500" y="306" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#d97706">apply accumulated grads</text>
+        <text x="500" y="322" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#d97706">clip + advance optimizer</text>
+        <text x="500" y="340" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#d97706">call once per batch</text>
+
+        <!-- Dashed arrow Phase 1 → Phase 2 -->
+        <path d="M300,292 L380,292" stroke="#0891b2" stroke-width="1.5" stroke-dasharray="4 3" fill="none" marker-end="url(#arrow-ft-cyan)"/>
+        <text x="340" y="284" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#0891b2">accumulate</text>
+
+        <!-- Down arrow from Phase 2 area to SamplingClient -->
+        <path d="M500,354 C 500,390 440,395 420,405" stroke="#566068" stroke-width="1.5" fill="none" marker-end="url(#arrow-ft)"/>
+
+        <!-- SamplingClient -->
+        <rect x="240" y="406" width="200" height="58" rx="10" fill="#ecfeff" stroke="#67e8f9" stroke-width="1.5"/>
+        <text x="340" y="432" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="14" fill="#0e7490">SamplingClient</text>
+        <text x="340" y="450" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#0891b2">generate completions from current weights</text>
+      </svg>
+      <figcaption>Four objects, two phases. Phase 1 runs many times to accumulate gradients; Phase 2 applies them once per effective batch.</figcaption>
+    </figure>
+
+    <p>Separating the two phases gives you exact control over the effective batch size without writing any gradient-accumulation plumbing yourself. You decide how many <code>forward_backward</code> calls go between <code>optim_step</code> calls; the client handles everything else.</p>
+
+    <h2>Beyond SFT: Reinforcement Learning on Your GPU</h2>
+    <p>The same two primitives cover reinforcement learning — which is really the reason this shape matters. SFT is easy to express in any framework; RL is where the boilerplate gets ugly.</p>
+
+    <p>Local Tinker has a loss function hierarchy that supports <strong>SFT</strong> (default), <strong>DPO</strong> for preference pairs, <strong>PPO</strong> for advantage-weighted updates with an internal value head, and <strong>GRPO</strong> for group-relative policy optimization. You pick the loss by passing <code>loss_fn="grpo"</code> (or <code>"dpo"</code>, <code>"ppo"</code>) to <code>forward_backward</code>. The client handles the bookkeeping.</p>
+
+    <p>A GRPO loop looks like this:</p>
+
+    <pre class="codeblock"><code><span class="ck-cmd">from</span> local_tinker <span class="ck-cmd">import</span> ServiceClient
+
+service = ServiceClient()
+trainer = service.create_lora_training_client(<span class="ck-str">"Qwen/Qwen2.5-7B"</span>, rank=<span class="ck-flag">16</span>)
+
+<span class="ck-cmd">for</span> step <span class="ck-cmd">in</span> <span class="ck-cmd">range</span>(max_steps):
+    <span class="ck-comment"># roll out completions from the current policy</span>
+    sampler = trainer.save_weights_and_get_sampling_client()
+    completions = sampler.sample_batch(prompts, n=<span class="ck-flag">8</span>)
+
+    <span class="ck-comment"># score with YOUR reward function (regex, test, classifier, judge LLM...)</span>
+    rewards = [reward_fn(p, c) <span class="ck-cmd">for</span> p, c <span class="ck-cmd">in</span> <span class="ck-cmd">zip</span>(prompts, completions)]
+
+    <span class="ck-comment"># GRPO update — same two-phase primitives</span>
+    trainer.forward_backward(completions, rewards, loss_fn=<span class="ck-str">"grpo"</span>)
+    trainer.optim_step()</code></pre>
+
+    <p>The interesting line is <code>rewards = [reward_fn(p, c) for ...]</code>. The reward function is yours. It can be a regex, a unit test, a classifier, or another LLM acting as a judge. Local Tinker doesn't care — it just needs a float per completion.</p>
+
+    <p>DPO follows the same shape but takes preferred and dispreferred pairs instead of rollouts. PPO manages a value head internally so you don't have to. All four loss functions use the same <code>forward_backward</code> + <code>optim_step</code> surface. The training loop doesn't change shape when you change objectives, which is the whole point.</p>
+
+    <h2>The Tech Stack</h2>
+    <div class="tech-stack-pills">
+      <span class="proj-lang">PyTorch</span>
+      <span class="proj-lang">HuggingFace Transformers</span>
+      <span class="proj-lang">PEFT</span>
+      <span class="proj-lang">bitsandbytes</span>
+    </div>
+
+    <p>Local Tinker is a thin layer of glue over a short stack of well-maintained libraries. <strong>PyTorch</strong> provides the tensor and autograd runtime. <strong>HuggingFace Transformers</strong> provides the base models and tokenizers. <strong>PEFT</strong> provides the LoRA adapter layers. <strong>bitsandbytes</strong> provides the 4-bit and 8-bit quantization kernels. Local Tinker is the glue that wires them into a single client API so you don't have to think about any of it during an experiment.</p>
+
+    <h2>Getting Started</h2>
+
+    <p><strong>Step 1 — clone and install:</strong></p>
+    <pre class="codeblock"><code><span class="ck-cmd">git</span> clone https://github.com/josephgec/finetuning.git
+<span class="ck-cmd">cd</span> finetuning
+<span class="ck-cmd">pip</span> install -e .</code></pre>
+
+    <p><strong>Step 2 — see which models you can train on your current hardware:</strong></p>
+    <pre class="codeblock"><code>$ <span class="ck-cmd">local-tinker</span> models
+
+MODEL                          PARAMS    QUANT   VRAM     STATUS
+meta-llama/Llama-3.2-1B        1.2B      4bit    ~3 GB    <span class="ck-str">ready</span>
+meta-llama/Llama-3.2-3B        3.2B      4bit    ~6 GB    <span class="ck-str">ready</span>
+mistralai/Mistral-7B-v0.3      7.3B      4bit    ~9 GB    <span class="ck-str">ready</span>
+Qwen/Qwen2.5-7B                7.6B      4bit    ~10 GB   <span class="ck-flag">tight</span>
+meta-llama/Llama-3.1-13B       13.0B     4bit    ~16 GB   <span class="ck-comment">OOM</span></code></pre>
+
+    <p>The status column is the useful one. <code>ready</code> means the model and a reasonable batch size fit comfortably. <code>tight</code> means it'll work but you may need to reduce micro-batch size or LoRA rank. <code>OOM</code> means don't bother — it won't fit on this card.</p>
+
+    <p><strong>Step 3 — launch a training run:</strong></p>
+    <pre class="codeblock"><code><span class="ck-cmd">local-tinker</span> run \
+  <span class="ck-flag">--model</span> meta-llama/Llama-3.2-3B \
+  <span class="ck-flag">--dataset</span> ./data/instructions.jsonl \
+  <span class="ck-flag">--rank</span> 32 \
+  <span class="ck-flag">--epochs</span> 3 \
+  <span class="ck-flag">--quantize</span> 4bit</code></pre>
+
+    <p>There's a <code>recipes/</code> directory in the repo with working configs for SFT, DPO, PPO, and GRPO. Copy one, point it at your dataset, and go.</p>
+
+    <h2>Who This Is For</h2>
+    <p>Local Tinker is for developers and researchers who have their own GPU, are working with 1B–13B models, and want to iterate quickly without fighting the framework. If you have a model idea and you want to test it before dinner, this is for you.</p>
+
+    <p>It's not a replacement for the cloud Tinker or for a full training platform like Axolotl or TRL. For models larger than ~13B, for distributed training across multiple machines, or for production training pipelines, use the right tool. Use Local Tinker for the tight loop of <em>"wonder if X works → try X → see if it worked"</em> on a model you can fit on one card.</p>
+
+    <h2>Get Started</h2>
+    <p>The source is on GitHub: <a href="https://github.com/josephgec/finetuning" target="_blank" rel="noopener noreferrer">github.com/josephgec/finetuning</a>. Clone it, install it, run <code>local-tinker models</code> to see what fits on your GPU, and try an SFT run before you reach for RL. The <code>recipes/</code> directory has known-good starting points for each loss function.</p>
+
+    <p>If you try it and something breaks, or if you have a use case that doesn't map cleanly onto the current primitives, open an issue or a PR. The API surface is small on purpose and I'd rather keep it small — but I'm open to good suggestions.</p>
+
+    <p>Happy tinkering.</p>
+
+    <h2>References</h2>
+    <p class="references-intro">The papers and projects this one builds on, for readers who want to go deeper.</p>
+
+    <h3>LoRA and quantization</h3>
+    <ul class="references">
+      <li>Hu et al. <em>LoRA: Low-Rank Adaptation of Large Language Models.</em> ICLR 2022. <a href="https://arxiv.org/abs/2106.09685" target="_blank" rel="noopener noreferrer">arXiv:2106.09685</a></li>
+      <li>Dettmers et al. <em>QLoRA: Efficient Finetuning of Quantized LLMs.</em> NeurIPS 2023. <a href="https://arxiv.org/abs/2305.14314" target="_blank" rel="noopener noreferrer">arXiv:2305.14314</a></li>
+      <li>Dettmers et al. <em>LLM.int8(): 8-bit Matrix Multiplication for Transformers at Scale.</em> NeurIPS 2022. <a href="https://arxiv.org/abs/2208.07339" target="_blank" rel="noopener noreferrer">arXiv:2208.07339</a></li>
+    </ul>
+
+    <h3>Reinforcement learning from feedback</h3>
+    <ul class="references">
+      <li>Schulman et al. <em>Proximal Policy Optimization Algorithms.</em> 2017. <a href="https://arxiv.org/abs/1707.06347" target="_blank" rel="noopener noreferrer">arXiv:1707.06347</a></li>
+      <li>Rafailov et al. <em>Direct Preference Optimization: Your Language Model is Secretly a Reward Model.</em> NeurIPS 2023. <a href="https://arxiv.org/abs/2305.18290" target="_blank" rel="noopener noreferrer">arXiv:2305.18290</a></li>
+      <li>Shao et al. <em>DeepSeekMath: Pushing the Limits of Mathematical Reasoning in Open Language Models.</em> 2024 (introduces GRPO). <a href="https://arxiv.org/abs/2402.03300" target="_blank" rel="noopener noreferrer">arXiv:2402.03300</a></li>
+    </ul>
+
+    <h3>Libraries and prior art</h3>
+    <ul class="references">
+      <li>Thinking Machines Lab. <em>Tinker API.</em> <a href="https://thinkingmachines.ai/tinker/" target="_blank" rel="noopener noreferrer">thinkingmachines.ai/tinker</a></li>
+      <li>HuggingFace. <em>PEFT — Parameter-Efficient Fine-Tuning.</em> <a href="https://github.com/huggingface/peft" target="_blank" rel="noopener noreferrer">github.com/huggingface/peft</a></li>
+      <li><em>bitsandbytes.</em> <a href="https://github.com/bitsandbytes-foundation/bitsandbytes" target="_blank" rel="noopener noreferrer">github.com/bitsandbytes-foundation/bitsandbytes</a></li>
+      <li>HuggingFace. <em>TRL — Transformer Reinforcement Learning.</em> <a href="https://github.com/huggingface/trl" target="_blank" rel="noopener noreferrer">github.com/huggingface/trl</a></li>
+    </ul>
+
+    <h3>Project source</h3>
+    <ul class="references">
+      <li>Local Tinker on GitHub — <a href="https://github.com/josephgec/finetuning" target="_blank" rel="noopener noreferrer">github.com/josephgec/finetuning</a></li>
+    </ul>
+  </div>
+
+  <div class="post-nav" role="navigation" aria-label="Post navigation">
+    <a class="post-nav-back" href="index.html">
+      <span class="writing-back-arrow">←</span>
+      All posts
+    </a>
+    <a class="post-nav-back post-nav-forward" href="deepsnake.html">
+      Read next: Building an AI That Masters Snake
+      <span class="writing-arrow">→</span>
+    </a>
+  </div>
+</article>
+
+<div class="writing-cta writing-cta-standalone">
+  <div class="writing-cta-text">
+    <strong>Stay in the loop.</strong> New posts on AI agents, distributed systems &amp; research.
+  </div>
+  <a class="writing-cta-btn" href="https://josephthomas.substack.com" target="_blank" rel="noopener noreferrer" aria-label="Subscribe on Substack">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22.539 8.242H1.46V5.406h21.08v2.836zM1.46 10.812V24l9.56-5.26L20.58 24V10.812H1.46zm0-8.242h21.08V0H1.46v2.57z"/></svg>
+    Subscribe
+  </a>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-cta">Open to advising, speaking engagements, and research collaborations.</div>
+      <div class="footer-brand">Joseph Thomas</div>
+      <div class="footer-copy">Saratoga, CA · Software Engineer · Google Cloud</div>
+    </div>
+    <div class="footer-links">
+      <a class="footer-link" href="https://scholar.google.com/citations?user=6RHIGk4AAAAJ&hl=en&oi=sra" target="_blank" rel="noopener noreferrer" title="Google Scholar" aria-label="Google Scholar">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 14l9-5-9-5-9 5 9 5z"/><path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+      </a>
+      <a class="footer-link" href="https://github.com/josephgec" target="_blank" rel="noopener noreferrer" title="GitHub" aria-label="GitHub">
+        <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844a9.59 9.59 0 012.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+      </a>
+      <a class="footer-link" href="https://www.linkedin.com/in/joseph-t-a6883013/" target="_blank" rel="noopener noreferrer" title="LinkedIn" aria-label="LinkedIn">
+        <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+      </a>
+    </div>
+  </div>
+</footer>
+
+<script>
+const nav = document.getElementById('mainNav');
+const hero = document.getElementById('hero');
+const navObs = new IntersectionObserver(
+  ([e]) => nav.classList.toggle('scrolled', !e.isIntersecting),
+  { threshold: 0.05 }
+);
+navObs.observe(hero);
+
+const progressBar = document.getElementById('scrollProgress');
+window.addEventListener('scroll', () => {
+  const h = document.documentElement;
+  const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+  progressBar.style.width = pct + '%';
+}, { passive: true });
+
+(function() {
+  const canvas = document.getElementById('swarmCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H, mouse = { x: -9999, y: -9999 };
+  const particles = [];
+  const COUNT = 60;
+  const CONNECT_DIST = 140;
+
+  function resize() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    W = canvas.width = rect.width;
+    H = canvas.height = rect.height;
+  }
+
+  function Particle() {
+    this.x = Math.random() * W;
+    this.y = Math.random() * H;
+    this.vx = (Math.random() - 0.5) * 0.6;
+    this.vy = (Math.random() - 0.5) * 0.6;
+    this.r = Math.random() * 2 + 1;
+  }
+
+  Particle.prototype.update = function() {
+    const dx = mouse.x - this.x;
+    const dy = mouse.y - this.y;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    if (dist < 300 && dist > 1) {
+      const force = 0.0003 * (300 - dist);
+      this.vx += (dx / dist) * force;
+      this.vy += (dy / dist) * force;
+    }
+    this.vx *= 0.995;
+    this.vy *= 0.995;
+    this.x += this.vx;
+    this.y += this.vy;
+    if (this.x < 0) this.x = W;
+    if (this.x > W) this.x = 0;
+    if (this.y < 0) this.y = H;
+    if (this.y > H) this.y = 0;
+  };
+
+  function init() {
+    resize();
+    for (let i = 0; i < COUNT; i++) particles.push(new Particle());
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const d = Math.sqrt(dx*dx + dy*dy);
+        if (d < CONNECT_DIST) {
+          const alpha = (1 - d / CONNECT_DIST) * 0.15;
+          ctx.strokeStyle = 'rgba(103, 232, 249,' + alpha + ')';
+          ctx.lineWidth = 0.8;
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+    for (const p of particles) {
+      p.update();
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(103, 232, 249, 0.6)';
+      ctx.fill();
+    }
+    requestAnimationFrame(draw);
+  }
+
+  hero.addEventListener('mousemove', e => {
+    const rect = canvas.getBoundingClientRect();
+    mouse.x = e.clientX - rect.left;
+    mouse.y = e.clientY - rect.top;
+  });
+  hero.addEventListener('mouseleave', () => {
+    mouse.x = -9999;
+    mouse.y = -9999;
+  });
+
+  window.addEventListener('resize', resize);
+  init();
+  draw();
+})();
+</script>
+
+</body>
+</html>
