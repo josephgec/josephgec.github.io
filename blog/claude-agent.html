@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <title>Two AIs, One Loop — Building a Self-Improving Code Agent · Joseph Thomas</title>
-  <meta name="description" content="How I built an outer-loop orchestrator that coordinates two Claude Code instances in a Planner / Implementer cycle to autonomously accomplish complex software goals." />
+  <meta name="description" content="What I learned building a Planner / Implementer dual-Claude loop — and what 50+ research papers say about feedback signals, termination, context, and when to stop." />
   <meta name="keywords" content="Claude agent, AI agents, LLM, Planner, Implementer, autonomous coding, Claude Code, self-improving agent" />
   <meta name="author" content="Joseph Thomas" />
   <meta name="robots" content="index, follow" />
@@ -87,42 +87,56 @@
       <div class="post-meta">
         <span class="writing-date">April 2026</span>
         <span class="proj-lang">AI Agents</span>
-        <span class="writing-read-time">6 min read</span>
+        <span class="writing-read-time">11 min read</span>
       </div>
       <h1 class="post-title">Two AIs, One Loop — Building a Self-Improving Code Agent</h1>
-      <p class="post-lede">Describe a complex software goal in one sentence. Two Claude instances — one planner, one implementer — handle the rest, iterating until the work is done.</p>
+      <p class="post-lede">A well-designed two-agent architecture — one LLM planning, another implementing, with git diffs and test results flowing between them — captures most of the value of multi-agent coding systems while avoiding their complexity. Here's what I built, and what the research literature says about why it works.</p>
     </div>
   </header>
 
   <div class="post-body">
     <p>LLMs are remarkable at taking a bounded request and producing code. But real software engineering isn't bounded. Building a feature means planning, coding, testing, discovering you got it wrong, and trying again. It's iterative by nature.</p>
 
-    <p>So I wanted to see what would happen if I closed the loop myself. Not a fancy agent framework. Not a task tree. Just two Claude Code instances wired together in a cycle, with an orchestrator forwarding context and diffs between them until the job is done.</p>
+    <p>I wanted to see what would happen if I closed the loop myself. Not a fancy multi-agent framework. Not a task tree. Just two Claude Code instances wired together in a cycle, with an orchestrator forwarding context, diffs, and test results between them until the job is done.</p>
 
-    <h2>The Problem</h2>
-    <p>A single prompt to an LLM gets you one pass. You describe what you want, the model writes code, and that's it. If the code is wrong, you notice and prompt again. If something subtle is off — a missed edge case, a regression somewhere else, a dependency you didn't think about — you might not notice at all.</p>
+    <p>What I found, both in my own experiments and in the surprisingly large body of research that already exists on this question, is that the architecture matters less than I expected — and the engineering decisions around it matter much more.</p>
 
-    <p>Real development is iterative:</p>
+    <h2>The Landscape</h2>
+    <p>Before I started, I wanted to understand what others had built. The space turns out to be larger and more contradictory than it looks.</p>
+
+    <p>On one end, there are role-based multi-agent frameworks like <strong>MetaGPT</strong> (5+ roles passing structured artifacts through a software-development pipeline) and <strong>ChatDev</strong> (7 roles communicating through pairwise "atomic chats"). Both treat software development as a virtual company with a division of labor. Both produce impressive demos and complete projects in under 7 minutes for under a dollar.</p>
+
+    <p>On the other end, there are deceptively powerful single-agent systems. <strong>SWE-Agent</strong> showed that optimizing the Agent-Computer Interface — custom commands, structured search, linting on edit — matters more than agent count. Its <code>mini-swe-agent</code> variant achieves <strong>65% on SWE-bench Verified in roughly 100 lines of Python</strong>. Claude Code itself, the tool I built on, scores <strong>80.8% on SWE-bench Verified</strong> as a single agent paired with strong tooling.</p>
+
+    <p>In the middle sits the architecture I ended up with: two agents, one plans, one executes, with a tight feedback loop between them. The closest production implementation is <strong>Aider's Architect/Editor mode</strong>, which uses an Architect model (e.g., o1-preview) to plan changes and an Editor model (e.g., Claude 3.5 Sonnet) to execute the specific edits, with git tracking every change. It scored <strong>85% on Aider's code editing benchmark</strong> — the highest recorded score on that suite, and a useful sanity check that the pattern is sound.</p>
+
+    <p>The industry trend through 2025 has actually moved <em>away</em> from heavy multi-agent orchestration toward "powerful single agents with excellent tooling." Devin, despite the $4B valuation and "first AI software engineer" branding, faced scrutiny when an independent Answer.AI evaluation found a <strong>15% success rate on real tasks</strong>. The agents that perform best on benchmarks rely on strong models paired with well-designed interfaces, not on agent count.</p>
+
+    <p>So why bother with two agents at all? Two reasons, both grounded in research.</p>
+
+    <h2>Why Separate Planning from Execution</h2>
+    <p>The case for splitting planning from execution — even just into two roles — is empirically strong. Several independent research lines converge on the same finding:</p>
+
     <ul>
-      <li><strong>Plan.</strong> Look at the codebase, understand constraints, decide on an approach.</li>
-      <li><strong>Code.</strong> Make the changes.</li>
-      <li><strong>Review.</strong> Look at the diff, run the tests, check the result.</li>
-      <li><strong>Refine.</strong> Fix what's wrong, go again.</li>
+      <li><strong>Plan-and-Solve Prompting</strong> (Wang et al., ACL 2023) showed that simply asking the model to "first understand the problem and devise a plan" consistently outperforms zero-shot Chain-of-Thought.</li>
+      <li><strong>ADaPT</strong> (Prasad et al., NAACL 2024) introduced recursive decomposition — when the executor fails, the planner decomposes further — achieving <strong>+28% on ALFWorld, +27% on WebShop, and +33% on TextCraft</strong> over ReAct baselines.</li>
+      <li><strong>GoalAct</strong> (Chen et al., 2025) quantified the inverse: removing global planning reduced agent performance by <strong>8% on average and 14% on coding tasks specifically</strong>.</li>
+      <li><strong>Plan-and-Act</strong> (Google DeepMind, 2025) demonstrated state-of-the-art on web navigation by separating high-level planning from low-level execution and training each side independently.</li>
     </ul>
 
-    <p>Humans do this naturally. LLMs don't, unless you put them in a loop.</p>
+    <p>Anthropic's own "Building Effective Agents" post (December 2024) names two of its five recommended patterns directly: <strong>Orchestrator-Workers</strong> and <strong>Evaluator-Optimizer</strong>. A Planner/Implementer loop is exactly the Evaluator-Optimizer pattern with a small twist — the evaluator and the planner are the same agent, holding the long-running plan in its head while reviewing each implementation step. As Anthropic put it: <em>"the most successful implementations weren't using complex frameworks... they were building with simple, composable patterns."</em></p>
+
+    <p>There's also a practical reason. A single Claude instance asked to both plan and code has a strong bias toward writing code, even when the right move is to stop and think. Splitting the roles forces each instance to do its job fully before handing off. I noticed this within an hour of testing — the moment I gave one model both jobs, it stopped reasoning about whether the previous step was actually correct.</p>
 
     <h2>Two Roles, One Goal</h2>
     <p>The architecture is the simplest thing that works: two Claude Code instances, each with a different system prompt, each specialized for one part of the cycle.</p>
 
-    <p><strong>The Planner</strong> is the senior tech lead. It looks at the current state of the repository — file tree, README, recent git log, the last diff produced — and decides what needs to happen next. It doesn't write code. Its job is to think, explain, and hand off a clear instruction. Its output is a natural-language directive like <em>"add a JWT middleware at <code>src/auth/jwt.ts</code> that validates the access token and sets <code>req.user</code>. Don't touch the refresh flow yet — we'll do that next."</em></p>
+    <p><strong>The Planner</strong> is the senior tech lead. It sees the current state of the repository — file tree, README, recent git log, the last diff produced, the test output — and decides what needs to happen next. It doesn't write code. Its job is to think, explain, and hand off a clear instruction. Its output is a natural-language directive like <em>"add a JWT middleware at <code>src/auth/jwt.ts</code> that validates the access token and sets <code>req.user</code>. Don't touch the refresh flow yet — we'll do that next."</em></p>
 
     <p><strong>The Implementer</strong> is the engineer. It receives the directive from the Planner and executes it. It reads the files it needs, makes the edits, runs the tests, and reports back what it changed. It does not second-guess the plan. Its job is to make the diff happen cleanly.</p>
 
-    <p>Separating these two roles matters for a subtle reason. A single Claude instance asked to both plan and code has a strong bias toward writing code — even when the right move is to stop and think. Splitting the roles forces each instance to do its job fully before handing off.</p>
-
     <h2>Architecture</h2>
-    <p>The orchestrator is a thin Python shim. It holds the conversation state for each role, forwards messages, and captures git diffs between rounds. Each iteration is a round trip through the diagram below: gather fresh context, ask the Planner what to do, hand the plan to the Implementer, collect the resulting diff, and feed the diff back to the Planner for the next iteration.</p>
+    <p>The orchestrator is a thin Python shim. It holds the conversation state for each role, captures git diffs and test output between rounds, and forwards a curated context packet to each Planner turn.</p>
 
     <div class="arch-diagram" aria-label="Architecture diagram">
       <div class="arch-node arch-input">
@@ -132,7 +146,7 @@
       <div class="arch-arrow"></div>
       <div class="arch-node">
         <div class="arch-label">Orchestrator</div>
-        <div class="arch-sub">gather context · forward diffs</div>
+        <div class="arch-sub">gather context · forward diffs &amp; tests</div>
       </div>
       <div class="arch-arrow"></div>
       <div class="arch-node arch-planner">
@@ -147,30 +161,39 @@
       <div class="arch-arrow"></div>
       <div class="arch-node">
         <div class="arch-label">Feedback</div>
-        <div class="arch-sub">git diff · output · test results</div>
+        <div class="arch-sub">git diff · test results · output</div>
       </div>
       <div class="arch-loop">↺ back to Planner — or GOAL COMPLETE</div>
     </div>
 
-    <h2>Context Gathering</h2>
-    <p>Before every Planner turn, the orchestrator builds a fresh context packet. It's deliberately shallow: just enough to reason about the next step without drowning the model.</p>
+    <h2>Context Engineering</h2>
+    <p>Context management turned out to be the single most important engineering decision. Bigger context windows do not automatically mean better results — the <strong>"lost in the middle"</strong> effect (Liu et al., Stanford, TACL 2024) shows models drop <strong>30%+ accuracy on content in the middle of long contexts</strong>, even with 1M-token windows.</p>
 
-    <p>The packet includes:</p>
+    <p>The context packet sent to the Planner before each turn includes:</p>
     <ul>
       <li><strong>File tree</strong> — a <code>find</code>-style listing of the repository, excluding <code>node_modules</code>, <code>.git</code>, and build artifacts.</li>
       <li><strong>Git log</strong> — the last 15 commits on the current branch for project memory.</li>
-      <li><strong>README</strong> — verbatim, so the Planner understands the project's intent.</li>
-      <li><strong>Previous diff</strong> — the unified diff the Implementer just produced, so the Planner can review what actually happened versus what was requested.</li>
+      <li><strong>README</strong> — verbatim, so the Planner understands what the project is for.</li>
+      <li><strong>Previous diff</strong> — the unified diff the Implementer just produced.</li>
+      <li><strong>Test output</strong> — pass/fail counts and failure traces, captured from running the project's test command after the previous Implementer turn.</li>
     </ul>
 
-    <p>This is the feedback channel. Without it, the Planner is flying blind. With it, the Planner can catch regressions, notice when the Implementer missed a detail, and steer the next step accordingly.</p>
+    <p>The test output is the part that took me the longest to get right, and it's also the part I'm most certain about. <strong>AlphaCodium</strong> (Ridnik et al., 2024) reported an unexpected negative result: <em>"injecting the last git patch diff to the prompt: no improvement was seen."</em> Raw diffs alone are not a useful feedback signal — the Planner has no way to know whether the diff was actually <em>correct</em>. Diffs paired with test results are a different story. The diff says what changed; the test results say whether it worked.</p>
+
+    <p>I still want to do better here. Aider's repository map system uses tree-sitter to parse 26+ languages into ASTs and applies <strong>personalized PageRank</strong> to identify the most relevant symbols relative to the current edit. The result is a scope-aware elided code view that fits in a small token budget. My orchestrator doesn't do this yet — it just sends the full file tree. PageRank-based context selection is the highest-value thing I'd add next.</p>
+
+    <p>A counterintuitive finding from JetBrains Research (NeurIPS 2025 DL4C Workshop) is worth flagging: <strong>observation masking</strong> — hiding verbose tool outputs from older turns while preserving the action and reasoning history — matched or beat LLM summarization in 4 of 5 settings, while being simpler and cheaper. Both approaches cut token costs by <strong>50%+</strong> compared to unmanaged context. The lesson: don't summarize what you can hide.</p>
 
     <h2>The Feedback Loop</h2>
-    <p>The loop is where the system earns its keep. After the Implementer reports back, the orchestrator runs <code>git diff</code> against the last commit and pipes that diff into the next Planner round as part of the context packet. The Planner sees exactly what changed.</p>
+    <p>The loop is where the system earns its keep. After the Implementer reports back, the orchestrator runs <code>git diff</code> and the project's test command, then pipes both into the next Planner round.</p>
 
-    <p>That's when the interesting things start happening. The Planner notices that the Implementer added a route but forgot to register it in the router. It notices that a new function was added but no tests. It notices that an edit touched an unrelated file by accident. It writes the next directive with all of that in hand: <em>"good work on the middleware — now wire it into <code>src/app.ts</code> and add a test for the invalid-token case."</em></p>
+    <p>That's when the interesting things start happening. The Planner notices that the Implementer added a route but forgot to register it in the router. It notices that a new function was added but no tests, and that the existing tests still pass — meaning the change isn't actually exercised. It notices that an edit touched an unrelated file by accident. It writes the next directive with all of that in hand: <em>"good work on the middleware — now wire it into <code>src/app.ts</code> and add a test for the invalid-token case."</em></p>
 
-    <p>A single-pass LLM couldn't do any of this. The loop makes the difference.</p>
+    <p>This matches the broader research consensus that <strong>external feedback signals are essential for iterative improvement to work</strong>. <strong>Self-Refine</strong> (Madaan et al., NeurIPS 2023) showed ~20% average improvement from generate-feedback-refine loops. <strong>Self-Debugging</strong> (Chen et al., ICLR 2024) gained up to +12% accuracy with execution feedback. <strong>Reflexion</strong> (Shinn et al., NeurIPS 2023) pushed HumanEval to <strong>91% pass@1</strong> by adding episodic memory of past failures.</p>
+
+    <p>But the same literature contains a sharp warning: <strong>intrinsic self-correction without external feedback degrades performance</strong>. "Large Language Models Cannot Self-Correct Reasoning Yet" (Huang et al., ICLR 2024) showed LLMs sometimes change correct answers to wrong ones when asked to self-evaluate without grounding. A TACL 2024 survey (Kamoi et al.) concluded that <em>"no prior work demonstrates successful self-correction with feedback from prompted LLMs"</em> — only with grounded signals like code execution.</p>
+
+    <p>The implication for any Planner/Implementer architecture is direct: <strong>the feedback loop is only as good as the external signals you wire into it</strong>. Diffs without tests are just opinion. Tests without diffs are missing the cause. You need both.</p>
 
     <h2>Running It</h2>
     <p>A full run looks like this:</p>
@@ -182,24 +205,36 @@
 
     <p>The key options:</p>
     <ul>
-      <li><code>--effort [low | medium | max]</code> — how aggressively each Claude instance should think before responding. At <code>max</code>, the planner is notably more careful about edge cases.</li>
+      <li><code>--effort [low | medium | max]</code> — how aggressively each Claude instance should think before responding. At <code>max</code>, the Planner is notably more careful about edge cases.</li>
       <li><code>--planner-model</code> and <code>--impl-model</code> — pick the model for each role independently. Opus for both when the goal is tricky; Sonnet for both when speed matters; mixed when the plan is hard but the code is mechanical.</li>
       <li><code>--max-iterations</code> — safety cap so a confused loop doesn't run all night.</li>
       <li><code>--timeout</code> — per-turn timeout so a stuck subprocess doesn't hang the loop.</li>
     </ul>
 
-    <h2>Termination</h2>
+    <h2>Knowing When to Stop</h2>
     <p>A loop that doesn't know when to stop is worse than no loop at all.</p>
-    <p>Termination happens in one of three ways:</p>
+
+    <p>The empirical evidence on iteration is consistent: <strong>most improvement happens in the first 1–2 iterations, with rapidly diminishing returns</strong>. Self-Refine's own data shows the bulk of gain in iterations 0→2. Self-Debugging plateaus at 2–3 turns. AlphaCodium captures the largest gains on the first test-fixing pass.</p>
+
+    <p>There are also failure modes that get <em>worse</em> with more iterations:</p>
+    <ul>
+      <li><strong>Self-bias amplification</strong> — LLMs systematically overrate their own generations, and the bias compounds monotonically across refinement rounds (Xu et al., 2024).</li>
+      <li><strong>Self-conditioning</strong> — per-step accuracy degrades as the agent sees more of its own prior outputs.</li>
+      <li><strong>Oscillation</strong> — agents can ping-pong between two states without converging. Claude Code's own production incident report (GitHub Issue #15909) describes a sub-agent that consumed <strong>27M tokens in an infinite loop over 4.6 hours</strong>.</li>
+    </ul>
+
+    <p>Termination in my orchestrator combines four signals, in order of priority:</p>
     <ol>
-      <li><strong>The Planner declares victory.</strong> After reviewing the most recent diff, if the Planner concludes the goal is achieved, it emits a <code>GOAL COMPLETE</code> sentinel and the orchestrator exits cleanly.</li>
-      <li><strong>The iteration cap is reached.</strong> Set with <code>--max-iterations</code>, this is the escape hatch for runs that get stuck in a local minimum.</li>
-      <li><strong>A turn errors.</strong> If either subprocess dies, times out, or returns a malformed response, the orchestrator writes the run log and exits so you can investigate.</li>
+      <li><strong>The Planner declares victory.</strong> After reviewing the most recent diff and test output, if the Planner concludes the goal is achieved, it emits a <code>GOAL COMPLETE</code> sentinel and the orchestrator exits cleanly.</li>
+      <li><strong>External validation gates pass.</strong> If all the project's tests pass, the linter is clean, and the diff matches the goal, that's strong evidence to stop.</li>
+      <li><strong>No-change detection.</strong> If two consecutive Implementer turns produce no meaningful diff, the loop has stalled and there's nothing more to learn from continuing.</li>
+      <li><strong>Iteration cap.</strong> Set with <code>--max-iterations</code>, default 5. The escape hatch for runs stuck in a local minimum.</li>
     </ol>
-    <p>In practice, the first mechanism handles roughly 80% of completed runs. The cap catches the pathological cases.</p>
+
+    <p>In practice, the first two mechanisms handle roughly 80% of completed runs. The cap catches the pathological cases. Recent theoretical work on <strong>Markovian Generation Chains</strong> formalizes this — under greedy decoding, iterative LLM output rapidly converges to fixed points or short cycles. That's both an explanation for why early termination works and a warning about why long runs don't help.</p>
 
     <h2>What You Can Build</h2>
-    <p>I've used the loop for a range of tasks. Some it handles cleanly, others reveal the seams.</p>
+    <p>I've used the loop on a range of tasks. Some it handles cleanly, others reveal the seams.</p>
 
     <h3>Works well</h3>
     <ul>
@@ -212,8 +247,19 @@
     <h3>Works poorly</h3>
     <ul>
       <li>Open-ended architectural decisions. The Planner will commit to a direction and defend it; stepping back to reconsider is hard.</li>
-      <li>Anything requiring cross-repo or cross-service context. The loop only sees one repository.</li>
+      <li>Cross-repo or cross-service work. The loop only sees one repository.</li>
       <li>UI work that needs human judgment about visual quality.</li>
+      <li>Greenfield feature development in unfamiliar codebases. <strong>FeatureBench</strong> found that even the strongest current frontier models score around <strong>11%</strong> on feature development versus <strong>74%</strong> on bug-fixing. Building new things is much harder than fixing existing ones, and the loop doesn't close that gap on its own.</li>
+    </ul>
+
+    <h2>What I'd Build Next</h2>
+    <p>The architecture works. The interesting questions now are about the things around it.</p>
+
+    <ul>
+      <li><strong>Repository-aware context selection.</strong> Borrow Aider's PageRank approach. Today my context is a flat file listing; the next version should weight files by relevance to the current goal.</li>
+      <li><strong>Tree-search rather than linear refinement.</strong> <strong>LATS</strong> (Zhou et al., ICML 2024) achieved <strong>94.4% pass@1 on HumanEval</strong> by exploring multiple refinement paths via Monte Carlo Tree Search instead of iterating on a single one. For hard problems, branching beats iterating.</li>
+      <li><strong>RL-trained iteration.</strong> <strong>RLEF</strong> (Gehring et al., ICML 2025) showed that an RL-trained 8B model outperformed AlphaCodium's 100-sample approach with only 3 LLM responses. The implication: the loop's value depends on whether the model has been trained to <em>use</em> feedback well, not just on whether the loop exists.</li>
+      <li><strong>Sub-agent isolation for exploration.</strong> Claude Code itself uses sub-agents to delegate heavy file exploration to isolated context windows — 30K tokens of exploration returns as a 2K summary, a <strong>93% context savings</strong>. My orchestrator should do the same for the Implementer's read phase.</li>
     </ul>
 
     <h2>Get Started</h2>
@@ -221,7 +267,61 @@
 
     <p>There's no installation beyond cloning the repo and having <code>claude</code> in your PATH. The orchestrator is a single Python file. Fork it, modify the system prompts, tune it to your taste — the architecture is simple enough that you can reshape it without fighting a framework.</p>
 
-    <p>If you try it on something interesting, I'd love to hear what worked and what broke. The most useful feedback so far has been about the termination criterion — the Planner's <code>GOAL COMPLETE</code> call is fuzzy, and there's a more principled version hiding somewhere in there.</p>
+    <p>If you try it on something interesting, I'd love to hear what worked and what broke. The most valuable feedback so far has been about the termination criterion — the Planner's <code>GOAL COMPLETE</code> call is fuzzy, and there's a more principled version hiding somewhere in the validation-gate plus no-change-detection combination.</p>
+
+    <h2>References</h2>
+    <p class="references-intro">A reference list of the research, blog posts, and open-source projects this article draws on. Most arXiv links open directly to the paper.</p>
+
+    <h3>Multi-agent coding systems</h3>
+    <ul class="references">
+      <li>Hong et al. <em>MetaGPT: Meta Programming for a Multi-Agent Collaborative Framework.</em> ICLR 2024. <a href="https://arxiv.org/abs/2308.00352" target="_blank" rel="noopener noreferrer">arXiv:2308.00352</a></li>
+      <li>Qian et al. <em>ChatDev: Communicative Agents for Software Development.</em> ACL 2024. <a href="https://arxiv.org/abs/2307.07924" target="_blank" rel="noopener noreferrer">arXiv:2307.07924</a></li>
+      <li>Wu et al. <em>AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation.</em> 2023. <a href="https://arxiv.org/abs/2308.08155" target="_blank" rel="noopener noreferrer">arXiv:2308.08155</a></li>
+      <li>Fourney et al. <em>Magentic-One: A Generalist Multi-Agent System for Solving Complex Tasks.</em> Microsoft Research, November 2024. <a href="https://www.microsoft.com/en-us/research/publication/magentic-one-a-generalist-multi-agent-system-for-solving-complex-tasks/" target="_blank" rel="noopener noreferrer">microsoft.com</a></li>
+      <li>Yang et al. <em>SWE-Agent: Agent-Computer Interfaces Enable Automated Software Engineering.</em> NeurIPS 2024. <a href="https://arxiv.org/abs/2405.15793" target="_blank" rel="noopener noreferrer">arXiv:2405.15793</a></li>
+      <li>Aider — <em>Architect/Editor mode</em>. <a href="https://aider.chat/2024/09/26/architect.html" target="_blank" rel="noopener noreferrer">aider.chat</a></li>
+    </ul>
+
+    <h3>Iterative self-refinement</h3>
+    <ul class="references">
+      <li>Madaan et al. <em>Self-Refine: Iterative Refinement with Self-Feedback.</em> NeurIPS 2023. <a href="https://arxiv.org/abs/2303.17651" target="_blank" rel="noopener noreferrer">arXiv:2303.17651</a></li>
+      <li>Chen et al. <em>Teaching Large Language Models to Self-Debug.</em> ICLR 2024. <a href="https://arxiv.org/abs/2304.05128" target="_blank" rel="noopener noreferrer">arXiv:2304.05128</a></li>
+      <li>Shinn et al. <em>Reflexion: Language Agents with Verbal Reinforcement Learning.</em> NeurIPS 2023. <a href="https://arxiv.org/abs/2303.11366" target="_blank" rel="noopener noreferrer">arXiv:2303.11366</a></li>
+      <li>Zhou et al. <em>Language Agent Tree Search.</em> ICML 2024. <a href="https://arxiv.org/abs/2310.04406" target="_blank" rel="noopener noreferrer">arXiv:2310.04406</a></li>
+      <li>Ridnik et al. <em>Code Generation with AlphaCodium.</em> 2024. <a href="https://arxiv.org/abs/2401.08500" target="_blank" rel="noopener noreferrer">arXiv:2401.08500</a></li>
+      <li>Huang et al. <em>Large Language Models Cannot Self-Correct Reasoning Yet.</em> ICLR 2024. <a href="https://arxiv.org/abs/2310.01798" target="_blank" rel="noopener noreferrer">arXiv:2310.01798</a></li>
+      <li>Olausson et al. <em>Is Self-Repair a Silver Bullet for Code Generation?</em> ICLR 2024. <a href="https://arxiv.org/abs/2306.09896" target="_blank" rel="noopener noreferrer">arXiv:2306.09896</a></li>
+      <li>Kamoi et al. <em>When Can LLMs Actually Correct Their Own Mistakes?</em> TACL 2024. <a href="https://arxiv.org/abs/2406.01297" target="_blank" rel="noopener noreferrer">arXiv:2406.01297</a></li>
+      <li>Gehring et al. <em>RLEF: Grounding Code LLMs in Execution Feedback with RL.</em> ICML 2025. <a href="https://arxiv.org/abs/2410.02089" target="_blank" rel="noopener noreferrer">arXiv:2410.02089</a></li>
+    </ul>
+
+    <h3>Planning and execution</h3>
+    <ul class="references">
+      <li>Wang et al. <em>Plan-and-Solve Prompting.</em> ACL 2023. <a href="https://arxiv.org/abs/2305.04091" target="_blank" rel="noopener noreferrer">arXiv:2305.04091</a></li>
+      <li>Prasad et al. <em>ADaPT: As-Needed Decomposition and Planning with Language Models.</em> NAACL 2024 Findings. <a href="https://arxiv.org/abs/2311.05772" target="_blank" rel="noopener noreferrer">arXiv:2311.05772</a></li>
+      <li>Xu et al. <em>ReWOO: Decoupling Reasoning from Observations.</em> 2023. <a href="https://arxiv.org/abs/2305.18323" target="_blank" rel="noopener noreferrer">arXiv:2305.18323</a></li>
+      <li>Kim et al. <em>LLMCompiler: An LLM Compiler for Parallel Function Calling.</em> ICML 2024. <a href="https://arxiv.org/abs/2312.04511" target="_blank" rel="noopener noreferrer">arXiv:2312.04511</a></li>
+      <li>Chen et al. <em>GoalAct: Planning Decomposition Improves Coding Agents.</em> 2025. <a href="https://arxiv.org/abs/2504.16563" target="_blank" rel="noopener noreferrer">arXiv:2504.16563</a></li>
+      <li><em>Plan-and-Act.</em> Google DeepMind, 2025. <a href="https://arxiv.org/abs/2503.09572" target="_blank" rel="noopener noreferrer">arXiv:2503.09572</a></li>
+      <li>Schluntz &amp; Zhang. <em>Building Effective Agents.</em> Anthropic, December 2024. <a href="https://www.anthropic.com/research/building-effective-agents" target="_blank" rel="noopener noreferrer">anthropic.com</a></li>
+    </ul>
+
+    <h3>Context and termination</h3>
+    <ul class="references">
+      <li>Liu et al. <em>Lost in the Middle: How Language Models Use Long Contexts.</em> TACL 2024. <a href="https://arxiv.org/abs/2307.03172" target="_blank" rel="noopener noreferrer">arXiv:2307.03172</a></li>
+      <li>Fraser &amp; Lindenbauer. <em>Context Compression for Coding Agents.</em> JetBrains Research, NeurIPS 2025 DL4C Workshop. <a href="https://arxiv.org/abs/2508.21433" target="_blank" rel="noopener noreferrer">arXiv:2508.21433</a></li>
+      <li>Cemri et al. <em>A Taxonomy of Multi-Agent Failures.</em> 2025. <a href="https://arxiv.org/abs/2503.13657" target="_blank" rel="noopener noreferrer">arXiv:2503.13657</a></li>
+    </ul>
+
+    <h3>Benchmarks &amp; tools</h3>
+    <ul class="references">
+      <li>Jimenez et al. <em>SWE-bench: Can Language Models Resolve Real-World GitHub Issues?</em> ICLR 2024. <a href="https://arxiv.org/abs/2310.06770" target="_blank" rel="noopener noreferrer">arXiv:2310.06770</a></li>
+      <li><em>SWE-bench Pro.</em> Scale AI, 2025. <a href="https://arxiv.org/abs/2509.16941" target="_blank" rel="noopener noreferrer">arXiv:2509.16941</a></li>
+      <li>Jain et al. <em>LiveCodeBench.</em> 2024. <a href="https://arxiv.org/abs/2403.07974" target="_blank" rel="noopener noreferrer">arXiv:2403.07974</a></li>
+      <li>Anthropic. <em>Claude Code.</em> <a href="https://www.anthropic.com/claude-code" target="_blank" rel="noopener noreferrer">anthropic.com/claude-code</a></li>
+      <li><em>Claude Agent SDK.</em> <a href="https://docs.claude.com/en/api/agent-sdk/overview" target="_blank" rel="noopener noreferrer">docs.claude.com</a></li>
+      <li>Project source: <a href="https://github.com/josephgec/claude-agent" target="_blank" rel="noopener noreferrer">github.com/josephgec/claude-agent</a></li>
+    </ul>
   </div>
 
   <div class="post-nav" role="navigation" aria-label="Post navigation">
