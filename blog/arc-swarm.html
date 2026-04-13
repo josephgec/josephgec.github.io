@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>When Swarms Write Code — How Particle Swarm Optimization Escapes the Local Minima Trap in ARC-AGI · Joseph Thomas</title>
+  <meta name="description" content="Standard LLM agents get stuck in local minima on ARC-AGI. The fix: swap the single-agent loop for a PSO-governed swarm of specialized LLM particles with a continuous fitness function." />
+  <meta name="keywords" content="ARC-AGI, Particle Swarm Optimization, PSO, swarm intelligence, code generation, LLM agents, François Chollet, Kennedy Eberhart, Joseph Thomas, Glowworm Swarm" />
+  <meta name="author" content="Joseph Thomas" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://jthomas.site/blog/arc-swarm" />
+  <meta name="theme-color" content="#0a1628" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://jthomas.site/blog/arc-swarm" />
+  <meta property="og:title" content="When Swarms Write Code — PSO vs. the Local Minima Trap in ARC-AGI" />
+  <meta property="og:description" content="Replace the single-agent loop with a swarm of specialized LLM-powered particles governed by Particle Swarm Optimization. The swarm provides the strategy; the LLM provides the syntax." />
+  <meta property="og:image" content="https://jthomas.site/photo.jpg" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:site_name" content="Joseph Thomas" />
+  <meta property="article:published_time" content="2026-04-13" />
+  <meta property="article:author" content="Joseph Thomas" />
+  <meta property="article:tag" content="Swarm Intelligence" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="When Swarms Write Code — PSO vs. ARC-AGI" />
+  <meta name="twitter:description" content="A swarm of specialized LLM particles governed by PSO, with a continuous fitness function that rewards near misses on ARC-AGI." />
+  <meta name="twitter:image" content="https://jthomas.site/photo.jpg" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "When Swarms Write Code — How Particle Swarm Optimization Escapes the Local Minima Trap in ARC-AGI",
+    "description": "A hybrid architecture combining Particle Swarm Optimization with LLM code generation to escape the local minima trap that single-agent ARC-AGI solvers fall into.",
+    "datePublished": "2026-04-13",
+    "url": "https://jthomas.site/blog/arc-swarm",
+    "author": {
+      "@type": "Person",
+      "name": "Joseph Thomas",
+      "url": "https://jthomas.site/"
+    },
+    "publisher": {
+      "@type": "Person",
+      "name": "Joseph Thomas",
+      "url": "https://jthomas.site/"
+    },
+    "mainEntityOfPage": "https://jthomas.site/blog/arc-swarm",
+    "keywords": ["ARC-AGI", "Particle Swarm Optimization", "Swarm Intelligence", "Code Generation", "LLM Agents"]
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&display=swap" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;400;500;600;700;800&family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+
+  <link rel="stylesheet" href="../styles.css" />
+</head>
+<body class="blog-page">
+
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<nav aria-label="Site navigation" id="mainNav">
+  <div class="nav-inner">
+    <a class="nav-name" href="../index.html" style="text-decoration:none;">JT</a>
+    <ul class="nav-links">
+      <li><a href="../index.html#experience" aria-label="View Experience on homepage">Experience</a></li>
+      <li><a href="../index.html#education" aria-label="View Education on homepage">Education</a></li>
+      <li><a href="../index.html#publications" aria-label="View Research on homepage">Research</a></li>
+      <li><a href="../index.html#projects" aria-label="View Projects on homepage">Projects</a></li>
+      <li><a href="index.html" aria-label="Writing — blog" aria-current="page">Writing</a></li>
+      <li><a href="../consulting.html" aria-label="View Consulting services">Consulting</a></li>
+    </ul>
+  </div>
+</nav>
+
+<article class="post">
+  <header class="post-header" id="hero">
+    <canvas class="hero-canvas" id="swarmCanvas"></canvas>
+    <div class="post-header-inner">
+      <a class="writing-back post-back" href="index.html">
+        <span class="writing-back-arrow">←</span>
+        Back to Writing
+      </a>
+      <div class="post-meta">
+        <span class="writing-date">April 2026</span>
+        <span class="proj-lang">Swarm Intelligence</span>
+        <span class="writing-read-time">13 min read</span>
+      </div>
+      <h1 class="post-title">When Swarms Write Code — How Particle Swarm Optimization Escapes the Local Minima Trap in ARC-AGI</h1>
+      <p class="post-lede">Standard LLM agents get stuck in repetitive loops on novel reasoning puzzles — structurally equivalent to converging on a local minimum. A swarm of specialized LLM particles governed by Particle Swarm Optimization, with a continuous fitness function that rewards near misses, searches the space of possible programs systematically instead of spinning in place.</p>
+    </div>
+  </header>
+
+  <div class="post-body">
+    <p><strong>TL;DR</strong> — Standard LLM agents, when faced with novel reasoning puzzles, tend to get stuck in repetitive generation cycles — a phenomenon that's structurally equivalent to converging on a local minimum in optimization. A <a href="https://github.com/josephgec/arc-agi-search" target="_blank" rel="noopener noreferrer">new open-source project</a> attacks this problem by replacing the single-agent loop with a <em>swarm</em> of specialized LLM-powered particles governed by Particle Swarm Optimization. The result is a system that searches the space of possible programs systematically rather than randomly, and rewards "near misses" rather than demanding perfection at every step.</p>
+
+    <h2>Why ARC-AGI Breaks Chain-of-Thought</h2>
+    <p>François Chollet's <a href="https://github.com/fchollet/ARC-AGI" target="_blank" rel="noopener noreferrer">Abstraction and Reasoning Corpus</a> remains one of the most unforgiving benchmarks in AI. Each task consists of a handful of input–output grid pairs that demonstrate some visual transformation rule — rotate, recolor, tile, fill, extract — and the solver must infer that rule from as few as two or three examples, then apply it to an unseen test input. There are no training distributions to memorize, no statistical shortcuts. The benchmark is a direct test of <em>fluid intelligence</em>: the ability to solve problems you have never seen before.</p>
+
+    <p>Large Language Models, despite their remarkable breadth, struggle here. The standard approach — wrap a model in a Chain-of-Thought agent loop, generate a candidate program, test it, feed the error back, and try again — works for well-structured tasks but collapses on ARC. The failure mode is predictable: the agent proposes a hypothesis, discovers it's wrong, tweaks it slightly, discovers it's still wrong, tweaks it again along the same axis, and spirals into a repetitive generation cycle. Anyone who has watched an LLM debug its own code recognizes the pattern. In optimization terms, the agent has converged on a <strong>local minimum</strong> — a region of solution space that's locally attractive but globally suboptimal — and lacks the mechanism to escape.</p>
+
+    <p>The <a href="https://github.com/josephgec/arc-agi-search" target="_blank" rel="noopener noreferrer">ARC-AGI PSO Swarm Solver</a> is built on a single insight: <strong>if the problem is convergence to local minima, the solution is an optimizer specifically designed to avoid them.</strong> Particle Swarm Optimization is exactly that optimizer.</p>
+
+    <h2>Swarm vs. Single Agent</h2>
+
+    <h3>Why PSO?</h3>
+    <p>PSO, introduced by Kennedy and Eberhart in 1995, simulates a flock of birds searching for food. Each "particle" in the swarm maintains its own position and velocity in a search space. Particles are pulled in two directions simultaneously: toward their own <strong>personal best</strong> (<code>pbest</code>) — the best solution they have individually discovered — and toward the <strong>global best</strong> (<code>gbest</code>) — the best solution any particle in the swarm has found. An inertia term keeps particles from oscillating too aggressively. The interplay between personal memory and social information sharing is what gives PSO its ability to escape local minima: even if one particle gets stuck, the social pull from a better-performing neighbor can yank it into a more promising region.</p>
+
+    <p>The update equations, as implemented in <code>pso_orchestrator.py</code>, are:</p>
+
+    <pre class="codeblock"><code><span class="ck-comment"># velocity and target update — one step per iteration, per particle</span>
+v_i      <span class="ck-cmd">=</span>  w · v_i  <span class="ck-cmd">+</span>  c1 · r1 · (pbest_i <span class="ck-cmd">-</span> x_i)  <span class="ck-cmd">+</span>  c2 · r2 · (gbest <span class="ck-cmd">-</span> x_i)
+target_i <span class="ck-cmd">=</span>  normalize(x_i <span class="ck-cmd">+</span> v_i)
+
+<span class="ck-comment"># w  = 0.5        inertia</span>
+<span class="ck-comment"># c1 = c2 = 1.5   cognitive and social coefficients</span>
+<span class="ck-comment"># r1, r2 ~ U[0,1] stochastic jitter</span></code></pre>
+
+    <p>The result is a target point on a 768-dimensional unit sphere — a direction the particle should move toward.</p>
+
+    <h3>The Inverse Mapping Problem</h3>
+    <p>There's a catch. PSO operates in continuous space — real-valued vectors. But the "solutions" in ARC are <em>programs</em>: discrete sequences of Python code. You can easily embed code into a continuous vector (that's what embedding models do), but you <em>cannot</em> decode an arbitrary floating-point vector back into valid Python. The mapping is one-directional. This is the <strong>Inverse Mapping Problem</strong>, and it's the central technical obstacle the project had to solve.</p>
+
+    <h3>The Generate-and-Project Bridge</h3>
+    <p>The solution is elegant. Rather than trying to invert the embedding, the system uses the LLM as a <em>generative projector</em>:</p>
+
+    <ol>
+      <li><strong>PSO computes a target vector</strong> in continuous embedding space, representing the direction a particle should explore.</li>
+      <li><strong>The LLM generates K candidate programs</strong> (default K=5), each blending logic from the particle's personal best and the swarm's global best.</li>
+      <li><strong>Each candidate is embedded</strong> into the same 768-dimensional space using <code>nomic-embed-text</code>.</li>
+      <li><strong>The candidate closest to the PSO target</strong> (by cosine distance) is selected.</li>
+    </ol>
+
+    <p>This is the <strong>Generate-and-Project bridge</strong> — the mechanism that decouples <em>search direction</em> (computed mathematically by PSO) from <em>solution generation</em> (performed semantically by the LLM). The swarm handles exploration strategy; the LLM handles the syntax.</p>
+
+    <figure class="svg-figure">
+      <svg viewBox="0 0 680 560" width="100%" role="img" aria-label="Architecture diagram showing continuous embedding space, a four-step generate-and-project bridge, and discrete code space">
+        <defs>
+          <marker id="arrow-arc" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6 z" fill="#566068"/>
+          </marker>
+          <marker id="arrow-arc-cyan" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6 z" fill="#0891b2"/>
+          </marker>
+        </defs>
+
+        <!-- Top: continuous embedding space -->
+        <rect x="20" y="20" width="640" height="140" rx="12" fill="#ecfeff" stroke="#67e8f9" stroke-width="1.5" stroke-dasharray="6 4"/>
+        <text x="40" y="48" font-family="Syne, sans-serif" font-weight="700" font-size="13" fill="#0e7490">Continuous Embedding Space</text>
+        <text x="230" y="48" font-family="JetBrains Mono, monospace" font-size="10" fill="#0891b2">768-d · real-valued vectors · cosine geometry</text>
+
+        <!-- particles in the embedding space (dots) -->
+        <circle cx="90"  cy="100" r="5" fill="#0891b2"/>
+        <circle cx="140" cy="130" r="5" fill="#7c3aed"/>
+        <circle cx="210" cy="90"  r="5" fill="#d97706"/>
+        <circle cx="260" cy="120" r="5" fill="#059669"/>
+        <circle cx="310" cy="105" r="5" fill="#e11d48"/>
+        <circle cx="370" cy="130" r="5" fill="#ea580c"/>
+
+        <!-- velocity arrows from particles -->
+        <line x1="90"  y1="100" x2="115" y2="110" stroke="#94a3b8" stroke-width="1.2" marker-end="url(#arrow-arc)"/>
+        <line x1="140" y1="130" x2="170" y2="118" stroke="#94a3b8" stroke-width="1.2" marker-end="url(#arrow-arc)"/>
+        <line x1="210" y1="90"  x2="240" y2="105" stroke="#94a3b8" stroke-width="1.2" marker-end="url(#arrow-arc)"/>
+        <line x1="260" y1="120" x2="290" y2="115" stroke="#94a3b8" stroke-width="1.2" marker-end="url(#arrow-arc)"/>
+        <line x1="310" y1="105" x2="340" y2="118" stroke="#94a3b8" stroke-width="1.2" marker-end="url(#arrow-arc)"/>
+        <line x1="370" y1="130" x2="395" y2="122" stroke="#94a3b8" stroke-width="1.2" marker-end="url(#arrow-arc)"/>
+
+        <!-- gbest star -->
+        <polygon points="440,100 445,112 458,112 447,120 451,132 440,125 429,132 433,120 422,112 435,112" fill="#d97706" stroke="#92400e" stroke-width="1"/>
+        <text x="465" y="106" font-family="JetBrains Mono, monospace" font-size="10" fill="#92400e" font-weight="600">gbest</text>
+
+        <!-- PSO target marker -->
+        <g transform="translate(560, 100)">
+          <line x1="-8" y1="-8" x2="8" y2="8" stroke="#0891b2" stroke-width="2"/>
+          <line x1="-8" y1="8" x2="8" y2="-8" stroke="#0891b2" stroke-width="2"/>
+        </g>
+        <text x="578" y="106" font-family="JetBrains Mono, monospace" font-size="10" fill="#0891b2" font-weight="600">PSO target</text>
+
+        <!-- Connector down from top zone -->
+        <line x1="340" y1="162" x2="340" y2="200" stroke="#0891b2" stroke-width="2" marker-end="url(#arrow-arc-cyan)" stroke-dasharray="3 3"/>
+
+        <!-- Bridge label -->
+        <text x="340" y="220" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="600" fill="#566068" letter-spacing="1.2">GENERATE-AND-PROJECT BRIDGE</text>
+
+        <!-- Four-step bridge -->
+        <rect x="30"  y="238" width="140" height="70" rx="8" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.3"/>
+        <text x="100" y="262" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#5b21b6">1</text>
+        <text x="100" y="282" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="11" fill="#5b21b6">PSO target</text>
+        <text x="100" y="298" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#7c3aed">direction in 768-d</text>
+
+        <line x1="172" y1="273" x2="198" y2="273" stroke="#566068" stroke-width="1.5" marker-end="url(#arrow-arc)"/>
+
+        <rect x="200" y="238" width="140" height="70" rx="8" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.3"/>
+        <text x="270" y="262" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#5b21b6">2</text>
+        <text x="270" y="282" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="11" fill="#5b21b6">LLM generates</text>
+        <text x="270" y="298" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#7c3aed">K=5 candidate programs</text>
+
+        <line x1="342" y1="273" x2="368" y2="273" stroke="#566068" stroke-width="1.5" marker-end="url(#arrow-arc)"/>
+
+        <rect x="370" y="238" width="140" height="70" rx="8" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.3"/>
+        <text x="440" y="262" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#5b21b6">3</text>
+        <text x="440" y="282" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="11" fill="#5b21b6">Embed each</text>
+        <text x="440" y="298" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#7c3aed">back into 768-d</text>
+
+        <line x1="512" y1="273" x2="538" y2="273" stroke="#566068" stroke-width="1.5" marker-end="url(#arrow-arc)"/>
+
+        <rect x="540" y="238" width="120" height="70" rx="8" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.3"/>
+        <text x="600" y="262" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#5b21b6">4</text>
+        <text x="600" y="282" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="11" fill="#5b21b6">Pick closest</text>
+        <text x="600" y="298" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#7c3aed">by cosine distance</text>
+
+        <!-- Connector down from bridge to code space -->
+        <line x1="340" y1="320" x2="340" y2="370" stroke="#566068" stroke-width="1.5" marker-end="url(#arrow-arc)"/>
+
+        <!-- Bottom: discrete code space -->
+        <rect x="20" y="380" width="640" height="160" rx="12" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.5"/>
+        <text x="40" y="408" font-family="Syne, sans-serif" font-weight="700" font-size="13" fill="#92400e">Discrete Code Space</text>
+        <text x="210" y="408" font-family="JetBrains Mono, monospace" font-size="10" fill="#d97706">Python programs · no valid interpolation</text>
+
+        <!-- Candidate program cards -->
+        <g font-family="JetBrains Mono, monospace" font-size="9" fill="#92400e">
+          <rect x="50"  y="428" width="110" height="90" rx="6" fill="#ffffff" stroke="#fcd34d" stroke-width="1.2"/>
+          <text x="60" y="446">def transform(g):</text>
+          <text x="60" y="460">  g = rotate(g, 90)</text>
+          <text x="60" y="474">  return recolor(</text>
+          <text x="60" y="488">    g, 3, 7)</text>
+          <text x="105" y="510" text-anchor="middle" font-size="8" fill="#d97706">candidate 1</text>
+
+          <rect x="170" y="428" width="110" height="90" rx="6" fill="#ffffff" stroke="#fcd34d" stroke-width="1.2"/>
+          <text x="180" y="446">def transform(g):</text>
+          <text x="180" y="460">  o = find_objects(</text>
+          <text x="180" y="474">    g)</text>
+          <text x="180" y="488">  return scale(o, 2)</text>
+          <text x="225" y="510" text-anchor="middle" font-size="8" fill="#d97706">candidate 2</text>
+
+          <rect x="290" y="428" width="110" height="90" rx="6" fill="#ecfeff" stroke="#0891b2" stroke-width="2"/>
+          <text x="300" y="446">def transform(g):</text>
+          <text x="300" y="460">  g = flip(g, "h")</text>
+          <text x="300" y="474">  return tile(g,</text>
+          <text x="300" y="488">    rows=2, cols=2)</text>
+          <text x="345" y="510" text-anchor="middle" font-size="8" fill="#0891b2" font-weight="700">selected ★</text>
+
+          <rect x="410" y="428" width="110" height="90" rx="6" fill="#ffffff" stroke="#fcd34d" stroke-width="1.2"/>
+          <text x="420" y="446">def transform(g):</text>
+          <text x="420" y="460">  m = mask(g, 0)</text>
+          <text x="420" y="474">  return flood_fill(</text>
+          <text x="420" y="488">    g, m, 5)</text>
+          <text x="465" y="510" text-anchor="middle" font-size="8" fill="#d97706">candidate 4</text>
+
+          <rect x="530" y="428" width="110" height="90" rx="6" fill="#ffffff" stroke="#fcd34d" stroke-width="1.2"/>
+          <text x="540" y="446">def transform(g):</text>
+          <text x="540" y="460">  b = bounding_box(</text>
+          <text x="540" y="474">    g)</text>
+          <text x="540" y="488">  return crop(g, b)</text>
+          <text x="585" y="510" text-anchor="middle" font-size="8" fill="#d97706">candidate 5</text>
+        </g>
+      </svg>
+      <figcaption>The Generate-and-Project bridge. PSO picks a direction in continuous space; the LLM generates K candidate programs; each candidate is re-embedded; the one closest to the PSO target is selected and becomes the particle's new position.</figcaption>
+    </figure>
+
+    <h2>Specialized Roles: Diversity by Design</h2>
+    <p>A well-known failure mode of PSO is <em>premature convergence</em> — all particles collapsing to the same region before the space has been adequately explored. The standard countermeasure is population diversity, and this project enforces it through <strong>specialist roles</strong>.</p>
+
+    <p>Each of the six particles in the swarm is initialized with a distinct cognitive bias:</p>
+
+    <table>
+      <thead>
+        <tr><th>Role</th><th>Focus Area</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Geometric Specialist</td><td>Rotation, flipping, translation, scaling</td></tr>
+        <tr><td>Color Specialist</td><td>Recoloring, masking, palette operations</td></tr>
+        <tr><td>Pattern Analyst</td><td>Periodic tiling, symmetry detection</td></tr>
+        <tr><td>Object Tracker</td><td>Connected-component analysis, bounding boxes</td></tr>
+        <tr><td>Rule Abstractor</td><td>Minimal abstract rules, clean generalization</td></tr>
+        <tr><td>Hybrid Solver</td><td>Holistic reasoning across all strategies</td></tr>
+      </tbody>
+    </table>
+
+    <p>These roles aren't just labels. Each particle's initialization prompt is tailored to its specialty, meaning the swarm's starting population covers the major reasoning strategies observed across ARC tasks. A geometric specialist will propose rotations and reflections; a color specialist will explore palette remappings. Even if one approach is a dead end, the others keep searching.</p>
+
+    <p>This is a departure from typical multi-agent LLM systems, where agents are often differentiated by <em>tone</em> or <em>persona</em>. Here, the differentiation is <em>functional</em> — it directly shapes the region of program space each particle explores during its first iterations.</p>
+
+    <h2>Advanced Mechanics</h2>
+
+    <h3>Hypothesis-Guided Initialization</h3>
+    <p>Before the PSO loop begins, a <strong>Hypothesizer</strong> agent (defined in <code>roles.py</code>) examines the training examples and generates three competing natural-language hypotheses about what the transformation rule might be. This isn't idle speculation — it gives the swarm a warm start. The initial code generated for each particle is informed by these hypotheses, meaning the swarm begins its search in a neighborhood that's at least plausibly correct, rather than starting from random programs.</p>
+
+    <h3>The Multi-Agent Fallback</h3>
+    <p>The PSO solver doesn't exist in isolation. The repository also implements a full multi-agent pipeline — Hypothesizer, Coder, Critic, Decomposer, and Verifier — organized as a state machine in <code>multi_agent.py</code>. The Critic reads spatial diffs (e.g., <em>"object shifted 2 rows down,"</em> <em>"bottom-right region: 3 wrong cells, expected blue, got red"</em>) and routes the conversation either back to the Coder for an implementation fix, or back to the Hypothesizer for a fundamentally new approach. A Decomposer fires when stagnation is detected (two or more consecutive non-improving cycles), breaking the task into sub-goals to restart the search.</p>
+
+    <p>This multi-agent loop is the backbone of the non-PSO strategies, and it also feeds an ensemble pipeline where multiple independent runs are pooled and resolved via pixel-level weighted majority voting.</p>
+
+    <h3>Crossover and Stagnation Recovery</h3>
+    <p>Within the PSO loop itself, the <code>PSOCoder</code> role (the LLM prompt that generates candidate mutations) is explicitly instructed to <em>blend</em> the logic of <code>pbest_code</code> and <code>gbest_code</code>. This is conceptually identical to <strong>crossover</strong> in genetic algorithms — combining successful sub-programs from two parents to produce offspring that inherit the strengths of both. If a particle's personal best knows how to get the colors right, and the global best knows how to get the shape right, the LLM is prompted to merge those two insights into a single program.</p>
+
+    <p>When the entire swarm stagnates, the velocity update equation naturally increases the social pull toward <code>gbest</code>, causing particles to converge — but because each new iteration generates fresh candidates from the LLM, even converged particles can escape if the LLM introduces a novel variation. The stochastic jitter from <code>r1</code> and <code>r2</code> at every step prevents the swarm from locking permanently.</p>
+
+    <h2>The Continuous Fitness Function: Rewarding Near Misses</h2>
+    <p>Perhaps the most consequential design choice in the entire system is the decision to replace ARC's native binary evaluation (pass/fail) with a <strong>continuous fitness function</strong>. PSO needs a gradient — not in the calculus sense, but in the sense that it needs to know whether a particle is <em>getting warmer</em>. A binary signal provides no information about how close a wrong answer actually was.</p>
+
+    <p>The continuous fitness function, implemented in <code>evaluate.py</code>, decomposes correctness into three weighted components:</p>
+
+    <pre class="codeblock"><code>fitness <span class="ck-cmd">=</span>  <span class="ck-flag">0.20</span> · dim_score
+          <span class="ck-cmd">+</span> <span class="ck-flag">0.30</span> · color_score
+          <span class="ck-cmd">+</span> <span class="ck-flag">0.50</span> · pixel_score</code></pre>
+
+    <p><strong>Dimension score (20%)</strong> measures whether the output grid has the right shape. If the predicted grid is 5×3 but the target is 5×5, this component penalizes proportionally rather than returning zero.</p>
+
+    <p><strong>Color score (30%)</strong> uses the Jaccard index over color palettes. A program that uses the correct set of colors — even if they're in the wrong positions — gets partial credit. This is a strong signal: if you have the right palette, you're probably on the right track.</p>
+
+    <p><strong>Pixel score (50%)</strong> counts cell-by-cell matches. This is the dominant term, but crucially, it's not all-or-nothing. A program that gets 80% of cells correct scores 0.4 on this component alone, which is enough to make it a competitive <code>pbest</code> and potentially the new <code>gbest</code>.</p>
+
+    <p>An <strong>AST complexity penalty</strong> is also applied, deducting up to 0.15 from the raw fitness for programs that show signs of memorization — excessive <code>if</code> statements, large hardcoded literals, and comparison chains. This keeps the swarm honest: it must find generalizable rules, not lookup tables.</p>
+
+    <p>The result is a fitness landscape with smooth gradients that PSO can actually navigate. A typical progression looks like:</p>
+
+    <pre class="codeblock"><code><span class="ck-comment">iteration  fitness   what happened</span>
+<span class="ck-flag">0</span>          <span class="ck-flag">0.12</span>      random code · wrong shape · wrong colors
+<span class="ck-flag">1</span>          <span class="ck-flag">0.31</span>      right colors emerging
+<span class="ck-flag">2</span>          <span class="ck-flag">0.54</span>      correct shape · ~50% pixel accuracy
+<span class="ck-flag">3</span>          <span class="ck-flag">0.83</span>      logic mostly right · edge cases wrong
+<span class="ck-flag">4</span>          <span class="ck-flag">1.00</span>      solved</code></pre>
+
+    <p>Each step is meaningful. Each step gives the swarm a direction.</p>
+
+    <figure class="svg-figure">
+      <svg viewBox="0 0 680 380" width="100%" role="img" aria-label="Fitness landscape showing local maxima trapping a single-agent search while a swarm distributes across the landscape and finds the global optimum">
+        <defs>
+          <marker id="arrow-land" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6 z" fill="#566068"/>
+          </marker>
+          <linearGradient id="land-grad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#ecfeff" stop-opacity="0.8"/>
+            <stop offset="100%" stop-color="#ecfeff" stop-opacity="0.2"/>
+          </linearGradient>
+        </defs>
+
+        <!-- Plot frame -->
+        <rect x="60" y="40" width="580" height="280" fill="#fafbfc" stroke="#e5e7eb" stroke-width="1"/>
+
+        <!-- Y axis labels -->
+        <text x="52" y="46"  text-anchor="end" font-family="JetBrains Mono, monospace" font-size="9" fill="#94a3b8">1.0</text>
+        <text x="52" y="115" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="9" fill="#94a3b8">0.75</text>
+        <text x="52" y="184" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="9" fill="#94a3b8">0.5</text>
+        <text x="52" y="253" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="9" fill="#94a3b8">0.25</text>
+        <text x="52" y="322" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="9" fill="#94a3b8">0.0</text>
+        <text x="28" y="180" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068" transform="rotate(-90 28 180)">fitness</text>
+
+        <!-- X axis label -->
+        <text x="350" y="352" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068">program space (1-d projection)</text>
+
+        <!-- Grid lines -->
+        <g stroke="#e5e7eb" stroke-width="0.6" stroke-dasharray="2 3">
+          <line x1="60" y1="115" x2="640" y2="115"/>
+          <line x1="60" y1="184" x2="640" y2="184"/>
+          <line x1="60" y1="253" x2="640" y2="253"/>
+        </g>
+
+        <!-- Landscape curve (higher y = lower fitness). Filled -->
+        <path d="M 60,310 C 90,295 110,220 140,215 C 170,212 190,285 215,280 C 245,270 260,150 295,148 C 320,148 345,260 380,258 C 410,257 440,215 470,210 C 500,205 520,75 555,70 C 585,68 605,165 640,185 L 640,320 L 60,320 Z"
+              fill="url(#land-grad)" stroke="none"/>
+        <path d="M 60,310 C 90,295 110,220 140,215 C 170,212 190,285 215,280 C 245,270 260,150 295,148 C 320,148 345,260 380,258 C 410,257 440,215 470,210 C 500,205 520,75 555,70 C 585,68 605,165 640,185"
+              stroke="#0891b2" stroke-width="1.8" fill="none"/>
+
+        <!-- Peak annotations -->
+        <!-- Local max 1 -->
+        <circle cx="140" cy="215" r="3" fill="#566068"/>
+        <text x="140" y="204" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#566068">local max</text>
+
+        <!-- Trap peak (local max 2) -->
+        <circle cx="295" cy="148" r="4" fill="#d97706"/>
+        <text x="295" y="136" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#d97706">single-agent trap</text>
+
+        <!-- Global max -->
+        <circle cx="555" cy="70" r="5" fill="#059669"/>
+        <text x="555" y="56" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#059669">global optimum</text>
+
+        <!-- Single-agent path: stuck at trap peak -->
+        <path d="M 85,300 Q 170,240 280,155" stroke="#d97706" stroke-width="1.8" stroke-dasharray="4 3" fill="none" marker-end="url(#arrow-land)"/>
+        <text x="140" y="298" font-family="JetBrains Mono, monospace" font-size="9" fill="#d97706">single-agent: gets stuck</text>
+
+        <!-- Swarm particles scattered, with one reaching global -->
+        <circle cx="100" cy="290" r="4" fill="#0891b2"/>
+        <circle cx="185" cy="255" r="4" fill="#7c3aed"/>
+        <circle cx="260" cy="200" r="4" fill="#e11d48"/>
+        <circle cx="390" cy="260" r="4" fill="#ea580c"/>
+        <circle cx="470" cy="180" r="4" fill="#059669"/>
+        <circle cx="550" cy="90"  r="5" fill="#0891b2" stroke="#0e7490" stroke-width="1.5"/>
+
+        <!-- Swarm path: wider search ending at global max -->
+        <path d="M 100,290 Q 200,260 300,230 Q 400,200 460,150 Q 510,105 545,85" stroke="#0891b2" stroke-width="1.5" stroke-dasharray="2 2" fill="none" opacity="0.7"/>
+        <text x="395" y="135" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#0891b2">swarm: spreads &amp; finds global</text>
+      </svg>
+      <figcaption>A 1-D cross-section of the fitness landscape. A single-agent, greedy-ascent search climbs to the nearest local maximum and stops. The swarm spreads across the landscape and some particles eventually find the global optimum.</figcaption>
+    </figure>
+
+    <h2>The Tech Stack</h2>
+    <div class="tech-stack-pills">
+      <span class="proj-lang">Python</span>
+      <span class="proj-lang">NumPy</span>
+      <span class="proj-lang">Ollama</span>
+      <span class="proj-lang">nomic-embed-text</span>
+      <span class="proj-lang">Anthropic (optional)</span>
+    </div>
+
+    <p>The project is deliberately lean. <strong>Python</strong> is the implementation language, with NumPy for grid operations and the DSL primitives. <strong>Ollama</strong> provides local LLM inference with tiered model selection — the <code>start_ollama.sh</code> script auto-configures for available VRAM, from an 8 GB <code>deepseek-r1:8b</code> + <code>qwen2.5-coder:7b</code> setup up to a 32 GB <code>deepseek-r1:32b</code> configuration. Embeddings are always handled by <strong>nomic-embed-text</strong>, a 768-dimensional open-weight model running locally with no API costs.</p>
+
+    <p>The custom ARC DSL (<code>dsl.py</code>) provides a set of pure transformation primitives — <code>crop</code>, <code>rotate</code>, <code>flip</code>, <code>translate</code>, <code>scale</code>, <code>tile</code>, <code>recolor</code>, <code>mask</code>, <code>overlay</code>, <code>flood_fill</code>, <code>find_objects</code>, <code>bounding_box</code>, <code>crop_to_content</code> — that are the only operations permitted inside generated <code>transform()</code> functions. These are injected into a hardened sandbox (<code>sandbox.py</code>) that executes untrusted code in a separate child process with a 10-second wall-clock timeout and no network or filesystem access.</p>
+
+    <p>An optional <strong>Anthropic backend</strong> is also supported — the same swarm architecture can use Claude models for generation while keeping embeddings local through Ollama. The test suite covers <strong>496 tests at 94% code coverage</strong>, with all LLM calls mocked for fully offline execution.</p>
+
+    <h2>Closing Thoughts: What the Hybrid Tells Us</h2>
+    <p>This project is small in scale — six particles, a handful of local models, 400 training tasks — but the architecture it demonstrates has implications that extend well beyond ARC.</p>
+
+    <p><strong>The failure of single-agent loops is structural, not parametric.</strong> You can't fix a local-minimum problem by making the model larger or the prompt longer. You fix it by changing the search algorithm. The ARC-AGI PSO Swarm Solver makes this argument concretely: the same LLM that gets stuck in a single-agent loop becomes dramatically more effective when its outputs are governed by a population-based optimizer.</p>
+
+    <p><strong>The Generate-and-Project bridge is a general pattern.</strong> Any problem where the solution space is discrete but evaluation is continuous — code synthesis, molecular design, circuit layout, drug discovery — could benefit from this architecture. The LLM handles the generative step (producing valid candidates in the discrete space), and the optimizer handles the search step (deciding which direction to explore next in continuous space). Neither could do the other's job.</p>
+
+    <p><strong>Continuous fitness functions unlock optimization for symbolic domains.</strong> The decision to reward near misses rather than demanding perfection is what makes PSO viable here. Binary evaluation gives one bit of information per candidate. Continuous evaluation gives a real-valued gradient. That difference is the difference between random search and directed search.</p>
+
+    <p><strong>Diversity is not a luxury; it is a mechanism.</strong> The specialist roles are not a gimmick — they are the primary defense against premature convergence. This echoes a deep insight from evolutionary computation: maintaining population diversity isn't about fairness or coverage for its own sake, but about preserving the swarm's ability to escape local optima.</p>
+
+    <p>Whether this particular architecture will scale to the hardest tiers of ARC-AGI remains an open question. But the intellectual contribution is clear: <strong>the best use of an LLM in a reasoning system may not be as the reasoner, but as the mutation engine in a larger optimization loop.</strong> The swarm provides the strategy. The LLM provides the syntax. Together, they search a space that neither could navigate alone.</p>
+
+    <figure class="svg-figure">
+      <svg viewBox="0 0 680 460" width="100%" role="img" aria-label="Snapshot of six specialized PSO particles in 2D projected embedding space with velocity arrows pointing toward the swarm's global best">
+        <defs>
+          <marker id="arrow-part" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6 z" fill="#94a3b8"/>
+          </marker>
+        </defs>
+
+        <!-- Search space container -->
+        <rect x="20" y="20" width="470" height="420" rx="12" fill="#fafbfc" stroke="#e5e7eb" stroke-width="1"/>
+        <text x="40" y="48" font-family="JetBrains Mono, monospace" font-size="10" font-weight="600" fill="#566068" letter-spacing="1.2">2-D PROJECTION OF 768-d EMBEDDING SPACE</text>
+
+        <!-- Background grid -->
+        <g stroke="#eef2f6" stroke-width="0.8">
+          <line x1="100" y1="60" x2="100" y2="420"/>
+          <line x1="180" y1="60" x2="180" y2="420"/>
+          <line x1="260" y1="60" x2="260" y2="420"/>
+          <line x1="340" y1="60" x2="340" y2="420"/>
+          <line x1="420" y1="60" x2="420" y2="420"/>
+          <line x1="40"  y1="100" x2="480" y2="100"/>
+          <line x1="40"  y1="180" x2="480" y2="180"/>
+          <line x1="40"  y1="260" x2="480" y2="260"/>
+          <line x1="40"  y1="340" x2="480" y2="340"/>
+        </g>
+
+        <!-- gbest (center-ish) -->
+        <g transform="translate(280, 220)">
+          <polygon points="0,-20 6,-6 22,-6 10,3 15,18 0,10 -15,18 -10,3 -22,-6 -6,-6" fill="#d97706" stroke="#92400e" stroke-width="1.5"/>
+        </g>
+        <text x="280" y="210" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#92400e">gbest</text>
+
+        <!-- Particles (with velocity arrows toward gbest) -->
+        <!-- 1. Geometric (cyan) -->
+        <circle cx="90" cy="110" r="8" fill="#0891b2" stroke="#0e7490" stroke-width="1.5"/>
+        <line x1="98" y1="118" x2="160" y2="160" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow-part)"/>
+        <text x="90" y="96" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#0e7490">geom</text>
+
+        <!-- 2. Color (violet) -->
+        <circle cx="430" cy="95" r="8" fill="#7c3aed" stroke="#5b21b6" stroke-width="1.5"/>
+        <line x1="422" y1="105" x2="340" y2="170" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow-part)"/>
+        <text x="430" y="82" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#5b21b6">color</text>
+
+        <!-- 3. Pattern (amber) -->
+        <circle cx="80" cy="320" r="8" fill="#d97706" stroke="#92400e" stroke-width="1.5"/>
+        <line x1="90" y1="312" x2="180" y2="260" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow-part)"/>
+        <text x="80" y="344" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#92400e">pattern</text>
+
+        <!-- 4. Object tracker (emerald) -->
+        <circle cx="440" cy="360" r="8" fill="#059669" stroke="#065f46" stroke-width="1.5"/>
+        <line x1="430" y1="352" x2="340" y2="290" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow-part)"/>
+        <text x="440" y="384" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#065f46">object</text>
+
+        <!-- 5. Rule abstractor (rose) -->
+        <circle cx="200" cy="380" r="8" fill="#e11d48" stroke="#9f1239" stroke-width="1.5"/>
+        <line x1="208" y1="372" x2="260" y2="280" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow-part)"/>
+        <text x="200" y="404" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#9f1239">rule</text>
+
+        <!-- 6. Hybrid (orange) — already close to gbest, small arrow -->
+        <circle cx="330" cy="270" r="8" fill="#ea580c" stroke="#9a3412" stroke-width="1.5"/>
+        <line x1="322" y1="262" x2="300" y2="240" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow-part)"/>
+        <text x="340" y="294" font-family="JetBrains Mono, monospace" font-size="9" fill="#9a3412">hybrid</text>
+
+        <!-- Legend on right -->
+        <rect x="510" y="20" width="150" height="420" rx="12" fill="#ffffff" stroke="#e5e7eb" stroke-width="1"/>
+        <text x="525" y="48" font-family="JetBrains Mono, monospace" font-size="10" font-weight="600" fill="#566068" letter-spacing="1.2">SPECIALISTS</text>
+
+        <g font-family="JetBrains Mono, monospace" font-size="10" fill="#3e484d">
+          <circle cx="530" cy="80" r="6" fill="#0891b2" stroke="#0e7490" stroke-width="1.2"/>
+          <text x="544" y="84">Geometric</text>
+
+          <circle cx="530" cy="112" r="6" fill="#7c3aed" stroke="#5b21b6" stroke-width="1.2"/>
+          <text x="544" y="116">Color</text>
+
+          <circle cx="530" cy="144" r="6" fill="#d97706" stroke="#92400e" stroke-width="1.2"/>
+          <text x="544" y="148">Pattern</text>
+
+          <circle cx="530" cy="176" r="6" fill="#059669" stroke="#065f46" stroke-width="1.2"/>
+          <text x="544" y="180">Object</text>
+
+          <circle cx="530" cy="208" r="6" fill="#e11d48" stroke="#9f1239" stroke-width="1.2"/>
+          <text x="544" y="212">Rule</text>
+
+          <circle cx="530" cy="240" r="6" fill="#ea580c" stroke="#9a3412" stroke-width="1.2"/>
+          <text x="544" y="244">Hybrid</text>
+
+          <polygon points="530,280 534,287 542,287 536,293 538,300 530,296 522,300 524,293 518,287 526,287" fill="#d97706" stroke="#92400e" stroke-width="1"/>
+          <text x="544" y="290">gbest</text>
+
+          <line x1="522" y1="322" x2="540" y2="322" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow-part)"/>
+          <text x="544" y="326">velocity</text>
+        </g>
+      </svg>
+      <figcaption>Snapshot of the swarm in a 2-D projection. Each specialist starts in its own region of the search space and is pulled toward the swarm's best-so-far, but its starting bias keeps exploration diverse.</figcaption>
+    </figure>
+
+    <h2>References</h2>
+    <p class="references-intro">The research and tools this project builds on, for readers who want to go deeper.</p>
+
+    <h3>Swarm intelligence and PSO</h3>
+    <ul class="references">
+      <li>Kennedy &amp; Eberhart. <em>Particle Swarm Optimization.</em> Proc. IEEE ICNN, 1995. <a href="https://ieeexplore.ieee.org/document/488968" target="_blank" rel="noopener noreferrer">ieeexplore.ieee.org</a></li>
+      <li>Shi &amp; Eberhart. <em>A Modified Particle Swarm Optimizer.</em> IEEE ICEC, 1998 (introduces the inertia weight). <a href="https://ieeexplore.ieee.org/document/699146" target="_blank" rel="noopener noreferrer">ieeexplore.ieee.org</a></li>
+      <li>Clerc. <em>Particle Swarm Optimization.</em> ISTE, 2006.</li>
+      <li>Krishnanand &amp; Ghose. <em>Glowworm Swarm Optimisation: A New Method for Optimising Multi-modal Functions.</em> Int'l Journal of Computational Intelligence Studies, 2009. <a href="https://www.inderscienceonline.com/doi/abs/10.1504/IJCISTUDIES.2009.025340" target="_blank" rel="noopener noreferrer">inderscienceonline.com</a></li>
+    </ul>
+
+    <h3>ARC-AGI and reasoning benchmarks</h3>
+    <ul class="references">
+      <li>Chollet. <em>On the Measure of Intelligence.</em> 2019. <a href="https://arxiv.org/abs/1911.01547" target="_blank" rel="noopener noreferrer">arXiv:1911.01547</a></li>
+      <li>Chollet. <em>ARC-AGI: The Abstraction and Reasoning Corpus.</em> <a href="https://github.com/fchollet/ARC-AGI" target="_blank" rel="noopener noreferrer">github.com/fchollet/ARC-AGI</a></li>
+      <li>Greenblatt. <em>Getting 50% (SoTA) on ARC-AGI with GPT-4o.</em> 2024. <a href="https://redwoodresearch.substack.com/p/getting-50-sota-on-arc-agi-with-gpt" target="_blank" rel="noopener noreferrer">redwoodresearch.substack.com</a></li>
+    </ul>
+
+    <h3>LLM code generation and failure modes</h3>
+    <ul class="references">
+      <li>Madaan et al. <em>Self-Refine: Iterative Refinement with Self-Feedback.</em> NeurIPS 2023. <a href="https://arxiv.org/abs/2303.17651" target="_blank" rel="noopener noreferrer">arXiv:2303.17651</a></li>
+      <li>Huang et al. <em>Large Language Models Cannot Self-Correct Reasoning Yet.</em> ICLR 2024. <a href="https://arxiv.org/abs/2310.01798" target="_blank" rel="noopener noreferrer">arXiv:2310.01798</a></li>
+      <li>Ridnik et al. <em>Code Generation with AlphaCodium.</em> 2024. <a href="https://arxiv.org/abs/2401.08500" target="_blank" rel="noopener noreferrer">arXiv:2401.08500</a></li>
+    </ul>
+
+    <h3>Embeddings and tools</h3>
+    <ul class="references">
+      <li>Nussbaum et al. <em>Nomic Embed: Training a Reproducible Long Context Text Embedder.</em> 2024. <a href="https://arxiv.org/abs/2402.01613" target="_blank" rel="noopener noreferrer">arXiv:2402.01613</a></li>
+      <li>Ollama — <em>Run large language models locally.</em> <a href="https://ollama.com" target="_blank" rel="noopener noreferrer">ollama.com</a></li>
+    </ul>
+
+    <h3>Project source</h3>
+    <ul class="references">
+      <li>ARC-AGI PSO Swarm Solver on GitHub — <a href="https://github.com/josephgec/arc-agi-search" target="_blank" rel="noopener noreferrer">github.com/josephgec/arc-agi-search</a></li>
+    </ul>
+  </div>
+
+  <div class="post-nav" role="navigation" aria-label="Post navigation">
+    <a class="post-nav-back" href="index.html">
+      <span class="writing-back-arrow">←</span>
+      All posts
+    </a>
+    <a class="post-nav-back post-nav-forward" href="finetuning.html">
+      Read next: Local Tinker — Fine-Tuning
+      <span class="writing-arrow">→</span>
+    </a>
+  </div>
+</article>
+
+<div class="writing-cta writing-cta-standalone">
+  <div class="writing-cta-text">
+    <strong>Stay in the loop.</strong> New posts on AI agents, distributed systems &amp; research.
+  </div>
+  <a class="writing-cta-btn" href="https://substack.com/@josephthomas666774" target="_blank" rel="noopener noreferrer" aria-label="Subscribe on Substack">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22.539 8.242H1.46V5.406h21.08v2.836zM1.46 10.812V24l9.56-5.26L20.58 24V10.812H1.46zm0-8.242h21.08V0H1.46v2.57z"/></svg>
+    Subscribe
+  </a>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-cta">Open to advising, speaking engagements, and research collaborations.</div>
+      <div class="footer-brand">Joseph Thomas</div>
+      <div class="footer-copy">Saratoga, CA · Software Engineer · Google Cloud</div>
+    </div>
+    <div class="footer-links">
+      <a class="footer-link" href="https://scholar.google.com/citations?user=6RHIGk4AAAAJ&hl=en&oi=sra" target="_blank" rel="noopener noreferrer" title="Google Scholar" aria-label="Google Scholar">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 14l9-5-9-5-9 5 9 5z"/><path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+      </a>
+      <a class="footer-link" href="https://github.com/josephgec" target="_blank" rel="noopener noreferrer" title="GitHub" aria-label="GitHub">
+        <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844a9.59 9.59 0 012.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+      </a>
+      <a class="footer-link" href="https://www.linkedin.com/in/joseph-t-a6883013/" target="_blank" rel="noopener noreferrer" title="LinkedIn" aria-label="LinkedIn">
+        <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+      </a>
+    </div>
+  </div>
+</footer>
+
+<script>
+const nav = document.getElementById('mainNav');
+const hero = document.getElementById('hero');
+const navObs = new IntersectionObserver(
+  ([e]) => nav.classList.toggle('scrolled', !e.isIntersecting),
+  { threshold: 0.05 }
+);
+navObs.observe(hero);
+
+const progressBar = document.getElementById('scrollProgress');
+window.addEventListener('scroll', () => {
+  const h = document.documentElement;
+  const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+  progressBar.style.width = pct + '%';
+}, { passive: true });
+
+(function() {
+  const canvas = document.getElementById('swarmCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H, mouse = { x: -9999, y: -9999 };
+  const particles = [];
+  const COUNT = 60;
+  const CONNECT_DIST = 140;
+
+  function resize() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    W = canvas.width = rect.width;
+    H = canvas.height = rect.height;
+  }
+
+  function Particle() {
+    this.x = Math.random() * W;
+    this.y = Math.random() * H;
+    this.vx = (Math.random() - 0.5) * 0.6;
+    this.vy = (Math.random() - 0.5) * 0.6;
+    this.r = Math.random() * 2 + 1;
+  }
+
+  Particle.prototype.update = function() {
+    const dx = mouse.x - this.x;
+    const dy = mouse.y - this.y;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    if (dist < 300 && dist > 1) {
+      const force = 0.0003 * (300 - dist);
+      this.vx += (dx / dist) * force;
+      this.vy += (dy / dist) * force;
+    }
+    this.vx *= 0.995;
+    this.vy *= 0.995;
+    this.x += this.vx;
+    this.y += this.vy;
+    if (this.x < 0) this.x = W;
+    if (this.x > W) this.x = 0;
+    if (this.y < 0) this.y = H;
+    if (this.y > H) this.y = 0;
+  };
+
+  function init() {
+    resize();
+    for (let i = 0; i < COUNT; i++) particles.push(new Particle());
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const d = Math.sqrt(dx*dx + dy*dy);
+        if (d < CONNECT_DIST) {
+          const alpha = (1 - d / CONNECT_DIST) * 0.15;
+          ctx.strokeStyle = 'rgba(103, 232, 249,' + alpha + ')';
+          ctx.lineWidth = 0.8;
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+    for (const p of particles) {
+      p.update();
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(103, 232, 249, 0.6)';
+      ctx.fill();
+    }
+    requestAnimationFrame(draw);
+  }
+
+  hero.addEventListener('mousemove', e => {
+    const rect = canvas.getBoundingClientRect();
+    mouse.x = e.clientX - rect.left;
+    mouse.y = e.clientY - rect.top;
+  });
+  hero.addEventListener('mouseleave', () => {
+    mouse.x = -9999;
+    mouse.y = -9999;
+  });
+
+  window.addEventListener('resize', resize);
+  init();
+  draw();
+})();
+</script>
+
+</body>
+</html>
