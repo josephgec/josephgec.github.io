@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Building an AI That Masters Snake — A Deep Reinforcement Learning Project from Scratch · Joseph Thomas</title>
+  <meta name="description" content="How I built a Snake AI with Deep Q-Learning in PyTorch — a neural network, a shaped reward signal, and a lot of virtual trial and error. Averages 44 points, peaks at 75." />
+  <meta name="keywords" content="Reinforcement Learning, Deep Q-Learning, DQN, PyTorch, Python, Snake Game, AI, Neural Networks, DeepSnake, Joseph Thomas" />
+  <meta name="author" content="Joseph Thomas" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://jthomas.site/blog/deepsnake" />
+  <meta name="theme-color" content="#0a1628" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://jthomas.site/blog/deepsnake" />
+  <meta property="og:title" content="Building an AI That Masters Snake — A Deep Reinforcement Learning Project from Scratch" />
+  <meta property="og:description" content="A neural network, a shaped reward signal, and a lot of virtual trial and error. How DeepSnake uses Deep Q-Learning to master the classic game." />
+  <meta property="og:image" content="https://jthomas.site/photo.jpg" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:site_name" content="Joseph Thomas" />
+  <meta property="article:published_time" content="2026-04-13" />
+  <meta property="article:author" content="Joseph Thomas" />
+  <meta property="article:tag" content="Reinforcement Learning" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Building an AI That Masters Snake — A Deep RL Project from Scratch" />
+  <meta name="twitter:description" content="How DeepSnake uses Deep Q-Learning in PyTorch to teach a neural network to play Snake." />
+  <meta name="twitter:image" content="https://jthomas.site/photo.jpg" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "Building an AI That Masters Snake — A Deep Reinforcement Learning Project from Scratch",
+    "description": "How I built a Snake AI with Deep Q-Learning in PyTorch — a neural network, a shaped reward signal, and a lot of virtual trial and error.",
+    "datePublished": "2026-04-13",
+    "url": "https://jthomas.site/blog/deepsnake",
+    "author": {
+      "@type": "Person",
+      "name": "Joseph Thomas",
+      "url": "https://jthomas.site/"
+    },
+    "publisher": {
+      "@type": "Person",
+      "name": "Joseph Thomas",
+      "url": "https://jthomas.site/"
+    },
+    "mainEntityOfPage": "https://jthomas.site/blog/deepsnake",
+    "keywords": ["Reinforcement Learning", "Deep Q-Learning", "DQN", "PyTorch", "Neural Networks"]
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&display=swap" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;400;500;600;700;800&family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+
+  <link rel="stylesheet" href="../styles.css" />
+</head>
+<body class="blog-page">
+
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<nav aria-label="Site navigation" id="mainNav">
+  <div class="nav-inner">
+    <a class="nav-name" href="../index.html" style="text-decoration:none;">JT</a>
+    <ul class="nav-links">
+      <li><a href="../index.html#experience" aria-label="View Experience on homepage">Experience</a></li>
+      <li><a href="../index.html#education" aria-label="View Education on homepage">Education</a></li>
+      <li><a href="../index.html#publications" aria-label="View Research on homepage">Research</a></li>
+      <li><a href="../index.html#projects" aria-label="View Projects on homepage">Projects</a></li>
+      <li><a href="index.html" aria-label="Writing — blog" aria-current="page">Writing</a></li>
+      <li><a href="../consulting.html" aria-label="View Consulting services">Consulting</a></li>
+    </ul>
+  </div>
+</nav>
+
+<article class="post">
+  <header class="post-header" id="hero">
+    <canvas class="hero-canvas" id="swarmCanvas"></canvas>
+    <div class="post-header-inner">
+      <a class="writing-back post-back" href="index.html">
+        <span class="writing-back-arrow">←</span>
+        Back to Writing
+      </a>
+      <div class="post-meta">
+        <span class="writing-date">April 2026</span>
+        <span class="proj-lang">Reinforcement Learning</span>
+        <span class="writing-read-time">9 min read</span>
+      </div>
+      <h1 class="post-title">Building an AI That Masters Snake — A Deep Reinforcement Learning Project from Scratch</h1>
+      <p class="post-lede">A neural network, a shaped reward signal, and a lot of virtual trial and error. How DeepSnake learned to average 44 points, peak at 75, and never read a rulebook.</p>
+    </div>
+  </header>
+
+  <div class="post-body">
+    <p>Imagine dropping a toddler into the middle of a board game with no rulebook. No teacher. No examples. Just the raw experience of "that worked" and "that didn't." Now imagine that toddler learns to play better than most humans — in a matter of minutes. That's essentially what <strong>Deep Reinforcement Learning</strong> does, and it's one of the most fascinating corners of modern AI.</p>
+
+    <p>The challenge sounds deceptively simple: teach an AI to play <strong>Snake</strong>, the classic grid-based game where a serpent chases food and grows longer while trying not to crash into itself or the walls. Simple rules, sure — but the decision space explodes as the snake grows. Every single frame demands a choice: go straight, turn left, or turn right. One bad move, and it's game over.</p>
+
+    <p><a href="https://github.com/josephgec/deepsnake" target="_blank" rel="noopener noreferrer">DeepSnake</a> is an open-source project that tackles exactly this problem, and the results speak for themselves: an agent that consistently scores 30+ points and averages nearly 44 points over 200 games, with a personal best of 75. No hand-coded strategy. No search algorithms. Just a neural network, a reward signal, and a lot of virtual trial and error.</p>
+
+    <figure class="svg-figure">
+      <svg viewBox="0 0 680 440" width="100%" role="img" aria-label="Stylized Snake game grid showing the snake and a food pellet">
+        <defs>
+          <linearGradient id="snake-head-grad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#0891b2"/>
+            <stop offset="100%" stop-color="#0e7490"/>
+          </linearGradient>
+          <linearGradient id="snake-body-grad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#67e8f9"/>
+            <stop offset="100%" stop-color="#22d3ee"/>
+          </linearGradient>
+        </defs>
+
+        <!-- Play area -->
+        <rect x="160" y="20" width="360" height="360" rx="6" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.5"/>
+
+        <!-- Grid lines -->
+        <g stroke="#e5e7ff" stroke-width="0.6">
+          <line x1="178" y1="20" x2="178" y2="380"/><line x1="196" y1="20" x2="196" y2="380"/>
+          <line x1="214" y1="20" x2="214" y2="380"/><line x1="232" y1="20" x2="232" y2="380"/>
+          <line x1="250" y1="20" x2="250" y2="380"/><line x1="268" y1="20" x2="268" y2="380"/>
+          <line x1="286" y1="20" x2="286" y2="380"/><line x1="304" y1="20" x2="304" y2="380"/>
+          <line x1="322" y1="20" x2="322" y2="380"/><line x1="340" y1="20" x2="340" y2="380"/>
+          <line x1="358" y1="20" x2="358" y2="380"/><line x1="376" y1="20" x2="376" y2="380"/>
+          <line x1="394" y1="20" x2="394" y2="380"/><line x1="412" y1="20" x2="412" y2="380"/>
+          <line x1="430" y1="20" x2="430" y2="380"/><line x1="448" y1="20" x2="448" y2="380"/>
+          <line x1="466" y1="20" x2="466" y2="380"/><line x1="484" y1="20" x2="484" y2="380"/>
+          <line x1="502" y1="20" x2="502" y2="380"/>
+          <line x1="160" y1="38" x2="520" y2="38"/><line x1="160" y1="56" x2="520" y2="56"/>
+          <line x1="160" y1="74" x2="520" y2="74"/><line x1="160" y1="92" x2="520" y2="92"/>
+          <line x1="160" y1="110" x2="520" y2="110"/><line x1="160" y1="128" x2="520" y2="128"/>
+          <line x1="160" y1="146" x2="520" y2="146"/><line x1="160" y1="164" x2="520" y2="164"/>
+          <line x1="160" y1="182" x2="520" y2="182"/><line x1="160" y1="200" x2="520" y2="200"/>
+          <line x1="160" y1="218" x2="520" y2="218"/><line x1="160" y1="236" x2="520" y2="236"/>
+          <line x1="160" y1="254" x2="520" y2="254"/><line x1="160" y1="272" x2="520" y2="272"/>
+          <line x1="160" y1="290" x2="520" y2="290"/><line x1="160" y1="308" x2="520" y2="308"/>
+          <line x1="160" y1="326" x2="520" y2="326"/><line x1="160" y1="344" x2="520" y2="344"/>
+          <line x1="160" y1="362" x2="520" y2="362"/>
+        </g>
+
+        <!-- Snake body (from tail to head) -->
+        <rect x="232" y="218" width="16" height="16" rx="3" fill="url(#snake-body-grad)"/>
+        <rect x="250" y="218" width="16" height="16" rx="3" fill="url(#snake-body-grad)"/>
+        <rect x="268" y="218" width="16" height="16" rx="3" fill="url(#snake-body-grad)"/>
+        <rect x="286" y="218" width="16" height="16" rx="3" fill="url(#snake-body-grad)"/>
+        <rect x="304" y="218" width="16" height="16" rx="3" fill="url(#snake-body-grad)"/>
+        <rect x="322" y="218" width="16" height="16" rx="3" fill="url(#snake-body-grad)"/>
+        <!-- Snake head (to the right) -->
+        <rect x="340" y="216" width="20" height="20" rx="4" fill="url(#snake-head-grad)"/>
+        <circle cx="352" cy="223" r="1.8" fill="#fff"/>
+        <circle cx="352" cy="230" r="1.8" fill="#fff"/>
+
+        <!-- Food -->
+        <circle cx="442" cy="116" r="7" fill="#dc2626"/>
+        <circle cx="439" cy="113" r="1.8" fill="#fca5a5"/>
+
+        <!-- Legend -->
+        <g transform="translate(552, 40)">
+          <text x="0" y="0" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068" font-weight="600" letter-spacing="0.8">LEGEND</text>
+
+          <rect x="0" y="18" width="18" height="18" rx="3" fill="url(#snake-head-grad)"/>
+          <text x="26" y="31" font-family="JetBrains Mono, monospace" font-size="10" fill="#4b5563">Head</text>
+
+          <rect x="0" y="44" width="18" height="18" rx="3" fill="url(#snake-body-grad)"/>
+          <text x="26" y="57" font-family="JetBrains Mono, monospace" font-size="10" fill="#4b5563">Body</text>
+
+          <circle cx="9" cy="79" r="7" fill="#dc2626"/>
+          <text x="26" y="83" font-family="JetBrains Mono, monospace" font-size="10" fill="#4b5563">Food</text>
+
+          <rect x="0" y="96" width="18" height="18" rx="3" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1"/>
+          <text x="26" y="109" font-family="JetBrains Mono, monospace" font-size="10" fill="#4b5563">Empty</text>
+        </g>
+
+        <!-- Grid size label -->
+        <text x="340" y="408" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068">20 × 20 grid · 3 relative actions per step</text>
+      </svg>
+      <figcaption>A 20×20 grid world. The agent picks one of three relative actions every frame: straight, turn right, or turn left.</figcaption>
+    </figure>
+
+    <p>Let's break down how it works.</p>
+
+    <h2>What Is DeepSnake, and Why Reinforcement Learning?</h2>
+
+    <p><a href="https://github.com/josephgec/deepsnake" target="_blank" rel="noopener noreferrer">DeepSnake</a> is a Python project that trains an AI agent to play Snake using a technique called <strong>Deep Q-Learning (DQN)</strong>. The entire project is built on <strong>PyTorch</strong> for the neural network and <strong>Pygame</strong> for visualization, making it both a practical ML exercise and a satisfying thing to watch.</p>
+
+    <p>So why Reinforcement Learning instead of, say, supervised learning or a scripted pathfinding algorithm?</p>
+
+    <p>The answer comes down to the nature of the problem. Supervised learning requires labeled training data — thousands of examples of "given this board state, the correct move is X." For a game as dynamic as Snake, generating that dataset would be impractical and brittle. A hard-coded algorithm like A* pathfinding could work for small boards, but it doesn't <em>learn</em> or <em>adapt</em>, and it breaks down as the snake's body creates increasingly complex obstacles.</p>
+
+    <p>Reinforcement Learning is the natural fit because the Snake problem has exactly the structure RL was designed for: an <strong>agent</strong> (the snake) takes <strong>actions</strong> (turn left, turn right, go straight) in an <strong>environment</strong> (the game grid), and receives <strong>rewards</strong> (positive for eating food, negative for dying). The agent's only job is to figure out which actions maximize its cumulative reward over time. No labels required — just experience.</p>
+
+    <h2>The Environment: A 20×20 Grid World</h2>
+
+    <p>The Snake game environment is a 20×20 grid. The snake starts at the center of the board with a length of 3, moving to the right. Food spawns at a random unoccupied cell. The game ends when the snake collides with a wall or its own body.</p>
+
+    <p>What makes the environment design clever is how <strong>actions are defined</strong>. Instead of absolute directions (up, down, left, right), the agent chooses from <strong>relative actions</strong>: go straight, turn right, or turn left. This simplifies the decision space from four options to three and removes the problem of the agent choosing to reverse directly into itself — a bug you'd otherwise have to code around explicitly.</p>
+
+    <h2>The Agent's Brain: A Deep Q-Network</h2>
+
+    <p>At the heart of DeepSnake is a <strong>Deep Q-Network (DQN)</strong> — a neural network that learns to estimate the expected future reward (called the <strong>Q-value</strong>) for each possible action given the current state of the game.</p>
+
+    <p>The network architecture is compact and efficient:</p>
+
+    <pre class="codeblock"><code><span class="ck-comment"># snake_dqn/model.py (simplified)</span>
+<span class="ck-cmd">class</span> DQN(nn.Module):
+    <span class="ck-cmd">def</span> __init__(self, state_size=<span class="ck-str">24</span>, action_size=<span class="ck-str">3</span>):
+        super().__init__()
+        self.fc1 = nn.Linear(state_size, <span class="ck-str">256</span>)
+        self.fc2 = nn.Linear(<span class="ck-str">256</span>, <span class="ck-str">128</span>)
+        self.fc3 = nn.Linear(<span class="ck-str">128</span>, action_size)
+
+    <span class="ck-cmd">def</span> forward(self, x):
+        x = F.relu(self.fc1(x))
+        x = F.relu(self.fc2(x))
+        <span class="ck-cmd">return</span> self.fc3(x)</code></pre>
+
+    <figure class="svg-figure">
+      <svg viewBox="0 0 680 340" width="100%" role="img" aria-label="Neural network architecture: 24 input features, two hidden layers (256 and 128), and 3 outputs">
+        <defs>
+          <marker id="arrow-nn" markerWidth="8" markerHeight="8" refX="7" refY="2.5" orient="auto">
+            <path d="M0,0 L6,2.5 L0,5 z" fill="#94a3b8"/>
+          </marker>
+        </defs>
+
+        <!-- Layer labels -->
+        <text x="80" y="26" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="600" fill="#566068" letter-spacing="0.8">INPUT</text>
+        <text x="80" y="40" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#94a3b8">24 features</text>
+
+        <text x="260" y="26" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="600" fill="#566068" letter-spacing="0.8">HIDDEN 1</text>
+        <text x="260" y="40" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#94a3b8">Linear(256) + ReLU</text>
+
+        <text x="440" y="26" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="600" fill="#566068" letter-spacing="0.8">HIDDEN 2</text>
+        <text x="440" y="40" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#94a3b8">Linear(128) + ReLU</text>
+
+        <text x="610" y="26" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="600" fill="#566068" letter-spacing="0.8">OUTPUT</text>
+        <text x="610" y="40" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#94a3b8">3 Q-values</text>
+
+        <!-- Input nodes (5 shown, representing 24) -->
+        <circle cx="80" cy="70"  r="8" fill="#ecfeff" stroke="#67e8f9" stroke-width="1.3"/>
+        <circle cx="80" cy="100" r="8" fill="#ecfeff" stroke="#67e8f9" stroke-width="1.3"/>
+        <circle cx="80" cy="130" r="8" fill="#ecfeff" stroke="#67e8f9" stroke-width="1.3"/>
+        <circle cx="80" cy="160" r="8" fill="#ecfeff" stroke="#67e8f9" stroke-width="1.3"/>
+        <text  x="80" cy="195" y="195" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="14" fill="#94a3b8">⋮</text>
+        <circle cx="80" cy="230" r="8" fill="#ecfeff" stroke="#67e8f9" stroke-width="1.3"/>
+        <circle cx="80" cy="260" r="8" fill="#ecfeff" stroke="#67e8f9" stroke-width="1.3"/>
+
+        <!-- Hidden layer 1 (7 shown, representing 256) -->
+        <circle cx="260" cy="60"  r="10" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.3"/>
+        <circle cx="260" cy="90"  r="10" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.3"/>
+        <circle cx="260" cy="120" r="10" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.3"/>
+        <circle cx="260" cy="150" r="10" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.3"/>
+        <circle cx="260" cy="180" r="10" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.3"/>
+        <text  x="260" y="212" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="14" fill="#94a3b8">⋮</text>
+        <circle cx="260" cy="245" r="10" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.3"/>
+        <circle cx="260" cy="275" r="10" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.3"/>
+
+        <!-- Hidden layer 2 (5 shown, representing 128) -->
+        <circle cx="440" cy="80"  r="10" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.3"/>
+        <circle cx="440" cy="115" r="10" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.3"/>
+        <circle cx="440" cy="150" r="10" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.3"/>
+        <text  x="440" y="185" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="14" fill="#94a3b8">⋮</text>
+        <circle cx="440" cy="220" r="10" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.3"/>
+        <circle cx="440" cy="255" r="10" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.3"/>
+
+        <!-- Output layer (3 nodes with labels) -->
+        <circle cx="610" cy="100" r="14" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.5"/>
+        <text x="632" y="104" font-family="JetBrains Mono, monospace" font-size="11" fill="#92400e">Straight</text>
+
+        <circle cx="610" cy="165" r="14" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.5"/>
+        <text x="632" y="169" font-family="JetBrains Mono, monospace" font-size="11" fill="#92400e">Right</text>
+
+        <circle cx="610" cy="230" r="14" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.5"/>
+        <text x="632" y="234" font-family="JetBrains Mono, monospace" font-size="11" fill="#92400e">Left</text>
+
+        <!-- Thin connection bundle (input → h1) -->
+        <g stroke="#cbd5e1" stroke-width="0.5" opacity="0.6">
+          <line x1="90" y1="70"  x2="250" y2="60"/>
+          <line x1="90" y1="70"  x2="250" y2="120"/>
+          <line x1="90" y1="70"  x2="250" y2="180"/>
+          <line x1="90" y1="100" x2="250" y2="90"/>
+          <line x1="90" y1="100" x2="250" y2="150"/>
+          <line x1="90" y1="100" x2="250" y2="245"/>
+          <line x1="90" y1="130" x2="250" y2="60"/>
+          <line x1="90" y1="130" x2="250" y2="180"/>
+          <line x1="90" y1="130" x2="250" y2="275"/>
+          <line x1="90" y1="160" x2="250" y2="90"/>
+          <line x1="90" y1="160" x2="250" y2="245"/>
+          <line x1="90" y1="230" x2="250" y2="120"/>
+          <line x1="90" y1="230" x2="250" y2="275"/>
+          <line x1="90" y1="260" x2="250" y2="150"/>
+          <line x1="90" y1="260" x2="250" y2="245"/>
+        </g>
+
+        <!-- Thin connection bundle (h1 → h2) -->
+        <g stroke="#cbd5e1" stroke-width="0.5" opacity="0.6">
+          <line x1="270" y1="60"  x2="430" y2="80"/>
+          <line x1="270" y1="60"  x2="430" y2="150"/>
+          <line x1="270" y1="90"  x2="430" y2="115"/>
+          <line x1="270" y1="90"  x2="430" y2="220"/>
+          <line x1="270" y1="120" x2="430" y2="80"/>
+          <line x1="270" y1="120" x2="430" y2="255"/>
+          <line x1="270" y1="150" x2="430" y2="150"/>
+          <line x1="270" y1="180" x2="430" y2="115"/>
+          <line x1="270" y1="180" x2="430" y2="220"/>
+          <line x1="270" y1="245" x2="430" y2="150"/>
+          <line x1="270" y1="245" x2="430" y2="255"/>
+          <line x1="270" y1="275" x2="430" y2="80"/>
+          <line x1="270" y1="275" x2="430" y2="220"/>
+        </g>
+
+        <!-- Connection bundle (h2 → output) -->
+        <g stroke="#cbd5e1" stroke-width="0.6" opacity="0.7">
+          <line x1="450" y1="80"  x2="596" y2="100"/>
+          <line x1="450" y1="80"  x2="596" y2="165"/>
+          <line x1="450" y1="115" x2="596" y2="100"/>
+          <line x1="450" y1="115" x2="596" y2="230"/>
+          <line x1="450" y1="150" x2="596" y2="165"/>
+          <line x1="450" y1="220" x2="596" y2="100"/>
+          <line x1="450" y1="220" x2="596" y2="230"/>
+          <line x1="450" y1="255" x2="596" y2="165"/>
+          <line x1="450" y1="255" x2="596" y2="230"/>
+        </g>
+
+        <!-- Caption row -->
+        <text x="340" y="310" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068" font-style="italic">argmax(Q-values) → chosen action</text>
+      </svg>
+      <figcaption>A compact feedforward network. Input features go in, a Q-value comes out for each of the three actions, and the agent picks the highest.</figcaption>
+    </figure>
+
+    <p>Those 24 input features are where a lot of the design work lives. Rather than feeding the entire raw grid to the network (which would be computationally expensive and slow to learn), the state is encoded as a carefully chosen set of features:</p>
+
+    <ul>
+      <li><strong>Immediate danger</strong> in three directions (straight, right, left) — is there a wall or body segment one step away?</li>
+      <li><strong>Current direction</strong> as a one-hot vector (4 values).</li>
+      <li><strong>Food direction</strong> — four binary values indicating whether the food is to the north, south, east, or west.</li>
+      <li><strong>Normalized head position</strong> (x, y) and <strong>food offset</strong> (dx, dy).</li>
+      <li><strong>Snake length</strong>, normalized.</li>
+      <li><strong>Distance to the nearest obstacle in 8 directions</strong>, calculated via raycasting.</li>
+    </ul>
+
+    <p>This compact representation gives the network everything it needs to make good decisions without drowning it in irrelevant data. The three outputs correspond to Q-values for each action (straight, right, left). During gameplay, the agent picks the action with the highest Q-value.</p>
+
+    <h2>The Reward System: How the AI Learns Right from Wrong</h2>
+
+    <p>The reward signal is the only feedback the agent gets, so its design is critical. DeepSnake uses a <strong>shaped reward system</strong>:</p>
+
+    <table>
+      <thead>
+        <tr><th>Event</th><th>Reward</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Eats food</td><td>+10</td></tr>
+        <tr><td>Dies (wall or self-collision)</td><td>−10</td></tr>
+        <tr><td>Moves closer to food</td><td>+1</td></tr>
+        <tr><td>Moves farther from food</td><td>−1</td></tr>
+      </tbody>
+    </table>
+
+    <p>The +10 / −10 for eating and dying are straightforward. The interesting addition is the <strong>+1 / −1 shaping reward</strong> for moving closer to or farther from the food. Without this, the agent would receive very sparse feedback — it might wander aimlessly for hundreds of steps before stumbling onto food or dying, making learning painfully slow. The proximity reward gives the agent a continuous gradient to follow, dramatically accelerating training.</p>
+
+    <h2>DQN Improvements: Beyond Vanilla Q-Learning</h2>
+
+    <p>DeepSnake doesn't just implement a basic DQN — it incorporates several important improvements that stabilize and accelerate learning:</p>
+
+    <ul>
+      <li><strong>Double DQN</strong> reduces Q-value overestimation, a common problem where the network becomes overly optimistic about certain actions (van Hasselt et al., 2016).</li>
+      <li><strong>Huber Loss (SmoothL1)</strong> replaces standard Mean Squared Error for more stable training gradients when the temporal-difference error is large.</li>
+      <li><strong>Soft target updates</strong> (τ = 0.005) gradually blend the target network's weights rather than copying them wholesale, producing smoother learning curves.</li>
+      <li><strong>Gradient clipping</strong> (max norm = 1.0) prevents exploding gradients from destabilizing the network.</li>
+      <li><strong>Epsilon-greedy exploration</strong> decays from 1.0 to 0.01, starting with nearly random actions and gradually shifting to exploitation as the agent becomes more confident.</li>
+    </ul>
+
+    <figure class="svg-figure">
+      <svg viewBox="0 0 680 340" width="100%" role="img" aria-label="Training curve showing score improving over 2000 episodes, with peak near 75 and average around 44">
+        <!-- Plot area background -->
+        <rect x="60" y="30" width="590" height="240" fill="#fafbfc" stroke="#e5e7eb" stroke-width="1"/>
+
+        <!-- Horizontal grid lines -->
+        <g stroke="#e5e7eb" stroke-width="0.8" stroke-dasharray="2 3">
+          <line x1="60" y1="80"  x2="650" y2="80"/>
+          <line x1="60" y1="130" x2="650" y2="130"/>
+          <line x1="60" y1="180" x2="650" y2="180"/>
+          <line x1="60" y1="230" x2="650" y2="230"/>
+        </g>
+
+        <!-- Y-axis labels (score) -->
+        <text x="52" y="35" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="9" fill="#94a3b8">80</text>
+        <text x="52" y="84" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="9" fill="#94a3b8">60</text>
+        <text x="52" y="134" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="9" fill="#94a3b8">40</text>
+        <text x="52" y="184" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="9" fill="#94a3b8">20</text>
+        <text x="52" y="234" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="9" fill="#94a3b8">0</text>
+        <text x="30" y="155" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068" transform="rotate(-90 30 155)">score</text>
+
+        <!-- X-axis labels (episode) -->
+        <text x="60"  y="290" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#94a3b8">0</text>
+        <text x="208" y="290" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#94a3b8">500</text>
+        <text x="355" y="290" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#94a3b8">1000</text>
+        <text x="502" y="290" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#94a3b8">1500</text>
+        <text x="650" y="290" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#94a3b8">2000</text>
+        <text x="355" y="310" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068">episode</text>
+
+        <!-- Raw score scatter (approximate noisy individual episode scores) -->
+        <g fill="#67e8f9" opacity="0.55">
+          <circle cx="72"  cy="228" r="1.6"/><circle cx="88"  cy="226" r="1.6"/><circle cx="104" cy="222" r="1.6"/>
+          <circle cx="120" cy="224" r="1.6"/><circle cx="136" cy="220" r="1.6"/><circle cx="152" cy="218" r="1.6"/>
+          <circle cx="168" cy="214" r="1.6"/><circle cx="184" cy="210" r="1.6"/><circle cx="200" cy="204" r="1.6"/>
+          <circle cx="216" cy="199" r="1.6"/><circle cx="232" cy="206" r="1.6"/><circle cx="248" cy="190" r="1.6"/>
+          <circle cx="264" cy="188" r="1.6"/><circle cx="280" cy="178" r="1.6"/><circle cx="296" cy="186" r="1.6"/>
+          <circle cx="312" cy="170" r="1.6"/><circle cx="328" cy="165" r="1.6"/><circle cx="344" cy="172" r="1.6"/>
+          <circle cx="360" cy="156" r="1.6"/><circle cx="376" cy="150" r="1.6"/><circle cx="392" cy="162" r="1.6"/>
+          <circle cx="408" cy="142" r="1.6"/><circle cx="424" cy="135" r="1.6"/><circle cx="440" cy="148" r="1.6"/>
+          <circle cx="456" cy="130" r="1.6"/><circle cx="472" cy="124" r="1.6"/><circle cx="488" cy="138" r="1.6"/>
+          <circle cx="504" cy="120" r="1.6"/><circle cx="520" cy="112" r="1.6"/><circle cx="536" cy="128" r="1.6"/>
+          <circle cx="552" cy="110" r="1.6"/><circle cx="568" cy="100" r="1.6"/><circle cx="584" cy="118" r="1.6"/>
+          <circle cx="600" cy="108" r="1.6"/><circle cx="616" cy="96"  r="1.6"/><circle cx="632" cy="112" r="1.6"/>
+        </g>
+
+        <!-- Rolling-mean curve -->
+        <path d="M60,228 C 160,220 220,200 290,178 S 420,138 500,120 T 650,108"
+              stroke="#0891b2" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+
+        <!-- Peak marker -->
+        <circle cx="616" cy="84" r="4" fill="#d97706"/>
+        <line x1="616" y1="84" x2="616" y2="60" stroke="#d97706" stroke-width="1" stroke-dasharray="2 2"/>
+        <text x="616" y="55" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="600" fill="#d97706">peak: 75</text>
+
+        <!-- Average marker -->
+        <line x1="500" y1="132" x2="640" y2="132" stroke="#059669" stroke-width="1.2" stroke-dasharray="4 3"/>
+        <text x="645" y="130" font-family="JetBrains Mono, monospace" font-size="10" font-weight="600" fill="#059669">~44 avg</text>
+
+        <!-- Title / caption row -->
+        <text x="60" y="24" font-family="Syne, sans-serif" font-size="12" font-weight="700" fill="#111827">Score per episode — 2000 episodes</text>
+      </svg>
+      <figcaption>A rough sketch of a training run. Score climbs fast through the first few hundred episodes as epsilon decays, then the rolling average settles in the mid-forties.</figcaption>
+    </figure>
+
+    <p>These are all well-established techniques from the RL literature, and seeing them applied together in a single, readable codebase is one of the most valuable aspects of this project for anyone learning the field.</p>
+
+    <h2>The Tech Stack</h2>
+
+    <p>DeepSnake is built entirely in Python with a focused set of dependencies:</p>
+
+    <ul>
+      <li><strong>Python 3.10+</strong> — the runtime.</li>
+      <li><strong>PyTorch</strong> — powers the DQN neural network and the entire training loop.</li>
+      <li><strong>Pygame</strong> — provides the visual rendering so you can watch the trained agent play in real time.</li>
+      <li><strong>NumPy</strong> — handles numerical operations and array manipulation.</li>
+      <li><strong>Matplotlib</strong> — generates the training performance plots.</li>
+    </ul>
+
+    <p>No bloated frameworks or unnecessary dependencies. Everything you need fits in a single <code>pip install</code> command.</p>
+
+    <h2>How to Get Started</h2>
+
+    <p>Getting DeepSnake running on your machine takes about two minutes.</p>
+
+    <p><strong>Step 1 — Clone the repository:</strong></p>
+    <pre class="codeblock"><code><span class="ck-cmd">git</span> clone https://github.com/josephgec/deepsnake.git
+<span class="ck-cmd">cd</span> deepsnake</code></pre>
+
+    <p><strong>Step 2 — Install dependencies:</strong></p>
+    <pre class="codeblock"><code><span class="ck-cmd">pip</span> install torch numpy pygame matplotlib</code></pre>
+
+    <p><strong>Step 3 — Watch the pre-trained agent play:</strong></p>
+    <pre class="codeblock"><code><span class="ck-cmd">cd</span> snake_dqn
+<span class="ck-cmd">python</span> play.py</code></pre>
+
+    <p>Use <code>SPACE</code> to pause/unpause, <code>R</code> to reset, and <code>Q</code> to quit.</p>
+
+    <p><strong>Step 4 (optional) — Train from scratch:</strong></p>
+    <pre class="codeblock"><code><span class="ck-cmd">python</span> train.py
+<span class="ck-comment"># 2,000 episodes with automatic checkpointing</span>
+<span class="ck-cmd">python</span> plot_training.py  <span class="ck-comment"># render the score curve</span></code></pre>
+
+    <p>The project structure is clean and modular — <code>snake_env.py</code> handles the game logic, <code>model.py</code> defines the neural network, <code>agent.py</code> manages the DQN training logic, and <code>train.py</code> ties everything together. Each file has a clear, single responsibility, making it easy to read, modify, and experiment with.</p>
+
+    <h2>Why This Project Is Worth Your Time</h2>
+
+    <p>DeepSnake sits in a sweet spot that's rare in ML education projects. It's <strong>complex enough</strong> to demonstrate real RL concepts — experience replay, target networks, epsilon decay, reward shaping — but <strong>simple enough</strong> that you can read the entire codebase in an afternoon and understand every line. The Snake game provides an intuitive, visual feedback loop that makes the learning process tangible in a way that abstract environments don't.</p>
+
+    <p>If you're an intermediate developer looking to move from "I've read about Reinforcement Learning" to "I've actually built something with it," this is a solid starting point.</p>
+
+    <h2>What to Try Next</h2>
+
+    <p>A few experiments to deepen your understanding once you've got the project running:</p>
+
+    <ol>
+      <li><strong>Tweak the reward system.</strong> What happens if you remove the proximity reward (+1 / −1) and only keep the +10 / −10? How much slower does the agent learn?</li>
+      <li><strong>Change the network architecture.</strong> Add a layer, double the hidden units, or try a different activation function. Does performance improve, or does the extra capacity just memorize noise?</li>
+      <li><strong>Modify the grid size.</strong> A 10×10 grid is a very different challenge than a 30×30 grid. How does the agent adapt?</li>
+      <li><strong>Swap relative actions for absolute actions.</strong> Does the agent still learn effectively with four action choices instead of three, or does the self-reversal problem come back?</li>
+    </ol>
+
+    <h2>Get Involved</h2>
+
+    <p>If you find DeepSnake useful or interesting, head over to the <a href="https://github.com/josephgec/deepsnake" target="_blank" rel="noopener noreferrer">GitHub repository</a>, give it a star, and start experimenting. Fork it, break it, improve it — that's how the best learning happens.</p>
+
+    <p>Deep Reinforcement Learning is one of the most exciting subfields in AI, and there's no better way to understand it than by watching a neural network teach itself to chase pixels around a grid. Happy training.</p>
+
+    <h2>References</h2>
+    <p class="references-intro">The core ideas behind DeepSnake, and where to read more.</p>
+
+    <h3>Foundational DQN papers</h3>
+    <ul class="references">
+      <li>Mnih et al. <em>Playing Atari with Deep Reinforcement Learning.</em> NeurIPS Workshop 2013. <a href="https://arxiv.org/abs/1312.5602" target="_blank" rel="noopener noreferrer">arXiv:1312.5602</a></li>
+      <li>Mnih et al. <em>Human-level control through deep reinforcement learning.</em> Nature 2015. <a href="https://www.nature.com/articles/nature14236" target="_blank" rel="noopener noreferrer">nature.com</a></li>
+      <li>van Hasselt, Guez &amp; Silver. <em>Deep Reinforcement Learning with Double Q-learning.</em> AAAI 2016. <a href="https://arxiv.org/abs/1509.06461" target="_blank" rel="noopener noreferrer">arXiv:1509.06461</a></li>
+      <li>Schaul et al. <em>Prioritized Experience Replay.</em> ICLR 2016. <a href="https://arxiv.org/abs/1511.05952" target="_blank" rel="noopener noreferrer">arXiv:1511.05952</a></li>
+    </ul>
+
+    <h3>Learning materials</h3>
+    <ul class="references">
+      <li>Sutton &amp; Barto. <em>Reinforcement Learning: An Introduction</em> (2nd ed.). MIT Press, 2018. <a href="http://incompleteideas.net/book/the-book-2nd.html" target="_blank" rel="noopener noreferrer">incompleteideas.net</a></li>
+      <li>OpenAI. <em>Spinning Up in Deep RL.</em> <a href="https://spinningup.openai.com/en/latest/" target="_blank" rel="noopener noreferrer">spinningup.openai.com</a></li>
+      <li>PyTorch. <em>Reinforcement Learning (DQN) Tutorial.</em> <a href="https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html" target="_blank" rel="noopener noreferrer">pytorch.org</a></li>
+    </ul>
+
+    <h3>Project source</h3>
+    <ul class="references">
+      <li>DeepSnake on GitHub — <a href="https://github.com/josephgec/deepsnake" target="_blank" rel="noopener noreferrer">github.com/josephgec/deepsnake</a></li>
+    </ul>
+  </div>
+
+  <div class="post-nav" role="navigation" aria-label="Post navigation">
+    <a class="post-nav-back" href="index.html">
+      <span class="writing-back-arrow">←</span>
+      All posts
+    </a>
+    <a class="post-nav-back post-nav-forward" href="claude-agent.html">
+      Read next: Two AIs, One Loop
+      <span class="writing-arrow">→</span>
+    </a>
+  </div>
+</article>
+
+<div class="writing-cta writing-cta-standalone">
+  <div class="writing-cta-text">
+    <strong>Stay in the loop.</strong> New posts on AI agents, distributed systems &amp; research.
+  </div>
+  <a class="writing-cta-btn" href="https://josephthomas.substack.com" target="_blank" rel="noopener noreferrer" aria-label="Subscribe on Substack">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22.539 8.242H1.46V5.406h21.08v2.836zM1.46 10.812V24l9.56-5.26L20.58 24V10.812H1.46zm0-8.242h21.08V0H1.46v2.57z"/></svg>
+    Subscribe
+  </a>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-cta">Open to advising, speaking engagements, and research collaborations.</div>
+      <div class="footer-brand">Joseph Thomas</div>
+      <div class="footer-copy">Saratoga, CA · Software Engineer · Google Cloud</div>
+    </div>
+    <div class="footer-links">
+      <a class="footer-link" href="https://scholar.google.com/citations?user=6RHIGk4AAAAJ&hl=en&oi=sra" target="_blank" rel="noopener noreferrer" title="Google Scholar" aria-label="Google Scholar">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 14l9-5-9-5-9 5 9 5z"/><path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+      </a>
+      <a class="footer-link" href="https://github.com/josephgec" target="_blank" rel="noopener noreferrer" title="GitHub" aria-label="GitHub">
+        <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844a9.59 9.59 0 012.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+      </a>
+      <a class="footer-link" href="https://www.linkedin.com/in/joseph-t-a6883013/" target="_blank" rel="noopener noreferrer" title="LinkedIn" aria-label="LinkedIn">
+        <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+      </a>
+    </div>
+  </div>
+</footer>
+
+<script>
+const nav = document.getElementById('mainNav');
+const hero = document.getElementById('hero');
+const navObs = new IntersectionObserver(
+  ([e]) => nav.classList.toggle('scrolled', !e.isIntersecting),
+  { threshold: 0.05 }
+);
+navObs.observe(hero);
+
+const progressBar = document.getElementById('scrollProgress');
+window.addEventListener('scroll', () => {
+  const h = document.documentElement;
+  const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+  progressBar.style.width = pct + '%';
+}, { passive: true });
+
+(function() {
+  const canvas = document.getElementById('swarmCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H, mouse = { x: -9999, y: -9999 };
+  const particles = [];
+  const COUNT = 60;
+  const CONNECT_DIST = 140;
+
+  function resize() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    W = canvas.width = rect.width;
+    H = canvas.height = rect.height;
+  }
+
+  function Particle() {
+    this.x = Math.random() * W;
+    this.y = Math.random() * H;
+    this.vx = (Math.random() - 0.5) * 0.6;
+    this.vy = (Math.random() - 0.5) * 0.6;
+    this.r = Math.random() * 2 + 1;
+  }
+
+  Particle.prototype.update = function() {
+    const dx = mouse.x - this.x;
+    const dy = mouse.y - this.y;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    if (dist < 300 && dist > 1) {
+      const force = 0.0003 * (300 - dist);
+      this.vx += (dx / dist) * force;
+      this.vy += (dy / dist) * force;
+    }
+    this.vx *= 0.995;
+    this.vy *= 0.995;
+    this.x += this.vx;
+    this.y += this.vy;
+    if (this.x < 0) this.x = W;
+    if (this.x > W) this.x = 0;
+    if (this.y < 0) this.y = H;
+    if (this.y > H) this.y = 0;
+  };
+
+  function init() {
+    resize();
+    for (let i = 0; i < COUNT; i++) particles.push(new Particle());
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const d = Math.sqrt(dx*dx + dy*dy);
+        if (d < CONNECT_DIST) {
+          const alpha = (1 - d / CONNECT_DIST) * 0.15;
+          ctx.strokeStyle = 'rgba(103, 232, 249,' + alpha + ')';
+          ctx.lineWidth = 0.8;
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+    for (const p of particles) {
+      p.update();
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(103, 232, 249, 0.6)';
+      ctx.fill();
+    }
+    requestAnimationFrame(draw);
+  }
+
+  hero.addEventListener('mousemove', e => {
+    const rect = canvas.getBoundingClientRect();
+    mouse.x = e.clientX - rect.left;
+    mouse.y = e.clientY - rect.top;
+  });
+  hero.addEventListener('mouseleave', () => {
+    mouse.x = -9999;
+    mouse.y = -9999;
+  });
+
+  window.addEventListener('resize', resize);
+  init();
+  draw();
+})();
+</script>
+
+</body>
+</html>

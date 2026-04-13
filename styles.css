@@ -2012,3 +2012,60 @@
       padding: 0 12px;
     }
 
+    /* ════════════════════════════════════════
+       POST-BODY tables (reward tables, etc.)
+    ════════════════════════════════════════ */
+    .post-body table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 24px 0 28px;
+      font-size: 0.95rem;
+      background: var(--ink-card);
+      border: 1px solid var(--ink-border-subtle);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .post-body table th,
+    .post-body table td {
+      padding: 12px 20px;
+      text-align: left;
+      border-bottom: 1px solid var(--ink-border-subtle);
+    }
+
+    .post-body table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .post-body table th {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      background: var(--ink-raised);
+      border-bottom: 1px solid var(--ink-border);
+    }
+
+    .post-body table td:last-child,
+    .post-body table th:last-child {
+      text-align: right;
+      font-family: var(--font-mono);
+      font-weight: 600;
+      color: var(--cyan-dim);
+      white-space: nowrap;
+    }
+
+    /* Forward arrow variant for post-nav */
+    .post-nav-forward .writing-arrow {
+      display: inline-block;
+      transition: transform var(--transition);
+      font-family: var(--font-mono);
+    }
+
+    .post-nav-forward:hover .writing-arrow {
+      transform: translateX(4px);
+      color: var(--cyan);
+    }
+
