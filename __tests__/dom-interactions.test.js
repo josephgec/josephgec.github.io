@@ -21,15 +21,15 @@ describe('Navigation DOM structure', () => {
     expect(list.tagName.toLowerCase()).toBe('ul');
   });
 
-  test('nav-links contain 4 section links', () => {
+  test('nav-links contain 5 section links', () => {
     const links = doc.querySelectorAll('.nav-links a[href^="#"]');
-    expect(links.length).toBe(4);
+    expect(links.length).toBe(5);
   });
 
   test('each nav link targets an existing section', () => {
     const links = doc.querySelectorAll('.nav-links a[href^="#"]');
     const ids = Array.from(links).map(l => l.getAttribute('href').slice(1));
-    expect(ids).toEqual(['experience', 'education', 'publications', 'projects']);
+    expect(ids).toEqual(['experience', 'education', 'publications', 'projects', 'writing']);
     ids.forEach(id => {
       expect(doc.getElementById(id)).not.toBeNull();
     });
