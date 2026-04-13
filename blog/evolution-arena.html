@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>When AI Becomes Its Own Scientist — Inside the Evolution Arena and the Rise of Autoresearch · Joseph Thomas</title>
+  <meta name="description" content="Evolution Arena is a 2D survival testbed for the Autoresearch pattern — a tight propose / run / score / ratchet loop where an AI agent rewrites its own code and only keeps changes that measurably improve the score." />
+  <meta name="keywords" content="Autoresearch, Karpathy, Evolution Arena, autonomous agents, Claude Code, ratchet, monotonic improvement, code self-modification, Joseph Thomas" />
+  <meta name="author" content="Joseph Thomas" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://jthomas.site/blog/evolution-arena" />
+  <meta name="theme-color" content="#0a1628" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://jthomas.site/blog/evolution-arena" />
+  <meta property="og:title" content="When AI Becomes Its Own Scientist — Inside the Evolution Arena and the Rise of Autoresearch" />
+  <meta property="og:description" content="A 2D survival testbed for the Autoresearch pattern. Propose, run, score, ratchet — and let the agent edit its own code." />
+  <meta property="og:image" content="https://jthomas.site/photo.jpg" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:site_name" content="Joseph Thomas" />
+  <meta property="article:published_time" content="2026-04-13" />
+  <meta property="article:author" content="Joseph Thomas" />
+  <meta property="article:tag" content="Autoresearch" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="When AI Becomes Its Own Scientist — Evolution Arena &amp; the Autoresearch Loop" />
+  <meta name="twitter:description" content="A 2D survival testbed for the Autoresearch pattern. Agent edits the code, simulation scores it, ratchet keeps only the improvements." />
+  <meta name="twitter:image" content="https://jthomas.site/photo.jpg" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "When AI Becomes Its Own Scientist — Inside the Evolution Arena and the Rise of Autoresearch",
+    "description": "Evolution Arena is a 2D survival testbed for the Autoresearch pattern — an AI agent edits its own code, runs the simulation, scores the result, and keeps only the changes that measurably improve performance.",
+    "datePublished": "2026-04-13",
+    "url": "https://jthomas.site/blog/evolution-arena",
+    "author": {
+      "@type": "Person",
+      "name": "Joseph Thomas",
+      "url": "https://jthomas.site/"
+    },
+    "publisher": {
+      "@type": "Person",
+      "name": "Joseph Thomas",
+      "url": "https://jthomas.site/"
+    },
+    "mainEntityOfPage": "https://jthomas.site/blog/evolution-arena",
+    "keywords": ["Autoresearch", "Autonomous Agents", "Code Self-Modification", "Ratchet", "Evolution Arena"]
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&display=swap" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;400;500;600;700;800&family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+
+  <link rel="stylesheet" href="../styles.css" />
+</head>
+<body class="blog-page">
+
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<nav aria-label="Site navigation" id="mainNav">
+  <div class="nav-inner">
+    <a class="nav-name" href="../index.html" style="text-decoration:none;">JT</a>
+    <ul class="nav-links">
+      <li><a href="../index.html#experience" aria-label="View Experience on homepage">Experience</a></li>
+      <li><a href="../index.html#education" aria-label="View Education on homepage">Education</a></li>
+      <li><a href="../index.html#publications" aria-label="View Research on homepage">Research</a></li>
+      <li><a href="../index.html#projects" aria-label="View Projects on homepage">Projects</a></li>
+      <li><a href="index.html" aria-label="Writing — blog" aria-current="page">Writing</a></li>
+      <li><a href="../consulting.html" aria-label="View Consulting services">Consulting</a></li>
+    </ul>
+  </div>
+</nav>
+
+<article class="post">
+  <header class="post-header" id="hero">
+    <canvas class="hero-canvas" id="swarmCanvas"></canvas>
+    <div class="post-header-inner">
+      <a class="writing-back post-back" href="index.html">
+        <span class="writing-back-arrow">←</span>
+        Back to Writing
+      </a>
+      <div class="post-meta">
+        <span class="writing-date">April 2026</span>
+        <span class="proj-lang">Autoresearch</span>
+        <span class="writing-read-time">10 min read</span>
+      </div>
+      <h1 class="post-title">When AI Becomes Its Own Scientist — Inside the Evolution Arena and the Rise of Autoresearch</h1>
+      <p class="post-lede">Imagine an AI that doesn't wait for a human to tune its parameters. It proposes its own experiments, runs them against a live simulation, measures the outcome with a hard number, and decides on its own whether to keep the change. No vibes. No subjective review. Just: <em>did the score go up?</em></p>
+    </div>
+  </header>
+
+  <div class="post-body">
+    <p>This isn't a thought experiment. It's the core mechanic of <strong>Autoresearch</strong>, a pattern popularized by Andrej Karpathy in early 2026 and now spreading across dozens of domains — from GPU kernel optimization to Bitcoin price modeling to autonomous ML training. The <a href="https://github.com/josephgec/evolution-arena" target="_blank" rel="noopener noreferrer">Evolution Arena</a> project takes this pattern and drops it into a survival game, creating one of the clearest, most tangible demonstrations of what happens when you hand an AI the keys to its own codebase and say: <em>make yourself better</em>.</p>
+
+    <h2>The Autoresearch Pattern: A Loop That Never Quits</h2>
+    <p>At its heart, Autoresearch is a brutally simple feedback loop. The agent operates in four phases:</p>
+
+    <p><strong>1. Propose a change.</strong> The AI agent examines the current state of the code — steering logic, configuration values, decision thresholds — and hypothesizes a modification that might improve performance.</p>
+
+    <p><strong>2. Run the simulation.</strong> The modified code is executed against the environment. In Evolution Arena, this means dropping the creature into the 2D world and letting it play.</p>
+
+    <p><strong>3. Evaluate the score.</strong> A hard, mechanical metric determines whether the change helped. Not a language model's opinion. Not a human's gut feeling. A number.</p>
+
+    <p><strong>4. Keep or revert.</strong> If the score improved, the change is committed. If it didn't, the change is rolled back to the last known-good state. Then the loop restarts.</p>
+
+    <p>This cycle runs indefinitely — or until you interrupt it. Karpathy's original implementation ran roughly 12 experiments per hour, producing around 100 experiments overnight while the researcher slept.</p>
+
+    <figure class="svg-figure">
+      <svg viewBox="0 0 680 480" width="100%" role="img" aria-label="The four-phase Autoresearch feedback loop: propose change, run simulation, evaluate score, keep or revert">
+        <defs>
+          <marker id="arrow-auto" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6 z" fill="#566068"/>
+          </marker>
+        </defs>
+
+        <!-- 1. Propose (top-left) -->
+        <rect x="40" y="40" width="270" height="150" rx="12" fill="#ecfeff" stroke="#67e8f9" stroke-width="1.5"/>
+        <text x="60" y="68" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#0e7490" letter-spacing="1.5">1 · PROPOSE</text>
+        <text x="60" y="100" font-family="Syne, sans-serif" font-weight="700" font-size="16" fill="#0e7490">Edit code or config</text>
+        <text x="60" y="126" font-family="JetBrains Mono, monospace" font-size="11" fill="#0891b2">agent reads game.py</text>
+        <text x="60" y="144" font-family="JetBrains Mono, monospace" font-size="11" fill="#0891b2">and config.json</text>
+        <text x="60" y="168" font-family="JetBrains Mono, monospace" font-size="11" fill="#0891b2">hypothesizes a change</text>
+
+        <!-- 2. Run (top-right) -->
+        <rect x="370" y="40" width="270" height="150" rx="12" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.5"/>
+        <text x="390" y="68" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#5b21b6" letter-spacing="1.5">2 · RUN</text>
+        <text x="390" y="100" font-family="Syne, sans-serif" font-weight="700" font-size="16" fill="#5b21b6">Run simulation</text>
+        <text x="390" y="126" font-family="JetBrains Mono, monospace" font-size="11" fill="#7c3aed">creature plays</text>
+        <text x="390" y="144" font-family="JetBrains Mono, monospace" font-size="11" fill="#7c3aed">N fixed steps</text>
+        <text x="390" y="168" font-family="JetBrains Mono, monospace" font-size="11" fill="#7c3aed">collects food · takes damage</text>
+
+        <!-- Arrow Propose → Run -->
+        <line x1="320" y1="115" x2="360" y2="115" stroke="#566068" stroke-width="1.8" marker-end="url(#arrow-auto)"/>
+
+        <!-- 3. Evaluate (bottom-right) -->
+        <rect x="370" y="260" width="270" height="150" rx="12" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.5"/>
+        <text x="390" y="288" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#92400e" letter-spacing="1.5">3 · EVALUATE</text>
+        <text x="390" y="320" font-family="Syne, sans-serif" font-weight="700" font-size="16" fill="#92400e">Mechanical score</text>
+        <text x="390" y="346" font-family="JetBrains Mono, monospace" font-size="11" fill="#d97706">score = food · 10</text>
+        <text x="390" y="364" font-family="JetBrains Mono, monospace" font-size="11" fill="#d97706">        − damage · 2</text>
+        <text x="390" y="388" font-family="JetBrains Mono, monospace" font-size="11" fill="#d97706">no opinions · just a number</text>
+
+        <!-- Arrow Run → Evaluate -->
+        <line x1="505" y1="200" x2="505" y2="250" stroke="#566068" stroke-width="1.8" marker-end="url(#arrow-auto)"/>
+
+        <!-- 4. Keep or revert (bottom-left) -->
+        <rect x="40" y="260" width="270" height="150" rx="12" fill="#ecfdf5" stroke="#34d399" stroke-width="1.5"/>
+        <text x="60" y="288" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#065f46" letter-spacing="1.5">4 · KEEP / REVERT</text>
+        <text x="60" y="320" font-family="Syne, sans-serif" font-weight="700" font-size="16" fill="#065f46">The Ratchet</text>
+        <text x="60" y="346" font-family="JetBrains Mono, monospace" font-size="11" fill="#059669">if score &gt; best: commit</text>
+        <text x="60" y="364" font-family="JetBrains Mono, monospace" font-size="11" fill="#059669">else:             revert</text>
+        <text x="60" y="388" font-family="JetBrains Mono, monospace" font-size="11" fill="#059669">only forward. never back.</text>
+
+        <!-- Arrow Evaluate → Revert (leftward) -->
+        <line x1="360" y1="335" x2="320" y2="335" stroke="#566068" stroke-width="1.8" marker-end="url(#arrow-auto)"/>
+
+        <!-- Arrow Revert → Propose (upward, closing the loop) -->
+        <line x1="175" y1="250" x2="175" y2="200" stroke="#0891b2" stroke-width="2" stroke-dasharray="4 3" marker-end="url(#arrow-auto)"/>
+        <text x="185" y="232" font-family="JetBrains Mono, monospace" font-size="10" fill="#0891b2" font-style="italic">restart loop</text>
+
+        <!-- Caption footer -->
+        <text x="340" y="450" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#566068">~12 experiments / hour  ·  runs unattended overnight</text>
+      </svg>
+      <figcaption>The Autoresearch loop. Four phases, one direction of travel, and no human in the inner cycle.</figcaption>
+    </figure>
+
+    <h3>The Ratchet Mechanism: Why "Only Forward" Matters</h3>
+    <p>The most critical architectural decision in any Autoresearch system is the <strong>Ratchet Script</strong>. This is the component that enforces <em>monotonic improvement</em> — the system can only move forward, never backward.</p>
+
+    <p>Why is this so important? Without the ratchet, an autonomous agent can easily oscillate. It improves in one dimension, then breaks something in another, then "fixes" the breakage by reverting the original improvement. You end up with a random walk instead of a climb. The ratchet transforms exploration into accumulation. Every successful experiment becomes the new floor. The agent can try wild, speculative changes — because if they fail, the system snaps back to its best-ever state.</p>
+
+    <p>This is what distinguishes Autoresearch from simple hyperparameter sweeps or random search. The agent isn't sampling from a grid. It's <em>building on its own history</em>, reading past results, identifying what worked, and choosing its next experiment based on the trajectory so far. Git acts as the memory. The results log acts as the experiment journal. The ratchet ensures the journal only records breakthroughs.</p>
+
+    <figure class="svg-figure">
+      <svg viewBox="0 0 680 380" width="100%" role="img" aria-label="Ratchet staircase: best score increases monotonically over experiments while failed experiments scatter below the line">
+        <!-- Plot frame -->
+        <rect x="60" y="40" width="580" height="280" fill="#fafbfc" stroke="#e5e7eb" stroke-width="1"/>
+
+        <!-- Y-axis labels (best score) -->
+        <text x="52" y="46"  text-anchor="end" font-family="JetBrains Mono, monospace" font-size="9" fill="#94a3b8">100</text>
+        <text x="52" y="106" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="9" fill="#94a3b8">75</text>
+        <text x="52" y="166" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="9" fill="#94a3b8">50</text>
+        <text x="52" y="226" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="9" fill="#94a3b8">25</text>
+        <text x="52" y="322" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="9" fill="#94a3b8">0</text>
+        <text x="28" y="180" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068" transform="rotate(-90 28 180)">score</text>
+
+        <!-- X-axis labels -->
+        <text x="60"  y="344" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#94a3b8">0</text>
+        <text x="200" y="344" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#94a3b8">25</text>
+        <text x="350" y="344" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#94a3b8">50</text>
+        <text x="495" y="344" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#94a3b8">75</text>
+        <text x="640" y="344" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#94a3b8">100</text>
+        <text x="350" y="366" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068">experiment #</text>
+
+        <!-- Horizontal grid lines -->
+        <g stroke="#e5e7eb" stroke-width="0.8" stroke-dasharray="2 3">
+          <line x1="60" y1="106" x2="640" y2="106"/>
+          <line x1="60" y1="166" x2="640" y2="166"/>
+          <line x1="60" y1="226" x2="640" y2="226"/>
+        </g>
+
+        <!-- Rejected attempts (scattered below the staircase, muted gray) -->
+        <g fill="#cbd5e1" opacity="0.85">
+          <circle cx="82"  cy="290" r="2.8"/>
+          <circle cx="108" cy="282" r="2.8"/>
+          <circle cx="126" cy="290" r="2.8"/>
+          <circle cx="168" cy="284" r="2.8"/>
+          <circle cx="188" cy="260" r="2.8"/>
+          <circle cx="210" cy="256" r="2.8"/>
+          <circle cx="245" cy="262" r="2.8"/>
+          <circle cx="270" cy="246" r="2.8"/>
+          <circle cx="298" cy="228" r="2.8"/>
+          <circle cx="335" cy="210" r="2.8"/>
+          <circle cx="358" cy="222" r="2.8"/>
+          <circle cx="390" cy="198" r="2.8"/>
+          <circle cx="428" cy="192" r="2.8"/>
+          <circle cx="448" cy="178" r="2.8"/>
+          <circle cx="470" cy="170" r="2.8"/>
+          <circle cx="508" cy="162" r="2.8"/>
+          <circle cx="528" cy="154" r="2.8"/>
+          <circle cx="548" cy="156" r="2.8"/>
+          <circle cx="582" cy="118" r="2.8"/>
+          <circle cx="610" cy="108" r="2.8"/>
+        </g>
+
+        <!-- Staircase: best-score line, monotonically non-decreasing -->
+        <path d="M60,278 L138,278 L138,253 L217,253 L217,225 L318,225 L318,196 L396,196 L396,165 L474,165 L474,151 L553,151 L553,91 L620,91"
+              stroke="#0891b2" stroke-width="2.2" fill="none"/>
+
+        <!-- Accepted attempts (green dots at step corners) -->
+        <g fill="#059669" stroke="#065f46" stroke-width="1">
+          <circle cx="138" cy="253" r="4"/>
+          <circle cx="217" cy="225" r="4"/>
+          <circle cx="318" cy="196" r="4"/>
+          <circle cx="396" cy="165" r="4"/>
+          <circle cx="474" cy="151" r="4"/>
+          <circle cx="553" cy="91"  r="5"/>
+        </g>
+
+        <!-- Annotations -->
+        <text x="82" y="316" font-family="JetBrains Mono, monospace" font-size="9" fill="#94a3b8">failed experiments (reverted)</text>
+
+        <line x1="553" y1="74" x2="553" y2="56" stroke="#d97706" stroke-width="1"/>
+        <text x="553" y="50" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#d97706">breakthrough: structural refactor</text>
+
+        <text x="180" y="68" font-family="JetBrains Mono, monospace" font-size="9" fill="#0891b2">best-so-far only moves up</text>
+      </svg>
+      <figcaption>Score over experiments. The staircase is the best score seen so far; grey dots are failed experiments that the ratchet reverted. The line never drops.</figcaption>
+    </figure>
+
+    <h2>The Arena: A 2D Survival Testbed</h2>
+    <p>Evolution Arena provides the simulation layer for this loop: a 2D environment where a creature must navigate a world of food and hazards.</p>
+
+    <p>The creature exists in a bounded space populated with two types of objects. <strong>Food items</strong> are scattered across the map — each one collected adds to the creature's score. <strong>Hazards</strong> are obstacles that deal damage on contact. The creature must develop logic to seek food efficiently while steering clear of danger.</p>
+
+    <h3>The Scoring System: Teaching Caution to an Algorithm</h3>
+    <p>The creature's fitness is calculated with a deliberately asymmetric formula:</p>
+
+    <pre class="codeblock"><code>score <span class="ck-cmd">=</span> (food_collected <span class="ck-cmd">*</span> <span class="ck-flag">10</span>) <span class="ck-cmd">-</span> (damage_taken <span class="ck-cmd">*</span> <span class="ck-flag">2</span>)</code></pre>
+
+    <p>This balance is more subtle than it appears. A pure food-maximizer that ignores hazards will rack up damage penalties that erode its gains. A purely cautious creature that avoids all risk will starve for points. The 5:1 reward-to-penalty ratio pushes the agent toward <em>confident but careful</em> behavior — it should aggressively pursue food, but not at the cost of reckless collisions.</p>
+
+    <p>This scoring asymmetry is what makes the arena a meaningful testbed for Autoresearch. The agent isn't just optimizing a single variable; it's learning to balance competing pressures. Every code change it proposes must navigate this tradeoff. A new steering algorithm that doubles food intake but triples damage will be reverted by the ratchet. Only changes that improve the <em>composite</em> score survive.</p>
+
+    <h2>The Role of the Agent: Editing Its Own DNA</h2>
+    <p>Here is where Evolution Arena becomes genuinely fascinating. The AI agent — such as Claude Code running in a terminal — doesn't play the game in real time. Instead, it modifies the <em>source code</em> and <em>configuration files</em> that govern how the creature behaves.</p>
+
+    <p>The agent interacts primarily with two files:</p>
+    <ul>
+      <li><strong><code>game.py</code></strong> contains the creature's steering logic, sensor processing, and movement rules. The agent can rewrite decision trees, adjust turn speeds, add wall-avoidance heuristics, or implement entirely new navigation strategies.</li>
+      <li><strong><code>config.json</code></strong> holds tunable parameters: vision range, movement speed, turn rate, how far ahead the creature looks for food, how aggressively it avoids hazards. The agent can tweak these values independently or in combination.</li>
+    </ul>
+
+    <p>The <strong>Evaluation Wrapper</strong> orchestrates each experiment. It takes the agent's proposed changes, runs the simulation for a fixed number of steps, captures the score, and passes it back to the ratchet for the keep-or-revert decision. The wrapper ensures that every experiment is directly comparable — same number of steps, same initial conditions, same scoring formula.</p>
+
+    <p>What emerges is something that looks remarkably like evolution. Early iterations might produce simple changes: bump the vision range up, increase movement speed slightly. But as the easy gains are exhausted, the agent begins making structural changes — rewriting the pathfinding logic, introducing state machines for different behavioral modes, adding predictive avoidance for hazards that are still several steps away. The ratchet ensures that each of these structural leaps only sticks if it actually produces better outcomes.</p>
+
+    <h2>Tech Stack: Deliberately Minimal</h2>
+    <div class="tech-stack-pills">
+      <span class="proj-lang">Python 3.8+</span>
+      <span class="proj-lang">Claude Code CLI</span>
+      <span class="proj-lang">Bash</span>
+      <span class="proj-lang">Git</span>
+    </div>
+
+    <p>Evolution Arena is built to be forked, not admired. The entire stack is intentionally minimal.</p>
+
+    <p><strong>Python 3.8+</strong> for the game simulation, scoring, and evaluation wrapper. No heavy frameworks, no distributed training infrastructure. One file runs the game. One file scores it.</p>
+
+    <p><strong>Claude Code CLI</strong> (or any compatible coding agent) as the researcher. The agent reads the codebase, proposes changes, and interacts with the file system directly through the terminal. It doesn't need a custom API or plugin — it just edits files and runs scripts.</p>
+
+    <p><strong>Bash scripts</strong> for orchestration. The <code>autoresearch.sh</code> script ties the loop together: invoke the agent, run the simulation, evaluate, commit or revert, log, repeat. Bash is the glue because the loop itself should be trivially inspectable. You can read the orchestration script in under a minute and understand exactly what happens at each step.</p>
+
+    <p>This minimalism is intentional. Karpathy's original Autoresearch was a single GPU, one file, one metric. Evolution Arena follows the same philosophy: the simpler the infrastructure, the easier it is to understand what the <em>agent</em> is doing versus what the <em>system</em> is doing.</p>
+
+    <h2>Future Implications: Beyond the Arena</h2>
+    <p>Evolution Arena is a game, but the pattern it demonstrates is not. The Autoresearch loop — propose, test, score, keep or revert — is already being applied to problems far more consequential than 2D creature survival.</p>
+
+    <ul>
+      <li><strong>ML training optimization.</strong> Karpathy's original repo has agents autonomously improving GPT training scripts, achieving compounding gains in validation loss across hundreds of unattended experiments.</li>
+      <li><strong>GPU kernel performance.</strong> Projects like AutoKernel use the same loop to find faster CUDA implementations — editing code, benchmarking throughput, and keeping only the changes that improve execution speed without breaking correctness.</li>
+      <li><strong>Database query tuning.</strong> Any system with a measurable latency metric and a configuration file is a candidate. Imagine an agent that continuously rewrites query plans, tests them against production-like workloads, and only deploys the ones that reduce p99 latency.</li>
+      <li><strong>Server and infrastructure configuration.</strong> Load balancer weights, cache eviction policies, connection pool sizes — numeric knobs that an Autoresearch loop could turn, test, and ratchet forward.</li>
+      <li><strong>Optimizing other AI models.</strong> This is the recursive frontier. An AI agent that rewrites the training code for <em>another</em> AI model, measures its benchmark performance, and keeps only the improvements. The Autoresearch pattern applied to Autoresearch itself.</li>
+    </ul>
+
+    <p>The key insight is that any domain with a <strong>mechanical metric</strong> — a number you can compute without human judgment — is a candidate for this pattern. The arena's <code>(food · 10) − (damage · 2)</code> is a toy version of what could be <code>p99_latency_ms</code>, <code>validation_bits_per_byte</code>, <code>inference_tokens_per_second</code>, or <code>revenue_per_user</code>. The ratchet doesn't care what the number means. It only cares whether it went up.</p>
+
+    <h2>Clone the Arena. See How High Your AI Can Score.</h2>
+    <p>The Evolution Arena is open source, minimal, and designed to run on a single machine. If you've ever been curious about what happens when you point a coding agent at its own codebase and tell it to improve — this is the cleanest sandbox to find out.</p>
+
+    <pre class="codeblock"><code><span class="ck-cmd">git</span> clone https://github.com/josephgec/evolution-arena.git
+<span class="ck-cmd">cd</span> evolution-arena
+<span class="ck-comment"># point your agent at the repo and start the loop</span>
+<span class="ck-cmd">bash</span> autoresearch.sh</code></pre>
+
+    <p>Watch the results log. See the score climb. Pay attention to the <em>kinds</em> of changes the agent makes as easy gains dry up and it starts getting creative. That's when it gets interesting.</p>
+
+    <p>The arena is small. The pattern is not.</p>
+
+    <h2>References</h2>
+    <p class="references-intro">The foundational ideas and sibling projects this one builds on.</p>
+
+    <h3>Autoresearch pattern</h3>
+    <ul class="references">
+      <li>Karpathy. <em>Autoresearch — autonomous research loops for ML training.</em> 2026. <a href="https://github.com/karpathy/autoresearch" target="_blank" rel="noopener noreferrer">github.com/karpathy/autoresearch</a></li>
+      <li><em>Awesome Autoresearch</em> — curated list of Autoresearch applications across domains. <a href="https://github.com/yibie/awesome-autoresearch" target="_blank" rel="noopener noreferrer">github.com/yibie/awesome-autoresearch</a></li>
+      <li>Anthropic. <em>Claude Code.</em> <a href="https://www.anthropic.com/claude-code" target="_blank" rel="noopener noreferrer">anthropic.com/claude-code</a></li>
+    </ul>
+
+    <h3>Related ideas: self-improving systems &amp; search</h3>
+    <ul class="references">
+      <li>Real et al. <em>AutoML-Zero: Evolving Machine Learning Algorithms From Scratch.</em> ICML 2020. <a href="https://arxiv.org/abs/2003.03384" target="_blank" rel="noopener noreferrer">arXiv:2003.03384</a></li>
+      <li>Lehman &amp; Stanley. <em>Abandoning Objectives: Evolution through the Search for Novelty Alone.</em> Evolutionary Computation, 2011. <a href="https://direct.mit.edu/evco/article/19/2/189/1365" target="_blank" rel="noopener noreferrer">mit.edu</a></li>
+      <li>Madaan et al. <em>Self-Refine: Iterative Refinement with Self-Feedback.</em> NeurIPS 2023. <a href="https://arxiv.org/abs/2303.17651" target="_blank" rel="noopener noreferrer">arXiv:2303.17651</a></li>
+      <li>Zhou et al. <em>Language Agent Tree Search.</em> ICML 2024. <a href="https://arxiv.org/abs/2310.04406" target="_blank" rel="noopener noreferrer">arXiv:2310.04406</a></li>
+    </ul>
+
+    <h3>Project source</h3>
+    <ul class="references">
+      <li>Evolution Arena on GitHub — <a href="https://github.com/josephgec/evolution-arena" target="_blank" rel="noopener noreferrer">github.com/josephgec/evolution-arena</a></li>
+    </ul>
+  </div>
+
+  <div class="post-nav" role="navigation" aria-label="Post navigation">
+    <a class="post-nav-back" href="index.html">
+      <span class="writing-back-arrow">←</span>
+      All posts
+    </a>
+    <a class="post-nav-back post-nav-forward" href="arc-swarm.html">
+      Read next: When Swarms Write Code
+      <span class="writing-arrow">→</span>
+    </a>
+  </div>
+</article>
+
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-cta">Open to advising, speaking engagements, and research collaborations.</div>
+      <div class="footer-brand">Joseph Thomas</div>
+      <div class="footer-copy">Saratoga, CA · Software Engineer · Google Cloud</div>
+    </div>
+    <div class="footer-links">
+      <a class="footer-link" href="https://scholar.google.com/citations?user=6RHIGk4AAAAJ&hl=en&oi=sra" target="_blank" rel="noopener noreferrer" title="Google Scholar" aria-label="Google Scholar">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 14l9-5-9-5-9 5 9 5z"/><path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+      </a>
+      <a class="footer-link" href="https://github.com/josephgec" target="_blank" rel="noopener noreferrer" title="GitHub" aria-label="GitHub">
+        <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844a9.59 9.59 0 012.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+      </a>
+      <a class="footer-link" href="https://www.linkedin.com/in/joseph-t-a6883013/" target="_blank" rel="noopener noreferrer" title="LinkedIn" aria-label="LinkedIn">
+        <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+      </a>
+    </div>
+  </div>
+</footer>
+
+<script>
+const nav = document.getElementById('mainNav');
+const hero = document.getElementById('hero');
+const navObs = new IntersectionObserver(
+  ([e]) => nav.classList.toggle('scrolled', !e.isIntersecting),
+  { threshold: 0.05 }
+);
+navObs.observe(hero);
+
+const progressBar = document.getElementById('scrollProgress');
+window.addEventListener('scroll', () => {
+  const h = document.documentElement;
+  const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+  progressBar.style.width = pct + '%';
+}, { passive: true });
+
+(function() {
+  const canvas = document.getElementById('swarmCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H, mouse = { x: -9999, y: -9999 };
+  const particles = [];
+  const COUNT = 60;
+  const CONNECT_DIST = 140;
+
+  function resize() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    W = canvas.width = rect.width;
+    H = canvas.height = rect.height;
+  }
+
+  function Particle() {
+    this.x = Math.random() * W;
+    this.y = Math.random() * H;
+    this.vx = (Math.random() - 0.5) * 0.6;
+    this.vy = (Math.random() - 0.5) * 0.6;
+    this.r = Math.random() * 2 + 1;
+  }
+
+  Particle.prototype.update = function() {
+    const dx = mouse.x - this.x;
+    const dy = mouse.y - this.y;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    if (dist < 300 && dist > 1) {
+      const force = 0.0003 * (300 - dist);
+      this.vx += (dx / dist) * force;
+      this.vy += (dy / dist) * force;
+    }
+    this.vx *= 0.995;
+    this.vy *= 0.995;
+    this.x += this.vx;
+    this.y += this.vy;
+    if (this.x < 0) this.x = W;
+    if (this.x > W) this.x = 0;
+    if (this.y < 0) this.y = H;
+    if (this.y > H) this.y = 0;
+  };
+
+  function init() {
+    resize();
+    for (let i = 0; i < COUNT; i++) particles.push(new Particle());
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const d = Math.sqrt(dx*dx + dy*dy);
+        if (d < CONNECT_DIST) {
+          const alpha = (1 - d / CONNECT_DIST) * 0.15;
+          ctx.strokeStyle = 'rgba(103, 232, 249,' + alpha + ')';
+          ctx.lineWidth = 0.8;
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+    for (const p of particles) {
+      p.update();
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(103, 232, 249, 0.6)';
+      ctx.fill();
+    }
+    requestAnimationFrame(draw);
+  }
+
+  hero.addEventListener('mousemove', e => {
+    const rect = canvas.getBoundingClientRect();
+    mouse.x = e.clientX - rect.left;
+    mouse.y = e.clientY - rect.top;
+  });
+  hero.addEventListener('mouseleave', () => {
+    mouse.x = -9999;
+    mouse.y = -9999;
+  });
+
+  window.addEventListener('resize', resize);
+  init();
+  draw();
+})();
+</script>
+
+</body>
+</html>
