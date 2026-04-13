@@ -2,10 +2,12 @@
   "name": "josephgec.github.io",
   "private": true,
   "scripts": {
-    "test": "jest --coverage"
+    "test": "jest --coverage",
+    "substack": "node scripts/to-substack.js"
   },
   "devDependencies": {
     "jest": "^29.7.0",
-    "jest-environment-jsdom": "^29.7.0"
+    "jest-environment-jsdom": "^29.7.0",
+    "jsdom": "^20.0.3"
   }
 }
