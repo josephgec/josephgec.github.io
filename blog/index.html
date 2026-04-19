@@ -4,26 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>Writing · Joseph Thomas | Essays on AI agents &amp; systems engineering</title>
+  <title>Writing · Joseph Thomas — Essays on AI agents &amp; systems engineering</title>
   <meta name="description" content="Essays on AI agents, swarm intelligence, and systems engineering from Joseph Thomas — Software Engineer at Google Cloud." />
-  <meta name="keywords" content="Joseph Thomas, blog, AI agents, swarm intelligence, systems engineering, LLM, Claude, Gemini" />
   <meta name="author" content="Joseph Thomas" />
-  <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://jthomas.site/blog/" />
-  <meta name="theme-color" content="#0a1628" />
+  <meta name="theme-color" content="#7a1f24" />
 
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://jthomas.site/blog/" />
   <meta property="og:title" content="Writing · Joseph Thomas" />
   <meta property="og:description" content="Essays on AI agents, swarm intelligence, and systems engineering." />
   <meta property="og:image" content="https://jthomas.site/photo.jpg" />
-  <meta property="og:locale" content="en_US" />
-  <meta property="og:site_name" content="Joseph Thomas" />
-
-  <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Writing · Joseph Thomas" />
-  <meta name="twitter:description" content="Essays on AI agents, swarm intelligence, and systems engineering." />
-  <meta name="twitter:image" content="https://jthomas.site/photo.jpg" />
 
   <script type="application/ld+json">
   {
@@ -32,190 +23,132 @@
     "name": "Joseph Thomas — Writing",
     "url": "https://jthomas.site/blog/",
     "description": "Essays on AI agents, swarm intelligence, and systems engineering.",
-    "author": {
-      "@type": "Person",
-      "name": "Joseph Thomas",
-      "url": "https://jthomas.site/"
-    }
+    "author": { "@type": "Person", "name": "Joseph Thomas", "url": "https://jthomas.site/" }
   }
   </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&display=swap" />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;400;500;600;700;800&family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,400;1,8..60,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="../styles.css" />
 </head>
-<body class="blog-page">
+<body>
 
-<div class="scroll-progress" id="scrollProgress"></div>
-
-<nav aria-label="Site navigation" id="mainNav" class="scrolled">
-  <div class="nav-inner">
-    <a class="nav-name" href="../index.html" style="text-decoration:none;">JT</a>
-    <ul class="nav-links">
-      <li><a href="../index.html#experience" aria-label="View Experience on homepage">Experience</a></li>
-      <li><a href="../index.html#education" aria-label="View Education on homepage">Education</a></li>
-      <li><a href="../index.html#publications" aria-label="View Research on homepage">Research</a></li>
-      <li><a href="../index.html#projects" aria-label="View Projects on homepage">Projects</a></li>
-      <li><a href="index.html" aria-label="Writing — blog" aria-current="page">Writing</a></li>
-      <li><a href="../consulting.html" aria-label="View Consulting services">Consulting</a></li>
-    </ul>
+<header class="site-nav">
+  <div>
+    <a class="brand" href="../index.html">jthomas.site</a>
+    <span class="brand-meta">// notebook · v.4.2026</span>
   </div>
-</nav>
+  <nav>
+    <a href="index.html" style="color:var(--ink);">writing</a>
+    <a href="../index.html#research">research</a>
+    <a href="../index.html#work">work</a>
+    <a href="../index.html#projects">projects</a>
+    <a href="../consulting.html">consulting</a>
+    <a href="../index.html#contact" class="contact"><span class="arr">→</span>contact</a>
+  </nav>
+</header>
 
-<main>
-<section class="section blog-index-section">
-  <div class="section-inner">
-    <a class="writing-back" href="../index.html">
-      <span class="writing-back-arrow">←</span>
-      Back to home
+<main class="measure" style="padding-top: 64px;">
+
+  <a class="post-back" href="../index.html">
+    <span class="arrow">←</span>
+    back to home
+  </a>
+
+  <div class="head" style="margin-top: 32px;">
+    <div class="kicker">
+      <span class="label">§ writing</span>
+      <span class="count">05 essays</span>
+    </div>
+    <h2 style="font-size: 48px;">Essays on AI agents, swarm intelligence &amp; systems engineering.</h2>
+    <div class="rule"></div>
+  </div>
+
+  <section class="section write-list">
+
+    <a class="write-card" href="evolution-arena.html">
+      <div class="meta">
+        <div class="date">apr 2026</div>
+        <div>autoresearch</div>
+        <div>10 min</div>
+      </div>
+      <div>
+        <h3>When AI Becomes Its Own Scientist</h3>
+        <p class="sub">Inside the Evolution Arena and the rise of autoresearch.</p>
+        <p class="blurb">An AI agent that proposes its own experiments, runs them against a live 2D survival simulation, scores the result with a hard mechanical metric, and commits or reverts on its own. No vibes, no subjective review — just a ratchet that only moves forward.</p>
+      </div>
     </a>
 
-    <div class="section-header blog-index-header">
-      <h1 class="section-title blog-index-title">Writing</h1>
-      <div class="section-line"></div>
-      <span class="section-count">05 posts</span>
-    </div>
+    <a class="write-card" href="arc-swarm.html">
+      <div class="meta">
+        <div class="date">mar 2026</div>
+        <div>swarm intelligence</div>
+        <div>13 min</div>
+      </div>
+      <div>
+        <h3>When Swarms Write Code</h3>
+        <p class="sub">How particle swarm optimization escapes the local-minima trap in ARC-AGI.</p>
+        <p class="blurb">Standard LLM agents get stuck in local minima on ARC-AGI. The fix: swap the single-agent loop for a PSO-governed swarm of specialized LLM particles with a continuous fitness function that rewards near misses. The swarm provides strategy; the LLM provides syntax.</p>
+      </div>
+    </a>
 
-    <div class="writing-subhead">
-      <p>Essays on AI agents, swarm intelligence &amp; systems engineering</p>
-    </div>
+    <a class="write-card" href="finetuning.html">
+      <div class="meta">
+        <div class="date">feb 2026</div>
+        <div>fine-tuning</div>
+        <div>8 min</div>
+      </div>
+      <div>
+        <h3>Stop Wrestling with Boilerplate</h3>
+        <p class="sub">Local Tinker — a clean API for local LLM fine-tuning.</p>
+        <p class="blurb">A Tinker-style API for LoRA fine-tuning of 1B–13B LLMs on your own GPU. Four primitives — ServiceClient, TrainingClient, forward_backward, optim_step — cover SFT, DPO, PPO, and GRPO without the usual HuggingFace + PEFT + bitsandbytes boilerplate.</p>
+      </div>
+    </a>
 
-    <!-- ════════════════════════════════════════
-         ALL POSTS — newest first. To add a post:
-         prepend a card block below. Template at
-         the bottom of this list (commented out).
-    ════════════════════════════════════════ -->
-    <div class="writing-list">
-      <a class="proj-card writing-card reveal" href="evolution-arena.html">
-        <div class="writing-meta">
-          <span class="writing-date">Apr 2026</span>
-          <span class="proj-lang">Autoresearch</span>
-          <span class="writing-read-time">10 min read</span>
-        </div>
-        <div class="writing-title">When AI Becomes Its Own Scientist — Inside the Evolution Arena and the Rise of Autoresearch</div>
-        <div class="proj-desc">An AI agent that proposes its own experiments, runs them against a live 2D survival simulation, scores the result with a hard mechanical metric, and commits or reverts on its own. No vibes, no subjective review — just a ratchet that only moves forward.</div>
-        <div class="proj-footer">
-          <span>Read the post</span>
-          <span class="writing-arrow">→</span>
-        </div>
-      </a>
+    <a class="write-card" href="deepsnake.html">
+      <div class="meta">
+        <div class="date">jan 2026</div>
+        <div>reinforcement learning</div>
+        <div>9 min</div>
+      </div>
+      <div>
+        <h3>Building an AI That Masters Snake</h3>
+        <p class="sub">A deep reinforcement learning project from scratch.</p>
+        <p class="blurb">How I built a Snake AI with Deep Q-Learning in PyTorch. A neural network, a shaped reward signal, and a lot of virtual trial and error — no hand-coded strategy, no search algorithms. Averages 44 points over 200 games, peaks at 75.</p>
+      </div>
+    </a>
 
-      <a class="proj-card writing-card reveal" href="arc-swarm.html">
-        <div class="writing-meta">
-          <span class="writing-date">Mar 2026</span>
-          <span class="proj-lang">Swarm Intelligence</span>
-          <span class="writing-read-time">13 min read</span>
-        </div>
-        <div class="writing-title">When Swarms Write Code — How Particle Swarm Optimization Escapes the Local Minima Trap in ARC-AGI</div>
-        <div class="proj-desc">Standard LLM agents get stuck in local minima on ARC-AGI. The fix: swap the single-agent loop for a PSO-governed swarm of specialized LLM particles with a continuous fitness function that rewards near misses. The swarm provides strategy; the LLM provides syntax.</div>
-        <div class="proj-footer">
-          <span>Read the post</span>
-          <span class="writing-arrow">→</span>
-        </div>
-      </a>
+    <a class="write-card" href="claude-agent.html">
+      <div class="meta">
+        <div class="date">dec 2025</div>
+        <div>ai agents</div>
+        <div>12 min</div>
+      </div>
+      <div>
+        <h3>Two AIs, One Loop</h3>
+        <p class="sub">Building a self-improving code agent.</p>
+        <p class="blurb">A two-agent architecture — one Claude planning, another implementing, with git diffs and test results flowing between them — captures most of the value of multi-agent coding systems while avoiding their complexity. What I built, and what 50+ research papers say about why it works.</p>
+      </div>
+    </a>
 
-      <a class="proj-card writing-card reveal" href="finetuning.html">
-        <div class="writing-meta">
-          <span class="writing-date">Feb 2026</span>
-          <span class="proj-lang">Fine-Tuning</span>
-          <span class="writing-read-time">8 min read</span>
-        </div>
-        <div class="writing-title">Stop Wrestling with Boilerplate — Local Tinker Gives You a Clean API for Local LLM Fine-Tuning</div>
-        <div class="proj-desc">A Tinker-style API for LoRA fine-tuning of 1B–13B LLMs on your own GPU. Four primitives — ServiceClient, TrainingClient, forward_backward, optim_step — cover SFT, DPO, PPO, and GRPO without the usual HuggingFace + PEFT + bitsandbytes boilerplate.</div>
-        <div class="proj-footer">
-          <span>Read the post</span>
-          <span class="writing-arrow">→</span>
-        </div>
-      </a>
-
-      <a class="proj-card writing-card reveal" href="deepsnake.html">
-        <div class="writing-meta">
-          <span class="writing-date">Jan 2026</span>
-          <span class="proj-lang">Reinforcement Learning</span>
-          <span class="writing-read-time">9 min read</span>
-        </div>
-        <div class="writing-title">Building an AI That Masters Snake — A Deep Reinforcement Learning Project from Scratch</div>
-        <div class="proj-desc">How I built a Snake AI with Deep Q-Learning in PyTorch. A neural network, a shaped reward signal, and a lot of virtual trial and error — no hand-coded strategy, no search algorithms. Averages 44 points over 200 games, peaks at 75.</div>
-        <div class="proj-footer">
-          <span>Read the post</span>
-          <span class="writing-arrow">→</span>
-        </div>
-      </a>
-
-      <a class="proj-card writing-card reveal" href="claude-agent.html">
-        <div class="writing-meta">
-          <span class="writing-date">Dec 2025</span>
-          <span class="proj-lang">AI Agents</span>
-          <span class="writing-read-time">12 min read</span>
-        </div>
-        <div class="writing-title">Two AIs, One Loop — Building a Self-Improving Code Agent</div>
-        <div class="proj-desc">A two-agent architecture — one Claude planning, another implementing, with git diffs and test results flowing between them — captures most of the value of multi-agent coding systems while avoiding their complexity. What I built, and what 50+ research papers say about why it works.</div>
-        <div class="proj-footer">
-          <span>Read the post</span>
-          <span class="writing-arrow">→</span>
-        </div>
-      </a>
-
-      <!-- ════════════════════════════════════════
-           POST CARD TEMPLATE — duplicate this block
-           and prepend to the list above when adding
-           a new post.
-      ════════════════════════════════════════
-
-      <a class="proj-card writing-card reveal" href="SLUG.html">
-        <div class="writing-meta">
-          <span class="writing-date">Mon YYYY</span>
-          <span class="proj-lang">Category</span>
-          <span class="writing-read-time">N min read</span>
-        </div>
-        <div class="writing-title">Post Title</div>
-        <div class="proj-desc">First 2-3 sentences of the post as an excerpt. Keep it punchy so readers get a sense of the angle without needing the full article.</div>
-        <div class="proj-footer">
-          <span>Read the post</span>
-          <span class="writing-arrow">→</span>
-        </div>
-      </a>
-
-      -->
-    </div>
-
-  </div>
-</section>
+  </section>
 </main>
 
-<footer>
-  <div class="footer-inner">
-    <div>
-      <div class="footer-cta">Open to advising, speaking engagements, and research collaborations.</div>
-      <div class="footer-brand">Joseph Thomas</div>
-      <div class="footer-copy">Saratoga, CA · Software Engineer · Google Cloud</div>
-    </div>
-    <div class="footer-links">
-      <a class="footer-link" href="https://scholar.google.com/citations?user=6RHIGk4AAAAJ&hl=en&oi=sra" target="_blank" rel="noopener noreferrer" title="Google Scholar" aria-label="Google Scholar">
-        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 14l9-5-9-5-9 5 9 5z"/><path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
-      </a>
-      <a class="footer-link" href="https://github.com/josephgec" target="_blank" rel="noopener noreferrer" title="GitHub" aria-label="GitHub">
-        <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844a9.59 9.59 0 012.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
-      </a>
-      <a class="footer-link" href="https://www.linkedin.com/in/joseph-t-a6883013/" target="_blank" rel="noopener noreferrer" title="LinkedIn" aria-label="LinkedIn">
-        <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-      </a>
-    </div>
+<footer id="contact" class="measure contact">
+  <h2>Have something <span class="accent">interesting</span> to talk about?</h2>
+  <p>Open to consulting on AI infrastructure, speaking on swarm intelligence and
+    emergent reasoning, and collaborating on multi-agent research.</p>
+  <div class="actions">
+    <a class="btn-mail" href="mailto:hello@jthomas.site">hello@jthomas.site →</a>
+    <span class="or">or via — <a href="https://www.linkedin.com/in/joseph-t-a6883013/">linkedin</a> · <a href="https://scholar.google.com/citations?user=6RHIGk4AAAAJ">scholar</a> · <a href="https://github.com/josephgec">github</a></span>
+  </div>
+  <div class="colophon">
+    <span>set in source serif &amp; jetbrains mono</span>
+    <span>© 2026 joseph thomas · saratoga, ca</span>
   </div>
 </footer>
-
-<script>
-// ── Scroll progress bar ──
-const progressBar = document.getElementById('scrollProgress');
-window.addEventListener('scroll', () => {
-  const h = document.documentElement;
-  const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
-  progressBar.style.width = pct + '%';
-}, { passive: true });
-</script>
 
 </body>
 </html>
