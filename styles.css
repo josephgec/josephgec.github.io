@@ -569,6 +569,15 @@ body {
   margin-top: 4px;
 }
 .nb-service li .text { flex: 1; line-height: 1.4; }
+.nb-service li a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid var(--rule);
+  transition: color .15s, border-color .15s;
+}
+.nb-service li a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+.nb-nav .brand { text-decoration: none; }
+.nb-nav .brand:hover { color: var(--accent); }
 .nb-service-tail {
   margin-top: 28px;
   font-family: var(--serif);
