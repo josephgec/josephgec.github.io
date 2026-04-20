@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Joseph Thomas — Writing</title>
+    <link>https://jthomas.site/blog/</link>
+    <description>Essays on AI agents, swarm intelligence, and systems engineering.</description>
+    <language>en-us</language>
+    <copyright>© 2026 Joseph Thomas</copyright>
+    <lastBuildDate>Mon, 20 Apr 2026 12:00:00 +0000</lastBuildDate>
+    <atom:link href="https://jthomas.site/blog/feed.xml" rel="self" type="application/rss+xml"/>
+    <managingEditor>hello@jthomas.site (Joseph Thomas)</managingEditor>
+
+    <item>
+      <title>When AI Becomes Its Own Scientist</title>
+      <link>https://jthomas.site/blog/evolution-arena.html</link>
+      <guid isPermaLink="true">https://jthomas.site/blog/evolution-arena.html</guid>
+      <pubDate>Wed, 01 Apr 2026 12:00:00 +0000</pubDate>
+      <category>Autoresearch</category>
+      <dc:creator>Joseph Thomas</dc:creator>
+      <description>Inside the Evolution Arena and the rise of autoresearch. An AI agent that proposes its own experiments, runs them against a live 2D survival simulation, scores the result with a hard mechanical metric, and commits or reverts on its own. A ratchet that only moves forward.</description>
+    </item>
+
+    <item>
+      <title>When Swarms Write Code</title>
+      <link>https://jthomas.site/blog/arc-swarm.html</link>
+      <guid isPermaLink="true">https://jthomas.site/blog/arc-swarm.html</guid>
+      <pubDate>Sun, 01 Mar 2026 12:00:00 +0000</pubDate>
+      <category>Swarm Intelligence</category>
+      <dc:creator>Joseph Thomas</dc:creator>
+      <description>How particle swarm optimization escapes the local-minima trap in ARC-AGI. Standard LLM agents get stuck. The fix: a PSO-governed swarm of specialized LLM particles with a continuous fitness function that rewards near-misses. The swarm provides strategy; the LLM provides syntax.</description>
+    </item>
+
+    <item>
+      <title>Stop Wrestling with Boilerplate</title>
+      <link>https://jthomas.site/blog/finetuning.html</link>
+      <guid isPermaLink="true">https://jthomas.site/blog/finetuning.html</guid>
+      <pubDate>Sat, 14 Feb 2026 12:00:00 +0000</pubDate>
+      <category>Fine-Tuning</category>
+      <dc:creator>Joseph Thomas</dc:creator>
+      <description>Local Tinker — a clean API for local LLM fine-tuning. A Tinker-style API for LoRA fine-tuning of 1B–13B LLMs on your own GPU. Four primitives cover SFT, DPO, PPO, and GRPO without the HuggingFace + PEFT + bitsandbytes boilerplate.</description>
+    </item>
+
+    <item>
+      <title>Building an AI That Masters Snake</title>
+      <link>https://jthomas.site/blog/deepsnake.html</link>
+      <guid isPermaLink="true">https://jthomas.site/blog/deepsnake.html</guid>
+      <pubDate>Thu, 01 Jan 2026 12:00:00 +0000</pubDate>
+      <category>Reinforcement Learning</category>
+      <dc:creator>Joseph Thomas</dc:creator>
+      <description>A deep reinforcement learning project from scratch. How I built a Snake AI with Deep Q-Learning in PyTorch. A neural network, a shaped reward signal, and a lot of virtual trial and error — no hand-coded strategy, no search algorithms. Averages 44 points over 200 games, peaks at 75.</description>
+    </item>
+
+    <item>
+      <title>Two AIs, One Loop</title>
+      <link>https://jthomas.site/blog/claude-agent.html</link>
+      <guid isPermaLink="true">https://jthomas.site/blog/claude-agent.html</guid>
+      <pubDate>Mon, 01 Dec 2025 12:00:00 +0000</pubDate>
+      <category>AI Agents</category>
+      <dc:creator>Joseph Thomas</dc:creator>
+      <description>Building a self-improving code agent. A two-agent architecture — one Claude planning, another implementing, with git diffs and test results flowing between them — captures most of the value of multi-agent coding systems while avoiding their complexity.</description>
+    </item>
+
+  </channel>
+</rss>
