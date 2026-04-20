@@ -24,10 +24,10 @@
 </head>
 <body>
 
-<header class="site-nav">
-  <div>
-    <a class="brand" href="/">jthomas.site</a>
-    <span class="brand-meta">// notebook · v.4.2026</span>
+<!-- NBNav -->
+<header class="nb-nav">
+  <div class="brand-block">
+    <span class="brand">jthomas.site</span><span class="brand-meta">// notebook · v.4.2026</span>
   </div>
   <nav>
     <a href="#writing">writing</a>
@@ -35,12 +35,12 @@
     <a href="#work">work</a>
     <a href="#projects">projects</a>
     <a href="consulting.html">consulting</a>
-    <a href="#contact" class="contact"><span class="arr">→</span>contact</a>
+    <a href="#contact" class="contact">→ contact</a>
   </nav>
 </header>
 
-<!-- Hero -->
-<section class="measure hero">
+<!-- NBHero -->
+<section class="wrap nb-hero">
   <div class="eyebrow">
     <span class="dot"></span>
     <span class="note">note 001 ·</span>
@@ -59,18 +59,18 @@
   </div>
 </section>
 
-<!-- Stats -->
-<section class="measure section-tight">
-  <div class="stats">
+<!-- NBStats -->
+<section class="wrap nb-stats-section">
+  <div class="nb-stats">
     <div class="stat"><div class="n">10B+</div><div class="l">events / day in production</div></div>
     <div class="stat"><div class="n">1</div><div class="l">US patent · swarm robotics</div></div>
     <div class="stat"><div class="n">4</div><div class="l">peer-reviewed publications</div></div>
   </div>
 </section>
 
-<!-- Throughline -->
-<section class="measure section">
-  <div class="head">
+<!-- NBThroughline -->
+<section class="wrap nb-section">
+  <div class="nb-head">
     <div class="kicker">
       <span class="label">§ argument</span>
       <span class="count">2008 → 2026</span>
@@ -78,7 +78,7 @@
     <h2>A throughline, in three notes.</h2>
     <div class="rule"></div>
   </div>
-  <ol class="throughline">
+  <ol class="nb-throughline">
     <li>
       <span class="yr">2008</span>
       <span>Built robots that found odor sources by talking to each other. Master's thesis at IISc, under Debasish Ghose.</span>
@@ -92,16 +92,15 @@
       <span>The same primitives — emergence, local rules, fitness landscapes — are how I think about agentic AI, ARC-AGI, and the data systems behind Gemini.</span>
     </li>
   </ol>
-  <div class="pullquote">
-    &ldquo;Complex, intelligent behavior emerges from simple rules applied at scale &mdash;
-    the same principle behind modern distributed AI systems.&rdquo;
+  <div class="nb-pullquote">
+    &ldquo;Complex, intelligent behavior emerges from simple rules applied at scale &mdash; the same principle behind modern distributed AI systems.&rdquo;
     <div class="attrib">&mdash; invited talk, IDSIA, Switzerland · Nov 2009</div>
   </div>
 </section>
 
-<!-- Writing -->
-<section id="writing" class="measure section">
-  <div class="head">
+<!-- NBWriting -->
+<section id="writing" class="wrap nb-section">
+  <div class="nb-head">
     <div class="kicker">
       <span class="label">§ writing</span>
       <span class="count"><a href="blog/index.html" style="color:inherit;text-decoration:none;border-bottom:1px solid var(--rule);">03 · view archive</a></span>
@@ -109,34 +108,25 @@
     <h2>Recent essays.</h2>
     <div class="rule"></div>
   </div>
-  <div class="write-list">
-    <a class="write-card" href="blog/evolution-arena.html">
-      <div class="meta">
-        <div class="date">apr 2026</div>
-        <div>autoresearch</div>
-      </div>
+  <div>
+    <a class="nb-write-card" href="blog/evolution-arena.html">
+      <div class="meta"><div class="date">apr 2026</div><div>autoresearch</div></div>
       <div>
         <h3>When AI Becomes Its Own Scientist</h3>
         <p class="sub">Inside the Evolution Arena and the rise of autoresearch.</p>
         <p class="blurb">An AI agent that proposes its own experiments, runs them against a live 2D simulation, scores the result with a hard mechanical metric, and commits or reverts on its own. A ratchet that only moves forward.</p>
       </div>
     </a>
-    <a class="write-card" href="blog/arc-swarm.html">
-      <div class="meta">
-        <div class="date">mar 2026</div>
-        <div>swarm intelligence</div>
-      </div>
+    <a class="nb-write-card" href="blog/arc-swarm.html">
+      <div class="meta"><div class="date">mar 2026</div><div>swarm intelligence</div></div>
       <div>
         <h3>When Swarms Write Code</h3>
         <p class="sub">How particle swarm optimization escapes the local-minima trap in ARC-AGI.</p>
         <p class="blurb">Standard LLM agents get stuck. The fix: a PSO-governed swarm of specialized LLM particles with a continuous fitness function that rewards near-misses. The swarm provides strategy; the LLM provides syntax.</p>
       </div>
     </a>
-    <a class="write-card" href="blog/finetuning.html">
-      <div class="meta">
-        <div class="date">feb 2026</div>
-        <div>fine-tuning</div>
-      </div>
+    <a class="nb-write-card" href="blog/finetuning.html">
+      <div class="meta"><div class="date">feb 2026</div><div>fine-tuning</div></div>
       <div>
         <h3>Stop Wrestling with Boilerplate</h3>
         <p class="sub">Local Tinker — a clean API for local LLM fine-tuning.</p>
@@ -146,9 +136,9 @@
   </div>
 </section>
 
-<!-- Highlights -->
-<section id="work" class="measure section">
-  <div class="head">
+<!-- NBHighlights -->
+<section id="work" class="wrap nb-section">
+  <div class="nb-head">
     <div class="kicker">
       <span class="label">§ selected work</span>
       <span class="count">03 / 12</span>
@@ -156,41 +146,41 @@
     <h2>Three things I built.</h2>
     <div class="rule"></div>
   </div>
-  <article class="high-card">
+  <article class="nb-high-card">
     <div class="kicker">Google Cloud · 2019 → present</div>
     <div>
       <h3>CrowdCompute &amp; DQaaS</h3>
       <p>Backend storage and data integrity for the engine generating RLHF and SFT datasets that train Google's foundation models. Plus a low-latency LLMOps platform for prompt versioning at enterprise scale.</p>
-      <div class="tags">
-        <span class="tag">Gemini</span><span class="tag">RLHF</span><span class="tag">LLMOps</span><span class="tag">gRPC</span>
+      <div class="nb-tags">
+        <span class="nb-tag">Gemini</span><span class="nb-tag">RLHF</span><span class="nb-tag">LLMOps</span><span class="nb-tag">gRPC</span>
       </div>
     </div>
   </article>
-  <article class="high-card">
+  <article class="nb-high-card">
     <div class="kicker">Amazon · 2017 → 2019</div>
     <div>
       <h3>DataCraft</h3>
       <p>Architected and shipped a centralized ingestion platform processing 10B+ events/day on Kinesis, Lambda, and S3. Resilient by default; the data lake's front door.</p>
-      <div class="tags">
-        <span class="tag">Kinesis</span><span class="tag">Lambda</span><span class="tag">S3</span><span class="tag">Data infra</span>
+      <div class="nb-tags">
+        <span class="nb-tag">Kinesis</span><span class="nb-tag">Lambda</span><span class="nb-tag">S3</span><span class="nb-tag">Data infra</span>
       </div>
     </div>
   </article>
-  <article class="high-card">
+  <article class="nb-high-card">
     <div class="kicker">IISc · 2006 → 2008 · still cited</div>
     <div>
       <h3>Glowworm Swarm Optimization</h3>
       <p>Master's thesis on multi-source odor localization with swarm robotics — the work behind US Patent 8,838,271 for nuclear spill detection. Cited 12× and the foundation for everything I do now.</p>
-      <div class="tags">
-        <span class="tag">Swarm intelligence</span><span class="tag">Patent</span><span class="tag">Research</span>
+      <div class="nb-tags">
+        <span class="nb-tag">Swarm intelligence</span><span class="nb-tag">Patent</span><span class="nb-tag">Research</span>
       </div>
     </div>
   </article>
 </section>
 
-<!-- Research -->
-<section id="research" class="measure section">
-  <div class="head">
+<!-- NBResearch -->
+<section id="research" class="wrap nb-section">
+  <div class="nb-head">
     <div class="kicker">
       <span class="label">§ bibliography</span>
       <span class="count">06 entries</span>
@@ -198,11 +188,11 @@
     <h2>Patents, publications &amp; talks.</h2>
     <div class="rule"></div>
   </div>
-  <ol class="bib">
+  <ol class="nb-bib">
     <li>
       <span class="num">[01]</span>
       <span>
-        <a class="title-link" href="https://patents.google.com/patent/US8838271B2/en">Detection of Nuclear Spills Using Swarm Optimization Algorithms</a>
+        <a class="title" href="https://patents.google.com/patent/US8838271B2/en">Detection of Nuclear Spills Using Swarm Optimization Algorithms</a>
         <div class="meta">D. Ghose, J. Thomas, K.N. Krishnanand · <em>US Patent 8,838,271</em> · 2014<span class="type">Patent</span></div>
       </span>
       <span class="cites">11 cites</span>
@@ -210,7 +200,7 @@
     <li>
       <span class="num">[02]</span>
       <span>
-        <a class="title-link" href="https://www.researchgate.net/publication/220888084_Strategies_for_Locating_Multiple_Odor_Sources_using_Glowworm_Swarm_Optimization">Strategies for Locating Multiple Odor Sources using Glowworm Swarm Optimization</a>
+        <a class="title" href="https://www.researchgate.net/publication/220888084_Strategies_for_Locating_Multiple_Odor_Sources_using_Glowworm_Swarm_Optimization">Strategies for Locating Multiple Odor Sources using Glowworm Swarm Optimization</a>
         <div class="meta">J. Thomas, D. Ghose · <em>IICAI, pp. 842–861</em> · 2009<span class="type">Conference</span></div>
       </span>
       <span class="cites">12 cites</span>
@@ -218,7 +208,7 @@
     <li>
       <span class="num">[03]</span>
       <span>
-        <a class="title-link" href="https://www.taylorfrancis.com/chapters/edit/10.1201/9781351235426-34/gso-based-swarm-algorithm-odor-source-localization-turbulent-environments-joseph-thomas-debasish-ghose">A GSO-Based Swarm Algorithm for Odor Source Localization in Turbulent Environments</a>
+        <a class="title" href="https://www.taylorfrancis.com/chapters/edit/10.1201/9781351235426-34/gso-based-swarm-algorithm-odor-source-localization-turbulent-environments-joseph-thomas-debasish-ghose">A GSO-Based Swarm Algorithm for Odor Source Localization in Turbulent Environments</a>
         <div class="meta">J. Thomas, D. Ghose · <em>Handbook of Approximation Algorithms and Metaheuristics, 2nd Ed., pp. 711–737</em> · 2018<span class="type">Book Chapter</span></div>
       </span>
       <span class="cites">1 cite</span>
@@ -226,7 +216,7 @@
     <li>
       <span class="num">[04]</span>
       <span>
-        <a class="title-link" href="https://www.researchgate.net/publication/44165369_Odor_Source_Localization_Using_Swarm_Robotics">Odor Source Localization using Swarm Robotics</a>
+        <a class="title" href="https://www.researchgate.net/publication/44165369_Odor_Source_Localization_Using_Swarm_Robotics">Odor Source Localization using Swarm Robotics</a>
         <div class="meta">J. Thomas · <em>Master's thesis, Indian Institute of Science, Bangalore</em> · 2008<span class="type">Thesis</span></div>
       </span>
       <span class="cites">3 cites</span>
@@ -250,9 +240,9 @@
   </ol>
 </section>
 
-<!-- Experience -->
-<section id="experience" class="measure section">
-  <div class="head">
+<!-- NBExperience -->
+<section id="experience" class="wrap nb-section">
+  <div class="nb-head">
     <div class="kicker">
       <span class="label">§ curriculum vitae</span>
       <span class="count">06 roles</span>
@@ -260,53 +250,17 @@
     <h2>Experience.</h2>
     <div class="rule"></div>
   </div>
-  <div class="exp-row">
-    <span class="yrs">2019 – Present</span>
-    <div>
-      <div class="role">Software Engineer<span class="now">NOW</span></div>
-      <div class="where">Google · Google Cloud · Mountain View, CA</div>
-    </div>
-  </div>
-  <div class="exp-row">
-    <span class="yrs">2017 – 2019</span>
-    <div>
-      <div class="role">SDE — Big Data Technologies</div>
-      <div class="where">Amazon · Palo Alto, CA</div>
-    </div>
-  </div>
-  <div class="exp-row">
-    <span class="yrs">2015 – 2017</span>
-    <div>
-      <div class="role">Data Scientist</div>
-      <div class="where">Datanyze · San Mateo, CA</div>
-    </div>
-  </div>
-  <div class="exp-row">
-    <span class="yrs">2013 – 2014</span>
-    <div>
-      <div class="role">Energy Analytics SDE</div>
-      <div class="where">Ascend Analytics · Oakland, CA</div>
-    </div>
-  </div>
-  <div class="exp-row">
-    <span class="yrs">2011 – 2012</span>
-    <div>
-      <div class="role">Senior Analyst — R&amp;D</div>
-      <div class="where">Global Analytics · Chennai, India</div>
-    </div>
-  </div>
-  <div class="exp-row">
-    <span class="yrs">2010 – 2011</span>
-    <div>
-      <div class="role">Associate — R&amp;D</div>
-      <div class="where">Idea R&amp;D · Pune, India</div>
-    </div>
-  </div>
+  <div class="nb-exp"><span class="yrs">2019 – Present</span><div><div class="role">Software Engineer<span class="now">NOW</span></div><div class="where">Google · Google Cloud · Mountain View, CA</div></div></div>
+  <div class="nb-exp"><span class="yrs">2017 – 2019</span><div><div class="role">SDE — Big Data Technologies</div><div class="where">Amazon · Palo Alto, CA</div></div></div>
+  <div class="nb-exp"><span class="yrs">2015 – 2017</span><div><div class="role">Data Scientist</div><div class="where">Datanyze · San Mateo, CA</div></div></div>
+  <div class="nb-exp"><span class="yrs">2013 – 2014</span><div><div class="role">Energy Analytics SDE</div><div class="where">Ascend Analytics · Oakland, CA</div></div></div>
+  <div class="nb-exp"><span class="yrs">2011 – 2012</span><div><div class="role">Senior Analyst — R&amp;D</div><div class="where">Global Analytics · Chennai, India</div></div></div>
+  <div class="nb-exp"><span class="yrs">2010 – 2011</span><div><div class="role">Associate — R&amp;D</div><div class="where">Idea R&amp;D · Pune, India</div></div></div>
 </section>
 
-<!-- Education -->
-<section id="education" class="measure section">
-  <div class="head">
+<!-- NBEducation -->
+<section id="education" class="wrap nb-section">
+  <div class="nb-head">
     <div class="kicker">
       <span class="label">§ schooling</span>
       <span class="count">03 degrees</span>
@@ -314,43 +268,23 @@
     <h2>Education.</h2>
     <div class="rule"></div>
   </div>
-  <div class="edu-row">
-    <div class="yrs">
-      <div class="years">2012 – 2013</div>
-      <div>GPA 3.5/4.0</div>
-    </div>
-    <div>
-      <h3>MEng, Computer Science</h3>
-      <div class="school">Cornell University</div>
-      <div class="focus">Machine Learning · NLP · Algorithms</div>
-    </div>
+  <div class="nb-edu">
+    <div class="yrs"><div class="years">2012 – 2013</div><div>GPA 3.5/4.0</div></div>
+    <div><h3>MEng, Computer Science</h3><div class="school">Cornell University</div><div class="focus">Machine Learning · NLP · Algorithms</div></div>
   </div>
-  <div class="edu-row">
-    <div class="yrs">
-      <div class="years">2006 – 2008</div>
-      <div>GPA 7.0/8.0</div>
-    </div>
-    <div>
-      <h3>MSc (Eng), Aerospace Engineering</h3>
-      <div class="school">Indian Institute of Science</div>
-      <div class="focus">Thesis: Odor Source Localization using Swarm Robotics</div>
-    </div>
+  <div class="nb-edu">
+    <div class="yrs"><div class="years">2006 – 2008</div><div>GPA 7.0/8.0</div></div>
+    <div><h3>MSc (Eng), Aerospace Engineering</h3><div class="school">Indian Institute of Science</div><div class="focus">Thesis: Odor Source Localization using Swarm Robotics</div></div>
   </div>
-  <div class="edu-row">
-    <div class="yrs">
-      <div class="years">2002 – 2006</div>
-    </div>
-    <div>
-      <h3>BTech, Electronics &amp; Communication</h3>
-      <div class="school">Govt. Engineering College, Trichur</div>
-      <div class="focus">Thesis: Blind Source Separation using ICA</div>
-    </div>
+  <div class="nb-edu">
+    <div class="yrs"><div class="years">2002 – 2006</div></div>
+    <div><h3>BTech, Electronics &amp; Communication</h3><div class="school">Govt. Engineering College, Trichur</div><div class="focus">Thesis: Blind Source Separation using ICA</div></div>
   </div>
 </section>
 
-<!-- Projects -->
-<section id="projects" class="measure section">
-  <div class="head">
+<!-- NBProjects -->
+<section id="projects" class="wrap nb-section">
+  <div class="nb-head">
     <div class="kicker">
       <span class="label">§ open source</span>
       <span class="count">04 of many</span>
@@ -358,68 +292,49 @@
     <h2>Things on GitHub.</h2>
     <div class="rule"></div>
   </div>
-  <div class="proj-grid">
-    <a class="proj-card" href="https://github.com/josephgec/arc-agi">
-      <div class="head-row">
-        <span class="name">arc-agi</span>
-        <span class="lang">Python</span>
-      </div>
+  <div class="nb-proj-grid">
+    <a class="nb-proj-card" href="https://github.com/josephgec/arc-agi">
+      <div class="head-row"><span class="name">arc-agi</span><span class="lang">Python</span></div>
       <p>Multi-agent systems for the ARC-AGI challenge — abstract reasoning frontier.</p>
     </a>
-    <a class="proj-card" href="https://github.com/josephgec/arc-agi-search">
-      <div class="head-row">
-        <span class="name">arc-agi-search</span>
-        <span class="lang">Python</span>
-      </div>
+    <a class="nb-proj-card" href="https://github.com/josephgec/arc-agi-search">
+      <div class="head-row"><span class="name">arc-agi-search</span><span class="lang">Python</span></div>
       <p>Swarm-based search applied to ARC-AGI — bio-inspired optimization for reasoning.</p>
     </a>
-    <a class="proj-card" href="https://github.com/josephgec/recursive-self-improvement">
-      <div class="head-row">
-        <span class="name">recursive-self-improvement</span>
-        <span class="lang">Python</span>
-      </div>
+    <a class="nb-proj-card" href="https://github.com/josephgec/recursive-self-improvement">
+      <div class="head-row"><span class="name">recursive-self-improvement</span><span class="lang">Python</span></div>
       <p>RSI framework for LLMs — iterative capability enhancement.</p>
     </a>
-    <a class="proj-card" href="https://github.com/josephgec/deepsnake">
-      <div class="head-row">
-        <span class="name">deepsnake</span>
-        <span class="lang">Python</span>
-      </div>
+    <a class="nb-proj-card" href="https://github.com/josephgec/deepsnake">
+      <div class="head-row"><span class="name">deepsnake</span><span class="lang">Python</span></div>
       <p>Deep Q-Network agent that learns to play Snake from raw reward.</p>
     </a>
   </div>
 </section>
 
-<!-- About -->
-<section id="about" class="measure section">
-  <div class="head">
-    <div class="kicker">
-      <span class="label">§ about the author</span>
-    </div>
+<!-- NBAbout -->
+<section id="about" class="wrap nb-section">
+  <div class="nb-head">
+    <div class="kicker"><span class="label">§ about the author</span></div>
     <h2>A short biography.</h2>
     <div class="rule"></div>
   </div>
-  <div class="about-grid">
+  <div class="nb-about">
     <div>
       <div class="photo" style="background-image:url('photo.jpg');"></div>
       <div class="fig-caption">fig. 1 · the author</div>
     </div>
     <div>
-      <p>I started as an aerospace engineer designing intake systems for missiles, became
-        a swarm-robotics researcher under Debasish Ghose at IISc, picked up a US patent
-        and a Cornell MEng on the way, and have spent the last decade shipping data
-        infrastructure at Amazon and Google.</p>
-      <p class="dim">Today I work on the data engine behind Google's foundation models. Off-hours, I
-        write essays and run experiments on multi-agent reasoning — the long tail of the
-        swarm research, in a new vocabulary.</p>
+      <p>I started as an aerospace engineer designing intake systems for missiles, became a swarm-robotics researcher under Debasish Ghose at IISc, picked up a US patent and a Cornell MEng on the way, and have spent the last decade shipping data infrastructure at Amazon and Google.</p>
+      <p class="dim">Today I work on the data engine behind Google's foundation models. Off-hours, I write essays and run experiments on multi-agent reasoning — the long tail of the swarm research, in a new vocabulary.</p>
       <p class="creds">Saratoga, California · Senior Member, IEEE · BCS Fellow</p>
     </div>
   </div>
 </section>
 
-<!-- Service -->
-<section id="service" class="measure section">
-  <div class="head">
+<!-- NBService -->
+<section id="service" class="wrap nb-section">
+  <div class="nb-head">
     <div class="kicker">
       <span class="label">§ service</span>
       <span class="count">07 active</span>
@@ -427,7 +342,7 @@
     <h2>On editorial boards &amp; program committees.</h2>
     <div class="rule"></div>
   </div>
-  <ul class="service-list">
+  <ul class="nb-service">
     <li><span class="bullet">·</span><span class="text">Program Committee — Evostar 2026</span></li>
     <li><span class="bullet">·</span><span class="text">Program Committee — ANTS 2026 (Swarm Intelligence)</span></li>
     <li><span class="bullet">·</span><span class="text">Reviewer — IEEE ICRA 2026</span></li>
@@ -436,16 +351,13 @@
     <li><span class="bullet">·</span><span class="text">Reviewer — Intl. Journal of Applied Evolutionary Computation</span></li>
     <li><span class="bullet">·</span><span class="text">Reviewer — ASME Journal of Computing &amp; Information Science</span></li>
   </ul>
-  <p class="service-tail">Also: Senior Member of IEEE · BCS Fellow · Hackathon Raptors Fellow ·
-    IEEEXtreme Proctor · GATE 99th-percentile scholar. Mentor at Google Tech Exchange,
-    Founder Institute, and Opportunity Machine.</p>
+  <p class="nb-service-tail">Also: Senior Member of IEEE · BCS Fellow · Hackathon Raptors Fellow · IEEEXtreme Proctor · GATE 99th-percentile scholar. Mentor at Google Tech Exchange, Founder Institute, and Opportunity Machine.</p>
 </section>
 
-<!-- Contact -->
-<footer id="contact" class="measure contact">
+<!-- NBContact -->
+<footer id="contact" class="wrap nb-contact">
   <h2>Have something <span class="accent">interesting</span> to talk about?</h2>
-  <p>Open to consulting on AI infrastructure, speaking on swarm intelligence and
-    emergent reasoning, and collaborating on multi-agent research.</p>
+  <p class="desc">Open to consulting on AI infrastructure, speaking on swarm intelligence and emergent reasoning, and collaborating on multi-agent research.</p>
   <div class="actions">
     <a class="btn-mail" href="mailto:hello@jthomas.site">hello@jthomas.site →</a>
     <span class="or">or via — <a href="https://www.linkedin.com/in/joseph-t-a6883013/">linkedin</a> · <a href="https://scholar.google.com/citations?user=6RHIGk4AAAAJ">scholar</a> · <a href="https://github.com/josephgec">github</a></span>
