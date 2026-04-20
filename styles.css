@@ -54,6 +54,9 @@ body {
    NBNav  (header strip — display:flex, gap 18, mono 12px)
    ───────────────────────────────────────────────────────────────── */
 .nb-nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
   max-width: var(--measure-wide);
   margin: 0 auto;
   padding: 20px 32px;
@@ -63,6 +66,8 @@ body {
   font-family: var(--mono);
   font-size: 12px;
   color: var(--muted);
+  background: var(--bg);
+  border-bottom: 1px solid rgba(207, 198, 179, 0.4);
 }
 .nb-nav .brand-block { display: block; }
 .nb-nav .brand { color: var(--ink); font-weight: 500; }
