@@ -217,9 +217,11 @@ body {
 }
 .nb-throughline .yr {
   font-family: var(--mono);
-  font-size: 13px;
+  font-size: 14px;
+  font-weight: 600;
   color: var(--accent);
   padding-top: 6px;
+  letter-spacing: 0.02em;
 }
 .nb-pullquote {
   margin-top: 36px;
@@ -254,6 +256,15 @@ body {
   color: inherit;
 }
 .nb-write-card:last-child { border-bottom: 0; }
+.nb-write-card { transition: background .15s ease; }
+.nb-write-card:hover {
+  background: var(--paper);
+  margin: 0 -16px;
+  padding-left: 16px;
+  padding-right: 16px;
+  border-bottom-color: var(--accent);
+}
+.nb-write-card:hover h3 { color: var(--accent); }
 .nb-write-card .meta {
   font-family: var(--mono);
   font-size: 11px;
@@ -332,6 +343,11 @@ body {
   color: var(--accent);
   border-radius: 3px;
 }
+.nb-tag.feat {
+  background: rgba(122, 31, 36, 0.18);
+  font-weight: 600;
+  border: 1px solid rgba(122, 31, 36, 0.28);
+}
 
 /* ─────────────────────────────────────────────────────────────────
    NBResearch  (bibliography — [num] · title meta · cites)
@@ -380,6 +396,16 @@ body {
   font-size: 11px;
   color: var(--muted);
   text-align: right;
+}
+.nb-bib .cites.high {
+  font-weight: 600;
+  color: var(--accent);
+}
+.nb-bib .type[data-t="Patent"] {
+  background: var(--accent-bg);
+  padding: 2px 6px;
+  border-radius: 3px;
+  margin-left: 8px;
 }
 
 /* ─────────────────────────────────────────────────────────────────
@@ -948,6 +974,39 @@ canvas#swarmCanvas, canvas#particleCanvas { display: none !important; }
 /* ─────────────────────────────────────────────────────────────────
    Responsive
    ───────────────────────────────────────────────────────────────── */
+/* ───────── Print ─────────
+   For "Print to PDF" — strip nav, hero CTAs, and contact-form buttons.
+   Keep typography readable on paper (black ink, no warm bg). */
+@media print {
+  body {
+    background: white;
+    color: black;
+    font-size: 11pt;
+  }
+  .nb-nav,
+  .nb-hero .actions,
+  .nb-contact .actions,
+  .nb-contact .colophon,
+  .post-back,
+  .post-nav { display: none !important; }
+  .nb-hero { padding-top: 0; }
+  .nb-section { padding-bottom: 32pt; page-break-inside: avoid; }
+  a { color: black !important; text-decoration: none !important; }
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-family: monospace;
+    font-size: 9pt;
+    color: #555;
+    word-break: break-all;
+  }
+  h1, h2, h3 { page-break-after: avoid; }
+  .nb-tag, .nb-tag.feat { background: transparent !important; border: 1px solid #ccc !important; color: black !important; }
+  .nb-throughline .yr,
+  .nb-write-card .meta .date,
+  .nb-bib .cites.high,
+  .nb-bib .type { color: black !important; }
+}
+
 @media (max-width: 720px) {
   .nb-stats { flex-direction: column; gap: 16px; }
   .nb-stats .stat { padding-left: 0; border-left: 0; }
