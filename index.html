@@ -5,20 +5,62 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <title>Joseph Thomas — Engineer · Researcher · Essayist</title>
-  <meta name="description" content="Emergent behavior, applied to the largest training systems on Earth. I work on the data that shapes Gemini. I write about the agents that will replace it." />
+  <meta name="description" content="Engineer at Google Cloud working on the data that trains Gemini. Swarm-robotics researcher, US patent holder, and essayist on multi-agent reasoning, autoresearch, and emergent behavior in AI systems." />
   <meta name="author" content="Joseph Thomas" />
   <link rel="canonical" href="https://jthomas.site/" />
   <meta name="theme-color" content="#7a1f24" />
 
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/photo.jpg" />
+
+  <!-- Open Graph -->
   <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Joseph Thomas" />
+  <meta property="og:locale" content="en_US" />
   <meta property="og:title" content="Joseph Thomas — Engineer · Researcher · Essayist" />
-  <meta property="og:description" content="Emergent behavior, applied to the largest training systems on Earth." />
+  <meta property="og:description" content="Emergent behavior, applied to the largest training systems on Earth. Engineer at Google Cloud, swarm-robotics researcher, essayist on multi-agent reasoning." />
   <meta property="og:image" content="https://jthomas.site/photo.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="1200" />
+  <meta property="og:image:alt" content="Joseph Thomas, portrait" />
   <meta property="og:url" content="https://jthomas.site/" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Joseph Thomas — Engineer · Researcher · Essayist" />
+  <meta name="twitter:description" content="Emergent behavior, applied to the largest training systems on Earth." />
+  <meta name="twitter:image" content="https://jthomas.site/photo.jpg" />
+  <meta name="twitter:image:alt" content="Joseph Thomas, portrait" />
+
+  <!-- JSON-LD: Person -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Joseph Thomas",
+    "url": "https://jthomas.site/",
+    "image": "https://jthomas.site/photo.jpg",
+    "jobTitle": "Software Engineer",
+    "worksFor": { "@type": "Organization", "name": "Google", "department": "Google Cloud" },
+    "alumniOf": [
+      { "@type": "CollegeOrUniversity", "name": "Cornell University" },
+      { "@type": "CollegeOrUniversity", "name": "Indian Institute of Science" }
+    ],
+    "address": { "@type": "PostalAddress", "addressLocality": "Saratoga", "addressRegion": "CA", "addressCountry": "US" },
+    "knowsAbout": ["Swarm Intelligence", "Multi-agent Systems", "LLMOps", "RLHF", "Distributed Systems", "Data Infrastructure", "Reinforcement Learning"],
+    "sameAs": [
+      "https://scholar.google.com/citations?user=6RHIGk4AAAAJ",
+      "https://github.com/josephgec",
+      "https://www.linkedin.com/in/joseph-t-a6883013/",
+      "https://patents.google.com/patent/US8838271B2/en"
+    ]
+  }
+  </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,400;1,8..60,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500&display=swap" />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="styles.css" />
   <link rel="alternate" type="application/rss+xml" title="Joseph Thomas — Writing" href="blog/feed.xml" />
@@ -53,9 +95,9 @@
     <a class="btn-primary" href="#contact">Book a consult <span>↗</span></a>
     <a class="link-underline" href="#writing">Read recent essays</a>
     <span class="social">
-      <a href="https://scholar.google.com/citations?user=6RHIGk4AAAAJ">scholar</a>
-      <a href="https://github.com/josephgec">github</a>
-      <a href="https://www.linkedin.com/in/joseph-t-a6883013/">linkedin</a>
+      <a href="https://scholar.google.com/citations?user=6RHIGk4AAAAJ" rel="me noopener" target="_blank">scholar</a>
+      <a href="https://github.com/josephgec" rel="me noopener" target="_blank">github</a>
+      <a href="https://www.linkedin.com/in/joseph-t-a6883013/" rel="me noopener" target="_blank">linkedin</a>
     </span>
   </div>
 </section>
@@ -81,21 +123,21 @@
   </div>
   <ol class="nb-throughline">
     <li>
-      <span class="yr">2008</span>
+      <span class="yr"><time datetime="2008">2008</time></span>
       <span>Built robots that found odor sources by talking to each other. Master's thesis at IISc, under Debasish Ghose.</span>
     </li>
     <li>
-      <span class="yr">2014</span>
+      <span class="yr"><time datetime="2014">2014</time></span>
       <span>The work became <a href="https://patents.google.com/patent/US8838271B2/en" style="color:var(--accent)">US Patent 8,838,271</a> — swarm-optimization algorithms for nuclear-spill detection.</span>
     </li>
     <li>
-      <span class="yr">2026</span>
+      <span class="yr"><time datetime="2026">2026</time></span>
       <span>The same primitives — emergence, local rules, fitness landscapes — are how I think about agentic AI, ARC-AGI, and the data systems behind Gemini.</span>
     </li>
   </ol>
   <div class="nb-pullquote">
     &ldquo;Complex, intelligent behavior emerges from simple rules applied at scale &mdash; the same principle behind modern distributed AI systems.&rdquo;
-    <div class="attrib">&mdash; invited talk, IDSIA, Switzerland · nov 2009</div>
+    <div class="attrib">&mdash; invited talk, IDSIA, Switzerland · <time datetime="2009-11">nov 2009</time></div>
   </div>
 </section>
 
@@ -111,7 +153,7 @@
   </div>
   <div>
     <a class="nb-write-card" href="blog/evolution-arena.html">
-      <div class="meta"><div class="date">apr 2026</div><div>autoresearch</div></div>
+      <div class="meta"><div class="date"><time datetime="2026-04">apr 2026</time></div><div>autoresearch</div></div>
       <div>
         <h3>When AI Becomes Its Own Scientist</h3>
         <p class="sub">Inside the Evolution Arena and the rise of autoresearch.</p>
@@ -119,7 +161,7 @@
       </div>
     </a>
     <a class="nb-write-card" href="blog/arc-swarm.html">
-      <div class="meta"><div class="date">mar 2026</div><div>swarm intelligence</div></div>
+      <div class="meta"><div class="date"><time datetime="2026-03">mar 2026</time></div><div>swarm intelligence</div></div>
       <div>
         <h3>When Swarms Write Code</h3>
         <p class="sub">How particle swarm optimization escapes the local-minima trap in ARC-AGI.</p>
@@ -127,7 +169,7 @@
       </div>
     </a>
     <a class="nb-write-card" href="blog/finetuning.html">
-      <div class="meta"><div class="date">feb 2026</div><div>fine-tuning</div></div>
+      <div class="meta"><div class="date"><time datetime="2026-02">feb 2026</time></div><div>fine-tuning</div></div>
       <div>
         <h3>Stop Wrestling with Boilerplate</h3>
         <p class="sub">Local Tinker — a clean API for local LLM fine-tuning.</p>
@@ -194,7 +236,7 @@
       <span class="num">[01]</span>
       <span>
         <a class="title" href="https://patents.google.com/patent/US8838271B2/en">Detection of Nuclear Spills Using Swarm Optimization Algorithms</a>
-        <div class="meta">D. Ghose, J. Thomas, K.N. Krishnanand · <em>US Patent 8,838,271</em> · 2014<span class="type" data-t="Patent">Patent</span></div>
+        <div class="meta">D. Ghose, J. Thomas, K.N. Krishnanand · <em>US Patent 8,838,271</em> · <time datetime="2014">2014</time><span class="type" data-t="Patent">Patent</span></div>
       </span>
       <span class="cites high">11 cites</span>
     </li>
@@ -202,7 +244,7 @@
       <span class="num">[02]</span>
       <span>
         <a class="title" href="https://www.researchgate.net/publication/220888084_Strategies_for_Locating_Multiple_Odor_Sources_using_Glowworm_Swarm_Optimization">Strategies for Locating Multiple Odor Sources using Glowworm Swarm Optimization</a>
-        <div class="meta">J. Thomas, D. Ghose · <em>IICAI, pp. 842–861</em> · 2009<span class="type">Conference</span></div>
+        <div class="meta">J. Thomas, D. Ghose · <em>IICAI, pp. 842–861</em> · <time datetime="2009">2009</time><span class="type">Conference</span></div>
       </span>
       <span class="cites high">12 cites</span>
     </li>
@@ -210,7 +252,7 @@
       <span class="num">[03]</span>
       <span>
         <a class="title" href="https://www.taylorfrancis.com/chapters/edit/10.1201/9781351235426-34/gso-based-swarm-algorithm-odor-source-localization-turbulent-environments-joseph-thomas-debasish-ghose">A GSO-Based Swarm Algorithm for Odor Source Localization in Turbulent Environments</a>
-        <div class="meta">J. Thomas, D. Ghose · <em>Handbook of Approximation Algorithms and Metaheuristics, 2nd Ed., pp. 711–737</em> · 2018<span class="type">Book Chapter</span></div>
+        <div class="meta">J. Thomas, D. Ghose · <em>Handbook of Approximation Algorithms and Metaheuristics, 2nd Ed., pp. 711–737</em> · <time datetime="2018">2018</time><span class="type">Book Chapter</span></div>
       </span>
       <span class="cites">1 cite</span>
     </li>
@@ -218,7 +260,7 @@
       <span class="num">[04]</span>
       <span>
         <a class="title" href="https://www.researchgate.net/publication/44165369_Odor_Source_Localization_Using_Swarm_Robotics">Odor Source Localization using Swarm Robotics</a>
-        <div class="meta">J. Thomas · <em>Master's thesis, Indian Institute of Science, Bangalore</em> · 2008<span class="type">Thesis</span></div>
+        <div class="meta">J. Thomas · <em>Master's thesis, Indian Institute of Science, Bangalore</em> · <time datetime="2008">2008</time><span class="type">Thesis</span></div>
       </span>
       <span class="cites">3 cites</span>
     </li>
@@ -226,7 +268,7 @@
       <span class="num">[05]</span>
       <span>
         Industry Talk: Data Science Road
-        <div class="meta">University of New Brunswick · mar 2022<span class="type">Invited Talk</span></div>
+        <div class="meta">University of New Brunswick · <time datetime="2022-03">mar 2022</time><span class="type">Invited Talk</span></div>
       </span>
       <span class="cites">—</span>
     </li>
@@ -234,7 +276,7 @@
       <span class="num">[06]</span>
       <span>
         Odor Source Localization using Swarm Robotics
-        <div class="meta">IDSIA, Switzerland · nov 2009<span class="type">Invited Talk</span></div>
+        <div class="meta">IDSIA, Switzerland · <time datetime="2009-11">nov 2009</time><span class="type">Invited Talk</span></div>
       </span>
       <span class="cites">—</span>
     </li>
@@ -251,12 +293,12 @@
     <h2>Experience.</h2>
     <div class="rule"></div>
   </div>
-  <div class="nb-exp"><span class="yrs">2019 – present</span><div><div class="role">Software Engineer<span class="now">NOW</span></div><div class="where">Google · Google Cloud · Mountain View, CA</div></div></div>
-  <div class="nb-exp"><span class="yrs">2017 – 2019</span><div><div class="role">SDE — Big Data Technologies</div><div class="where">Amazon · Palo Alto, CA</div></div></div>
-  <div class="nb-exp"><span class="yrs">2015 – 2017</span><div><div class="role">Data Scientist</div><div class="where">Datanyze · San Mateo, CA</div></div></div>
-  <div class="nb-exp"><span class="yrs">2013 – 2014</span><div><div class="role">Energy Analytics SDE</div><div class="where">Ascend Analytics · Oakland, CA</div></div></div>
-  <div class="nb-exp"><span class="yrs">2011 – 2012</span><div><div class="role">Senior Analyst — R&amp;D</div><div class="where">Global Analytics · Chennai, India</div></div></div>
-  <div class="nb-exp"><span class="yrs">2010 – 2011</span><div><div class="role">Associate — R&amp;D</div><div class="where">Idea R&amp;D · Pune, India</div></div></div>
+  <div class="nb-exp"><span class="yrs"><time datetime="2019">2019</time> – present</span><div><div class="role">Software Engineer<span class="now">NOW</span></div><div class="where">Google · Google Cloud · Mountain View, CA</div></div></div>
+  <div class="nb-exp"><span class="yrs"><time datetime="2017">2017</time> – <time datetime="2019">2019</time></span><div><div class="role">SDE — Big Data Technologies</div><div class="where">Amazon · Palo Alto, CA</div></div></div>
+  <div class="nb-exp"><span class="yrs"><time datetime="2015">2015</time> – <time datetime="2017">2017</time></span><div><div class="role">Data Scientist</div><div class="where">Datanyze · San Mateo, CA</div></div></div>
+  <div class="nb-exp"><span class="yrs"><time datetime="2013">2013</time> – <time datetime="2014">2014</time></span><div><div class="role">Energy Analytics SDE</div><div class="where">Ascend Analytics · Oakland, CA</div></div></div>
+  <div class="nb-exp"><span class="yrs"><time datetime="2011">2011</time> – <time datetime="2012">2012</time></span><div><div class="role">Senior Analyst — R&amp;D</div><div class="where">Global Analytics · Chennai, India</div></div></div>
+  <div class="nb-exp"><span class="yrs"><time datetime="2010">2010</time> – <time datetime="2011">2011</time></span><div><div class="role">Associate — R&amp;D</div><div class="where">Idea R&amp;D · Pune, India</div></div></div>
 </section>
 
 <!-- NBEducation -->
@@ -270,15 +312,15 @@
     <div class="rule"></div>
   </div>
   <div class="nb-edu">
-    <div class="yrs"><div class="years">2012 – 2013</div><div>GPA 3.5/4.0</div></div>
+    <div class="yrs"><div class="years"><time datetime="2012">2012</time> – <time datetime="2013">2013</time></div><div>GPA 3.5/4.0</div></div>
     <div><h3>MEng, Computer Science</h3><div class="school">Cornell University</div><div class="focus">Machine Learning · NLP · Algorithms</div></div>
   </div>
   <div class="nb-edu">
-    <div class="yrs"><div class="years">2006 – 2008</div><div>GPA 7.0/8.0</div></div>
+    <div class="yrs"><div class="years"><time datetime="2006">2006</time> – <time datetime="2008">2008</time></div><div>GPA 7.0/8.0</div></div>
     <div><h3>MSc (Eng), Aerospace Engineering</h3><div class="school">Indian Institute of Science</div><div class="focus">Thesis: Odor Source Localization using Swarm Robotics</div></div>
   </div>
   <div class="nb-edu">
-    <div class="yrs"><div class="years">2002 – 2006</div></div>
+    <div class="yrs"><div class="years"><time datetime="2002">2002</time> – <time datetime="2006">2006</time></div></div>
     <div><h3>BTech, Electronics &amp; Communication</h3><div class="school">Govt. Engineering College, Trichur</div><div class="focus">Thesis: Blind Source Separation using ICA</div></div>
   </div>
 </section>
@@ -322,7 +364,7 @@
   </div>
   <div class="nb-about">
     <div>
-      <div class="photo" style="background-image:url('photo.jpg');"></div>
+      <img class="photo" src="photo.jpg" alt="Joseph Thomas, portrait" width="180" height="220" />
     </div>
     <div>
       <p>I started as an aerospace engineer designing intake systems for missiles, became a swarm-robotics researcher under Debasish Ghose at IISc, picked up a US patent and a Cornell MEng on the way, and have spent the last decade shipping data infrastructure at Amazon and Google.</p>
@@ -358,7 +400,7 @@
   <p class="desc">Open to consulting on AI infrastructure, speaking on swarm intelligence and emergent reasoning, and collaborating on multi-agent research.</p>
   <div class="actions">
     <a class="btn-mail" href="mailto:hello@jthomas.site">hello@jthomas.site →</a>
-    <span class="or">or via — <a href="https://www.linkedin.com/in/joseph-t-a6883013/">linkedin</a> · <a href="https://scholar.google.com/citations?user=6RHIGk4AAAAJ">scholar</a> · <a href="https://github.com/josephgec">github</a></span>
+    <span class="or">or via — <a href="https://www.linkedin.com/in/joseph-t-a6883013/" rel="me noopener" target="_blank">linkedin</a> · <a href="https://scholar.google.com/citations?user=6RHIGk4AAAAJ" rel="me noopener" target="_blank">scholar</a> · <a href="https://github.com/josephgec" rel="me noopener" target="_blank">github</a></span>
   </div>
   <div class="colophon">
     <span>set in source serif &amp; jetbrains mono</span>

@@ -547,9 +547,10 @@ body {
 }
 .nb-about .photo {
   width: 180px; height: 220px;
-  background-size: cover; background-position: center;
+  object-fit: cover; object-position: center;
   border: 1px solid var(--rule);
   filter: grayscale(0.3) contrast(1.05);
+  display: block;
 }
 .nb-about .fig-caption {
   font-family: var(--mono);
