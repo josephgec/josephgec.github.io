@@ -40,7 +40,7 @@
       <div class="ml-intro-block">
         <div class="ml-eyebrow">The concept</div>
         <p class="lead">Total prediction error decomposes into <span class="term">bias²</span> + <span class="term">variance</span> + irreducible noise.</p>
-        <p><em>Bias</em>: how far is the model's <em>average</em> prediction from the truth, across many training datasets? A linear model on quadratic data has high bias — it can't capture the curve. Underfitting.</p>
+        <p><em>Bias</em>: how far is the model's <em>average</em> prediction from the truth, across many imagined training datasets? A linear model on curved data has high bias — it can't capture the curve, no matter which dataset you train it on. Underfitting.</p>
         <p><em>Variance</em>: how much do the model's predictions <em>change</em> when the training set changes? A 12-degree polynomial has high variance — different training samples produce wildly different curves. Overfitting.</p>
         <p>The sweet spot is whatever model complexity minimizes the sum. For a fixed dataset size, that's a specific degree, depth, or capacity.</p>
       </div>
@@ -53,18 +53,29 @@
     <div class="ml-try">
       <div class="ml-eyebrow accent">Try this</div>
       <ol>
-        <li>Drag the <em>polynomial degree</em> slider from 1 to 15. At degree 1, the line misses the curve — high bias. At degree 15, the curve wiggles through every point — high variance.</li>
-        <li>Click <em>Resample</em> several times. Watch how degree-1 fits stay similar while degree-15 fits look completely different — that's variance.</li>
-        <li>The bottom plot decomposes total error: bias² (ink), variance (oxblood), and total (sum). The minimum sits at moderate complexity — the actual sweet spot.</li>
+        <li>Drag the <em>polynomial degree</em> slider from 1 to 15. The dashed vertical line in the bottom plot moves with you — bias² (ink) shrinks, variance (oxblood) grows. Watch the connector lines between the spread of fits (top) and the variance reading (bottom).</li>
+        <li>Click <em>Resample</em> several times. Watch how degree-1 fits stay similar while degree-15 fits look completely different — that bundle of wiggly curves <em>is</em> variance.</li>
+        <li>Toggle <em>Show noise</em>. The data splits into the smooth true signal <em>sin(πx)</em> and the vertical sticks of added noise. The σ² readout in the gloss tells you the irreducible piece — no model, however clever, can beat it.</li>
       </ol>
+    </div>
+
+    <div class="ml-try" style="margin-top:14px; background: rgba(38,35,32,0.025); border-left: 2px solid rgba(38,35,32,0.18); padding-left: 14px">
+      <div class="ml-eyebrow">The decomposition, in plain English</div>
+      <div class="ml-equation" style="font-size:14px; margin: 8px 0 6px">Error(x) = bias²(x) + variance(x) + σ²</div>
+      <ul style="font-family:var(--serif); font-style:italic; font-size:14px; line-height:1.65; color:var(--ink); margin:6px 0 0; padding-left:18px">
+        <li><b>bias²</b> · how far the model's <em>average</em> prediction (across many imagined training datasets) is from the truth. Squared so positive.</li>
+        <li><b>variance</b> · how much the model's prediction <em>wobbles</em> when you swap in a different training set of the same size.</li>
+        <li><b>σ²</b> (sigma-squared) · irreducible noise in the data — the labels themselves are noisy. No model can beat this; it sets the error floor.</li>
+        <li><b>Error(x)</b> · expected squared error at a point x, averaged over all the training datasets you might have drawn.</li>
+      </ul>
     </div>
   </section>
 
   <section class="ml-stage">
     <aside class="left-rail">
       <div class="ml-rail-label">Polynomial degree</div>
-      <input id="deg-slider" type="range" min="1" max="15" step="1" value="3" style="width:100%; accent-color:var(--accent)" />
-      <div id="deg-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">degree 3</div>
+      <input id="deg-slider" type="range" min="1" max="15" step="1" value="6" style="width:100%; accent-color:var(--accent)" />
+      <div id="deg-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">degree 6</div>
 
       <div class="ml-rail-label" style="margin-top: 18px">Noise σ</div>
       <input id="noise-slider" type="range" min="0" max="0.6" step="0.02" value="0.25" style="width:100%; accent-color:var(--accent)" />
@@ -74,7 +85,13 @@
       <input id="n-slider" type="range" min="8" max="40" step="1" value="20" style="width:100%; accent-color:var(--accent)" />
       <div id="n-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">n = 20</div>
 
-      <div style="display:flex; gap:8px; margin-top: 18px">
+      <div style="margin-top: 18px; display:flex; align-items:center; gap:8px">
+        <label style="display:flex; align-items:center; gap:6px; font-family:var(--serif); font-style:italic; font-size:13px; color:var(--ink)">
+          <input id="show-noise" type="checkbox" style="accent-color:var(--accent)"> show noise
+        </label>
+      </div>
+
+      <div style="display:flex; gap:8px; margin-top: 12px">
         <button id="resample" class="ml-sbtn" style="flex:1; padding:10px 14px; font-family:var(--serif); font-style:italic; font-size:14px">↻ Resample</button>
       </div>
 
@@ -87,19 +104,96 @@
       </div>
       <div class="ml-caption">
         <span class="ml-cap-num">·</span>
-        Top: a polynomial of the chosen degree fit to noisy samples of <em>f(x) = sin(πx)</em>. The <em>10 faded curves</em> are fits to different random training sets — their spread <em>is</em> the variance. Bottom: bias², variance, and total error vs polynomial degree.
+        Top: a polynomial of the chosen degree fit to noisy samples of <em>f(x) = sin(πx)</em>. The <em>10 faded curves</em> are fits to different random training sets — their spread <em>is</em> the variance, made visible. Bottom: bias², variance, and total error vs polynomial degree, with a dashed vertical line at your current degree. Connector lines link the spread above to the variance reading below.
       </div>
     </div>
 
     <aside class="right-rail">
       <div class="ml-margin">
         <div class="ml-margin-rule"></div>
-        <div class="ml-margin-h">The decomposition</div>
-        <div class="ml-equation" style="font-size:13px">Error = bias² + variance + σ²</div>
-        <p>Squared bias plus variance plus irreducible noise. Total expected MSE on a new test point. Model complexity slides the bias-vs-variance balance; only adding data or regularization lowers the sum.</p>
+        <div class="ml-margin-h">Before this</div>
+        <p class="quiet">Before the bias-variance decomposition (Geman, Bienenstock, Doursat 1992), practitioners overfit and underfit by accident — there was no shared language for the trade-off. The formula split error into bias² + variance + noise, giving a vocabulary for "your model is too simple" vs "your model memorized the training set." Modern double descent (Belkin 2019) added a twist: in heavily overparameterized regimes, more capacity can <em>reduce</em> variance. The classic frame is still where everyone starts.</p>
+
         <div class="ml-margin-rule thin"></div>
-        <div class="ml-margin-h sm">Double descent</div>
-        <p class="quiet">For very overparameterized models (degree ≫ n), the U-curve sometimes <em>descends again</em> — interpolating models can generalize. A 21st-century puzzle the textbook decomposition didn't predict.</p>
+        <div class="ml-margin-h">The bias-variance bullseye</div>
+        <svg viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; margin:6px 0 4px">
+          <!-- 2x2 grid of targets: rows = bias (low/high), cols = variance (low/high) -->
+          <!-- Top-left: low bias, low variance -->
+          <g transform="translate(10,18)">
+            <circle cx="40" cy="40" r="36" fill="none" stroke="rgba(38,35,32,0.25)" stroke-width="0.6"/>
+            <circle cx="40" cy="40" r="24" fill="none" stroke="rgba(38,35,32,0.30)" stroke-width="0.6"/>
+            <circle cx="40" cy="40" r="12" fill="rgba(122,31,36,0.10)" stroke="rgba(38,35,32,0.40)" stroke-width="0.6"/>
+            <circle cx="40" cy="40" r="3"  fill="#7a1f24"/>
+            <!-- shots tightly clustered on bullseye -->
+            <circle cx="38" cy="38" r="1.6" fill="#262320"/>
+            <circle cx="42" cy="41" r="1.6" fill="#262320"/>
+            <circle cx="40" cy="42" r="1.6" fill="#262320"/>
+            <circle cx="41" cy="38" r="1.6" fill="#262320"/>
+            <circle cx="39" cy="40" r="1.6" fill="#262320"/>
+          </g>
+          <!-- Top-right: low bias, high variance -->
+          <g transform="translate(110,18)">
+            <circle cx="40" cy="40" r="36" fill="none" stroke="rgba(38,35,32,0.25)" stroke-width="0.6"/>
+            <circle cx="40" cy="40" r="24" fill="none" stroke="rgba(38,35,32,0.30)" stroke-width="0.6"/>
+            <circle cx="40" cy="40" r="12" fill="rgba(122,31,36,0.10)" stroke="rgba(38,35,32,0.40)" stroke-width="0.6"/>
+            <circle cx="40" cy="40" r="3"  fill="#7a1f24"/>
+            <!-- shots scattered around bullseye, centered on it -->
+            <circle cx="28" cy="38" r="1.6" fill="#262320"/>
+            <circle cx="50" cy="44" r="1.6" fill="#262320"/>
+            <circle cx="44" cy="28" r="1.6" fill="#262320"/>
+            <circle cx="36" cy="56" r="1.6" fill="#262320"/>
+            <circle cx="55" cy="34" r="1.6" fill="#262320"/>
+            <circle cx="32" cy="48" r="1.6" fill="#262320"/>
+          </g>
+          <!-- Bottom-left: high bias, low variance -->
+          <g transform="translate(10,118)">
+            <circle cx="40" cy="40" r="36" fill="none" stroke="rgba(38,35,32,0.25)" stroke-width="0.6"/>
+            <circle cx="40" cy="40" r="24" fill="none" stroke="rgba(38,35,32,0.30)" stroke-width="0.6"/>
+            <circle cx="40" cy="40" r="12" fill="rgba(122,31,36,0.10)" stroke="rgba(38,35,32,0.40)" stroke-width="0.6"/>
+            <circle cx="40" cy="40" r="3"  fill="#7a1f24"/>
+            <!-- shots tightly clustered, off-center -->
+            <circle cx="60" cy="22" r="1.6" fill="#262320"/>
+            <circle cx="62" cy="24" r="1.6" fill="#262320"/>
+            <circle cx="58" cy="20" r="1.6" fill="#262320"/>
+            <circle cx="61" cy="20" r="1.6" fill="#262320"/>
+            <circle cx="59" cy="23" r="1.6" fill="#262320"/>
+          </g>
+          <!-- Bottom-right: high bias, high variance -->
+          <g transform="translate(110,118)">
+            <circle cx="40" cy="40" r="36" fill="none" stroke="rgba(38,35,32,0.25)" stroke-width="0.6"/>
+            <circle cx="40" cy="40" r="24" fill="none" stroke="rgba(38,35,32,0.30)" stroke-width="0.6"/>
+            <circle cx="40" cy="40" r="12" fill="rgba(122,31,36,0.10)" stroke="rgba(38,35,32,0.40)" stroke-width="0.6"/>
+            <circle cx="40" cy="40" r="3"  fill="#7a1f24"/>
+            <!-- shots scattered, off-center -->
+            <circle cx="62" cy="14" r="1.6" fill="#262320"/>
+            <circle cx="50" cy="26" r="1.6" fill="#262320"/>
+            <circle cx="68" cy="32" r="1.6" fill="#262320"/>
+            <circle cx="56" cy="10" r="1.6" fill="#262320"/>
+            <circle cx="72" cy="22" r="1.6" fill="#262320"/>
+            <circle cx="46" cy="18" r="1.6" fill="#262320"/>
+          </g>
+          <!-- Axis labels -->
+          <text x="50"  y="13" font-family="JetBrains Mono, monospace" font-size="7" fill="#262320" text-anchor="middle">low variance</text>
+          <text x="150" y="13" font-family="JetBrains Mono, monospace" font-size="7" fill="#262320" text-anchor="middle">high variance</text>
+          <text x="6" y="60"  font-family="JetBrains Mono, monospace" font-size="7" fill="#262320" text-anchor="middle" transform="rotate(-90 6 60)">low bias</text>
+          <text x="6" y="160" font-family="JetBrains Mono, monospace" font-size="7" fill="#262320" text-anchor="middle" transform="rotate(-90 6 160)">high bias</text>
+          <!-- Small caption labels per quadrant -->
+          <text x="50"  y="106" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="8" fill="rgba(38,35,32,0.65)" text-anchor="middle">ideal</text>
+          <text x="150" y="106" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="8" fill="rgba(38,35,32,0.65)" text-anchor="middle">overfit</text>
+          <text x="50"  y="206" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="8" fill="rgba(38,35,32,0.65)" text-anchor="middle">underfit</text>
+          <text x="150" y="206" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="8" fill="rgba(38,35,32,0.65)" text-anchor="middle">worst</text>
+        </svg>
+        <p class="quiet" style="margin-top:6px">Each target is one model class. The red dot is truth; the ink dots are predictions from many imagined training datasets. Off-center cluster = bias. Spread of cluster = variance. You want the top-left quadrant.</p>
+
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">The U-curve, mathematically</div>
+        <div class="ml-equation" style="font-size:13px">↑ complexity ⇒ bias² ↓ &amp; variance ↑</div>
+        <p class="quiet">More flexibility means the model can fit any underlying truth (bias falls), but it can also chase noise (variance rises). The minimum of the sum is your sweet spot — and it shifts with dataset size.</p>
+
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Double descent caveat</div>
+        <p class="quiet">Past degree ~12 in this toy, the U here keeps rising — the classical regime. In <em>deep nets</em>, when parameters far exceed data, the right tail sometimes <em>descends again</em> (Belkin et al., 2019). Why is still partly an open question. Beyond this course; covered in the further-reading link.</p>
+
         <div class="ml-margin-rule thin"></div>
         <div class="ml-margin-h sm">Regularization</div>
         <p class="quiet">L1/L2 penalties trade variance for bias. At the optimal regularization strength, you've moved closer to the sweet spot without changing model class.</p>

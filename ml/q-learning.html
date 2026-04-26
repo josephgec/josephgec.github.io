@@ -87,22 +87,60 @@
       </div>
       <div class="ml-caption">
         <span class="ml-cap-num">·</span>
-        Left: the grid world with the agent (accent dot), the goal (top-right), and a hazard. Right: the Q-table — each cell shows four wedges, one per action, colored by Q-value. As the agent learns, the wedges sharpen toward the optimal action.
+        Left: the world with the agent (accent dot) and a fading trail of recent steps. Right: the Q-table — four wedges per cell, one per direction (<em>↑→↓←</em>). Every step <span class="ml-ink-orange">flashes</span> the wedge it updated and prints the <em>TD-error</em> — the gap between the old estimate and the new evidence, which is the signal that drives all of learning.
+      </div>
+      <div class="ml-equation-anchor" style="font-family:var(--serif); font-style:italic; font-size:15px; text-align:center; margin-top:10px; line-height:1.6; color:var(--ml-ink-soft)">
+        <span style="color:var(--ml-ink-fade); font-family:var(--mono); font-style:normal; font-size:10px; letter-spacing:0.2em">Q-UPDATE</span><br />
+        Q(s,a) ← Q(s,a) + α · <span style="background:rgba(122,31,36,0.16); padding:1px 4px; border-radius:3px; color:var(--accent)">[ r + γ max<sub>a′</sub> Q(s′,a′) − Q(s,a) ]</span><br />
+        <span style="color:var(--ml-ink-fade); font-style:italic; font-size:12px">old estimate ← old estimate + (learning rate) × <span style="color:var(--accent)">[ reward + γ × best next Q  −  old estimate ]</span></span><br />
+        <span style="color:var(--ml-ink-fade); font-style:normal; font-size:11px; font-family:var(--mono); letter-spacing:0">α = alpha (learning rate, 0–1) · γ = gamma (discount) · ε = epsilon (random-action rate) · max<sub>a′</sub> = best Q over next state's actions</span>
+      </div>
+
+      <div class="ml-legend" style="display:flex; flex-wrap:wrap; gap:14px; justify-content:center; margin-top:10px; font-family:var(--serif); font-style:italic; font-size:12px; color:var(--ml-ink-fade)">
+        <span><span style="display:inline-block; width:10px; height:10px; background:var(--accent); border-radius:50%; vertical-align:middle; margin-right:5px; border:2px solid #fffdf6; box-sizing:border-box"></span>agent (current state)</span>
+        <span><span style="display:inline-block; width:8px; height:8px; background:rgba(122,31,36,0.4); border-radius:50%; vertical-align:middle; margin-right:5px"></span>fading trail = recent steps</span>
+        <span><span style="display:inline-block; width:10px; height:10px; background:rgba(122,31,36,0.5); vertical-align:middle; margin-right:5px"></span>warm wedge = positive Q (good move)</span>
+        <span><span style="display:inline-block; width:10px; height:10px; background:rgba(38,35,32,0.4); vertical-align:middle; margin-right:5px"></span>dark wedge = negative Q</span>
+        <span><span style="color:rgba(122,31,36,0.85); font-family:var(--mono); font-style:normal; font-size:10px; font-weight:500">EXPLOIT</span> = greedy · <span style="color:rgba(38,35,32,0.7); font-family:var(--mono); font-style:normal; font-size:10px; font-weight:500">EXPLORE</span> = random (ε)</span>
       </div>
     </div>
 
     <aside class="right-rail">
       <div class="ml-margin">
         <div class="ml-margin-rule"></div>
-        <div class="ml-margin-h">The Q-update</div>
-        <div class="ml-equation" style="font-size:13px">Q(s, a) ← Q(s, a) + α[r + γ max<sub>a′</sub> Q(s′, a′) − Q(s, a)]</div>
-        <p>The bracket is the <em>temporal-difference error</em> — the gap between the current estimate and the better one we just observed. The update nudges the estimate toward the new evidence.</p>
+        <div class="ml-margin-h">Before Q-learning</div>
+        <p class="quiet">Before Watkins (1989), reinforcement learning required a <em>model</em> of the environment — you had to know all transition probabilities and rewards to compute values via the Bellman equation. Q-learning made it model-free: learn directly from experience, with provable convergence. It's the algorithm that taught a computer to play Atari (DeepMind, 2013).</p>
         <div class="ml-margin-rule thin"></div>
-        <div class="ml-margin-h sm">ε-greedy</div>
-        <p class="quiet">With probability ε, pick a random action; otherwise act greedily. The classical exploration-vs-exploitation knob.</p>
+        <div class="ml-margin-h sm">The RL loop</div>
+        <svg viewBox="0 0 220 180" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; margin:6px 0 10px">
+          <defs>
+            <marker id="ql-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#262320" />
+            </marker>
+          </defs>
+          <rect x="20" y="20" width="80" height="42" rx="6" fill="none" stroke="#7a1f24" stroke-width="1.5" />
+          <text x="60" y="38" text-anchor="middle" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="14" fill="#7a1f24">agent</text>
+          <text x="60" y="54" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="rgba(38,35,32,0.55)">Q(s,a)</text>
+
+          <rect x="120" y="118" width="80" height="42" rx="6" fill="none" stroke="#262320" stroke-width="1.5" />
+          <text x="160" y="136" text-anchor="middle" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="14" fill="#262320">grid world</text>
+          <text x="160" y="152" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="rgba(38,35,32,0.55)">unknown</text>
+
+          <path d="M 100 50 Q 160 60 160 118" fill="none" stroke="#262320" stroke-width="1.2" marker-end="url(#ql-arrow)" />
+          <text x="138" y="84" text-anchor="middle" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="11" fill="#262320">action a</text>
+          <text x="138" y="98" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="rgba(38,35,32,0.55)">ε-greedy</text>
+
+          <path d="M 120 140 Q 60 130 60 62" fill="none" stroke="#262320" stroke-width="1.2" marker-end="url(#ql-arrow)" />
+          <text x="78" y="106" text-anchor="middle" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="11" fill="#262320">state s′,</text>
+          <text x="78" y="119" text-anchor="middle" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="11" fill="#7a1f24">reward r</text>
+        </svg>
+        <p class="quiet"><em>Q-learning's update:</em> after every (s, a, r, s′), nudge Q(s,a) toward r + γ·max Q(s′,·). No model of the world. Pure bookkeeping plus arithmetic.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Glossary</div>
+        <p class="quiet"><em>Q(s,a)</em> — expected total reward if you take action <em>a</em> from state <em>s</em> and act greedily after. <em>α</em> (alpha) — learning rate (how much to nudge each update). <em>γ</em> (gamma) — discount on future reward. <em>ε</em> (epsilon) — fraction of steps spent exploring (random) vs exploiting (best so far). <em>TD-error</em> — gap between old guess and new evidence.</p>
         <div class="ml-margin-rule thin"></div>
         <div class="ml-margin-h sm">From table to network</div>
-        <p class="quiet">When states are too many to enumerate (Atari pixels, robot images), replace the table with a neural network <em>Q(s, a; θ)</em>. That's <em>DQN</em>.</p>
+        <p class="quiet">When states are too many to enumerate (Atari pixels, robot images), replace the table with a neural network <em>Q(s, a; θ)</em>. That's <em>DQN</em> — same update, gradient descent in place of cell assignment.</p>
       </div>
     </aside>
   </section>

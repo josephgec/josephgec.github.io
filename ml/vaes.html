@@ -52,16 +52,20 @@
     <div class="ml-try">
       <div class="ml-eyebrow accent">Try this</div>
       <ol>
-        <li>Drag the <em>z₁</em> and <em>z₂</em> sliders. The decoder paints a continuous map of generated outputs across latent space — a <em>continent</em> of plausible inputs.</li>
-        <li>Hit <em>Sample N(0, I)</em>. Each click draws a fresh random latent and decodes it. With a well-trained VAE, every sample is a valid-looking output, not noise.</li>
-        <li>Compare to a plain autoencoder (Vol XX). A regular AE leaves "holes" in latent space — places that decode to nothing meaningful. A VAE's KL term forces the holes to fill in.</li>
+        <li>Switch to <em>KL · two distributions</em>. You see two ellipses: the encoder's <em>q(z|x) = N(μ, σ²)</em> and the prior <em>N(0, I)</em>. Hit <em>Improve KL</em> and the encoder ellipse gets pulled toward the prior. That tug is the KL regularizer making latent space tile cleanly.</li>
+        <li>Switch to <em>Reparameterization</em>. Watch ε get sampled from the prior, scaled by σ, translated by μ — landing at z. Sampling becomes a deterministic function of an outside random ε, so gradients flow.</li>
+        <li>Switch to <em>Walk the manifold</em>. Pick two endpoints; the slider interpolates the latent line; the decoder paints each step. Smooth interpolation means every point in between is plausible.</li>
+        <li>Hit <em>Sample N(0, I)</em> on the manifold view. Every random draw decodes to <em>something</em> — that's what the VAE bought you.</li>
       </ol>
     </div>
   </section>
 
   <section class="ml-stage">
     <aside class="left-rail">
-      <div class="ml-rail-label">Latent z₁</div>
+      <div class="ml-rail-label">View</div>
+      <div class="ml-presets" id="view-toggle"></div>
+
+      <div class="ml-rail-label" style="margin-top: 18px">Latent z₁</div>
       <input id="z1-slider" type="range" min="-3" max="3" step="0.05" value="0" style="width:100%; accent-color:var(--accent)" />
       <div id="z1-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">z₁ = 0.00</div>
 
@@ -73,8 +77,16 @@
         <button id="sample-btn" class="ml-sbtn" style="flex:1; padding:10px 14px; font-family:var(--serif); font-style:italic; font-size:14px">↻ Sample N(0, I)</button>
       </div>
 
-      <div class="ml-rail-label" style="margin-top: 24px">View</div>
-      <div class="ml-presets" id="view-toggle"></div>
+      <div id="kl-controls" style="margin-top:14px; display:none">
+        <button id="kl-step" class="ml-sbtn ghost" style="width:100%; padding:8px 10px; font-family:var(--serif); font-style:italic; font-size:13px">⇨ Improve KL by one step</button>
+        <button id="kl-reset" class="ml-sbtn ghost" style="width:100%; padding:8px 10px; margin-top:6px; font-family:var(--serif); font-style:italic; font-size:13px">↺ Reset encoder</button>
+      </div>
+
+      <div id="walk-controls" style="margin-top:14px; display:none">
+        <div class="ml-rail-label" style="margin-top:0">Walk t</div>
+        <input id="walk-slider" type="range" min="0" max="1" step="0.01" value="0.5" style="width:100%; accent-color:var(--accent)" />
+        <div id="walk-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">t = 0.50</div>
+      </div>
 
       <div class="ml-readout" id="readout" style="margin-top: 18px"></div>
     </aside>
@@ -89,15 +101,59 @@
     <aside class="right-rail">
       <div class="ml-margin">
         <div class="ml-margin-rule"></div>
-        <div class="ml-margin-h">VAE loss</div>
-        <div class="ml-equation" style="font-size:13px">L = ‖x − x̂‖² + KL(q(z|x) ‖ N(0, I))</div>
-        <p>Reconstruction loss + regularizer. The KL term pulls each input's encoded distribution toward the standard normal — making latent space a single cohesive blob you can sample from.</p>
+        <div class="ml-margin-h">Before this</div>
+        <p class="quiet">Plain autoencoders learned a code per training example, but the latent space had holes — interpolating between codes produced garbage. VAEs (Kingma &amp; Welling 2014) made every region of latent space decode to <em>something</em> by training the encoder to output a distribution and pulling all of them toward N(0, I). Sampling becomes free; smooth interpolation appears.</p>
+
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h">The architecture</div>
+        <svg viewBox="0 0 220 150" style="width:100%; max-width:220px; display:block; margin:6px 0 10px">
+          <!-- input -->
+          <rect x="6" y="60" width="22" height="30" fill="rgba(122,31,36,0.12)" stroke="#7a1f24" stroke-width="1"/>
+          <text x="17" y="105" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#262320">x</text>
+          <!-- encoder -->
+          <polygon points="32,55 70,65 70,85 32,95" fill="rgba(122,31,36,0.08)" stroke="#7a1f24" stroke-width="1"/>
+          <text x="51" y="78" text-anchor="middle" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="10" fill="#262320">enc</text>
+          <!-- mu, sigma split -->
+          <rect x="76" y="48" width="22" height="14" fill="#7a1f24"/>
+          <text x="87" y="58" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#fffdf6">μ</text>
+          <rect x="76" y="88" width="22" height="14" fill="rgba(38,35,32,0.85)"/>
+          <text x="87" y="98" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#fffdf6">σ</text>
+          <!-- arrows from μ,σ → z -->
+          <line x1="98" y1="55" x2="118" y2="73" stroke="#7a1f24" stroke-width="1"/>
+          <line x1="98" y1="95" x2="118" y2="77" stroke="rgba(38,35,32,0.6)" stroke-width="1"/>
+          <!-- ε -->
+          <text x="105" y="36" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="rgba(38,35,32,0.55)">ε ~ N(0,I)</text>
+          <line x1="105" y1="40" x2="118" y2="68" stroke="rgba(38,35,32,0.4)" stroke-width="1" stroke-dasharray="2,2"/>
+          <!-- z -->
+          <circle cx="124" cy="75" r="9" fill="rgba(122,31,36,0.18)" stroke="#7a1f24"/>
+          <text x="124" y="79" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#262320">z</text>
+          <!-- decoder -->
+          <polygon points="138,65 176,55 176,95 138,85" fill="rgba(122,31,36,0.08)" stroke="#7a1f24" stroke-width="1"/>
+          <text x="157" y="78" text-anchor="middle" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="10" fill="#262320">dec</text>
+          <!-- output -->
+          <rect x="184" y="60" width="22" height="30" fill="rgba(122,31,36,0.12)" stroke="#7a1f24"/>
+          <text x="195" y="105" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#262320">x̂</text>
+          <text x="111" y="135" text-anchor="middle" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="9" fill="rgba(38,35,32,0.55)">z = μ + σ · ε   (reparameterize)</text>
+        </svg>
+        <p class="quiet" style="font-size:12px">The encoder outputs <em>two</em> vectors, not one — a mean μ and a spread σ. Sampling is rebuilt as <em>z = μ + σ · ε</em> so gradients can flow through.</p>
+
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">VAE loss</div>
+        <div class="ml-equation" style="font-size:13px"><span style="color:#7a1f24">‖x − x̂‖²</span> + <span style="color:#262320">KL(q(z|x) ∥ N(0, I))</span></div>
+        <p class="quiet"><span style="color:#7a1f24">First term</span>: reconstruction error — how well <em>x̂</em> matches the input <em>x</em>. <span style="color:#262320">Second term</span>: KL divergence — pulls the encoder's output distribution <em>q(z|x)</em> toward the standard normal <em>N(0, I)</em>, so the latent space stays smooth. Tension between the two is what fills latent space.</p>
+
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Symbol gloss</div>
+        <p class="quiet"><em>μ (mu)</em>: the encoder's predicted <em>mean</em> of the latent code. <em>σ (sigma)</em>: the encoder's predicted <em>spread</em> (standard deviation). Both are vectors — one number per latent dimension.<br /><em>ε (epsilon)</em>: a tiny random sample drawn from <em>N(0, I)</em>, the standard normal (mean 0, variance 1).<br /><em>KL</em>: Kullback–Leibler divergence — a measure of how different two distributions are. Zero means identical; bigger means more different.</p>
+
         <div class="ml-margin-rule thin"></div>
         <div class="ml-margin-h sm">Reparameterization trick</div>
-        <p class="quiet">To make the random sampling differentiable: sample <em>ε</em> from a fixed N(0,I), then compute <em>z = μ + σ · ε</em>. The randomness is now an "input," and gradients flow cleanly through μ and σ.</p>
+        <div class="ml-equation" style="font-size:14px">z = μ + σ · ε</div>
+        <p class="quiet">Read it as arithmetic: take the noise <em>ε</em>, stretch it by the encoder's spread <em>σ</em>, then shift it to the mean <em>μ</em>. The randomness is an "input," not part of the graph — so gradients flow cleanly through μ and σ during training.</p>
+
         <div class="ml-margin-rule thin"></div>
         <div class="ml-margin-h sm">VAE vs GAN</div>
-        <p class="quiet">VAEs produce blurry samples (MSE loss likes the average). GANs produce sharper samples (adversarial loss penalizes implausibility). Modern systems often combine both.</p>
+        <p class="quiet">VAEs produce slightly blurry samples (MSE likes the average). GANs produce sharper samples (adversarial loss penalizes implausibility). Modern systems often combine both.</p>
       </div>
     </aside>
   </section>

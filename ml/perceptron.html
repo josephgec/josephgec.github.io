@@ -52,7 +52,7 @@
       <div class="ml-intro-block">
         <div class="ml-eyebrow">The concept</div>
         <p class="lead">A <span class="term">perceptron</span> is the simplest neural network: it computes <em>w·x + b</em>, then outputs 1 if that's positive, 0 otherwise.</p>
-        <p>Geometrically, the equation <em>w·x + b = 0</em> defines a <em>line</em> (or hyperplane in higher dimensions). Everything on one side gets classified as 1, everything on the other as 0. The two weights <em>w₁, w₂</em> set the line's slope; the bias <em>b</em> shifts it.</p>
+        <p>Read the formula slowly: <em>w·x</em> is a <em>dot product</em> — multiply each weight by the matching input feature, then sum (<em>w₁·x₁ + w₂·x₂</em>). Add the bias <em>b</em>. If the result is positive, output 1; otherwise 0. Geometrically, <em>w·x + b = 0</em> traces a <em>line</em> (a hyperplane in higher dimensions): the two weights set the line's tilt, the bias slides it along.</p>
         <p>The learning rule is brutally simple: when the perceptron is wrong on a point, nudge the weights toward correctness. Repeat until everything is classified — provably converges, <em>if</em> the data is linearly separable.</p>
       </div>
       <div class="ml-intro-block">
@@ -84,9 +84,16 @@
       <button id="resample" class="ml-resample-btn">↻ Resample</button>
 
       <div style="display: flex; gap: 8px; margin-top: 18px">
-        <button id="train-btn" class="ml-sbtn" style="flex:1; padding:8px 18px; font-family:var(--serif); font-style:italic; font-size:14px">Train</button>
-        <button id="random-init" class="ml-sbtn ghost" style="padding:8px 14px; font-family:var(--serif); font-style:italic; font-size:13px">Random init</button>
+        <button id="train-btn" class="ml-sbtn" title="Run the perceptron rule until it stops misclassifying (or hits XOR)" style="flex:1; padding:8px 18px; font-family:var(--serif); font-style:italic; font-size:14px">Train</button>
+        <button id="random-init" class="ml-sbtn ghost" title="Reset weights to a random starting point" style="padding:8px 14px; font-family:var(--serif); font-style:italic; font-size:13px">Random init</button>
       </div>
+      <div style="font-family:var(--serif); font-style:italic; font-size:11px; color:var(--ml-ink-fade); margin-top: 8px; line-height: 1.45">
+        Drag the sliders to nudge the line by hand · press <em>Train</em> to let the rule do it.
+      </div>
+      <label id="mlp-toggle-wrap" style="display:none; align-items:center; gap:8px; margin-top: 14px; cursor:pointer; font-family:var(--serif); font-style:italic; font-size:13px; color:var(--ml-ink-soft)">
+        <input type="checkbox" id="mlp-toggle" />
+        <span>Show 2-line MLP solution</span>
+      </label>
       <div class="ml-preset-blurb" id="warning" style="margin-top: 14px; min-height: 1em"></div>
     </aside>
 
@@ -103,10 +110,19 @@
     <aside class="right-rail">
       <div class="ml-margin">
         <div class="ml-margin-rule"></div>
+        <div class="ml-margin-h">Before this</div>
+        <p class="quiet">Before Rosenblatt (1957), classification was hand-coded rules — pick features, set thresholds, hope. The perceptron showed a machine could <em>learn</em> where to draw the line from labeled examples. Then Minsky and Papert (1969) showed a single perceptron couldn't do XOR — and progress stalled for a decade until the multi-layer rescue.</p>
+        <div class="ml-margin-rule thin"></div>
         <div class="ml-margin-h">In the margin</div>
         <div class="ml-equation">ŷ = step(w·x + b)</div>
         <p>The simplest neural network: a weighted sum, then a threshold.</p>
         <p class="quiet">Rosenblatt's 1958 learning rule: when wrong, nudge weights in the direction of the input, by the amount of the error.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Symbols, plainly</div>
+        <p class="quiet"><b>w·x</b> = dot product — pair up entries, multiply, sum. <b>w</b> = weight vector (the dark arrow on the canvas). <b>b</b> = bias, a single number that shifts the line. <b>step(z)</b> = 1 if <em>z</em> > 0, else 0. <b>η</b> (eta) = learning rate, the step size of each weight nudge. The arrow is drawn perpendicular to the line because <em>w</em> is the line's <em>normal</em>: the dot product is largest along <em>w</em>, zero across it.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Reading the picture</div>
+        <p class="quiet">Filled <span class="ml-ink-orange" style="color:var(--accent)">orange</span> dot = class 1; dark dot = class 0. Open ring around a dot = currently misclassified. The shaded oxblood half-plane is the region the perceptron currently labels "1." The fading ghost lines are the previous decision boundaries — its trail through training.</p>
         <div class="ml-margin-rule thin"></div>
         <div class="ml-margin-h sm">The wall</div>
         <p class="quiet">Minsky &amp; Papert (1969) proved one perceptron can't learn XOR. Stack them in layers and the wall falls — but you need backpropagation to train them.</p>

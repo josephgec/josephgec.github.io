@@ -100,6 +100,10 @@
 
     <p><a href="https://github.com/josephgec/deepsnake" target="_blank" rel="noopener noreferrer">DeepSnake</a> is an open-source project that tackles exactly this problem, and the results speak for themselves: an agent that consistently scores 30+ points and averages nearly 44 points over 200 games, with a personal best of 75. No hand-coded strategy. No search algorithms. Just a neural network, a reward signal, and a lot of virtual trial and error.</p>
 
+    <blockquote>
+      <strong style="font-style:normal;">Before this.</strong> Classical reinforcement learning kept its values in a table — one row per state, one column per action — and updated cells with the Bellman equation. That works for tic-tac-toe; it falls apart the moment the state is anything richer, because the table grows combinatorially and the agent has no way to generalize between similar situations. The 2013 DeepMind paper <em>Playing Atari with Deep Reinforcement Learning</em> replaced the table with a neural network and trained it on raw pixels — same update rule, learned weights instead of cell assignments. That single substitution gave RL the ability to handle any state you can encode as a vector. DeepSnake is a small, readable instance of that recipe.
+    </blockquote>
+
     <figure class="svg-figure">
       <svg viewBox="0 0 680 440" width="100%" role="img" aria-label="Stylized Snake game grid showing the snake and a food pellet">
         <defs>
@@ -190,6 +194,19 @@
     <p>The answer comes down to the nature of the problem. Supervised learning requires labeled training data — thousands of examples of "given this board state, the correct move is X." For a game as dynamic as Snake, generating that dataset would be impractical and brittle. A hard-coded algorithm like A* pathfinding could work for small boards, but it doesn't <em>learn</em> or <em>adapt</em>, and it breaks down as the snake's body creates increasingly complex obstacles.</p>
 
     <p>Reinforcement Learning is the natural fit because the Snake problem has exactly the structure RL was designed for: an <strong>agent</strong> (the snake) takes <strong>actions</strong> (turn left, turn right, go straight) in an <strong>environment</strong> (the game grid), and receives <strong>rewards</strong> (positive for eating food, negative for dying). The agent's only job is to figure out which actions maximize its cumulative reward over time. No labels required — just experience.</p>
+
+    <figure class="svg-figure" style="background: var(--paper); padding: 20px 26px;">
+      <figcaption style="text-align:left; margin: 0 0 10px; font-size:11px; color:var(--accent); letter-spacing:0.08em;">A SHORT VOCABULARY</figcaption>
+      <ul style="margin:0; padding-left:1.2em; font-family:var(--serif); font-size:16px; line-height:1.55;">
+        <li><strong>State</strong> <em>(s)</em> — what the agent sees right now. For DeepSnake, a 24-number summary of the board.</li>
+        <li><strong>Action</strong> <em>(a)</em> — what the agent does. Here: <em>straight</em>, <em>turn right</em>, or <em>turn left</em>.</li>
+        <li><strong>Reward</strong> <em>(r)</em> — a single number the environment hands back after each step. Positive = good, negative = bad.</li>
+        <li><strong>Q-value</strong> <em>Q(s, a)</em> — the expected sum of all <em>future</em> rewards if the agent takes action <em>a</em> from state <em>s</em> and plays well after. Bigger Q = better move.</li>
+        <li><strong>DQN</strong> — a neural network that approximates <em>Q(s, a)</em>. Input: state vector. Output: one Q-value per action.</li>
+        <li><strong>ε-greedy</strong> — pick the highest-Q action <em>most</em> of the time, but with probability <em>ε</em> pick a random action. The random fraction is how the agent discovers things it hasn't tried.</li>
+        <li><strong>Replay buffer</strong> — a rolling log of past <em>(state, action, reward, next state)</em> transitions. Training samples random minibatches from this log so the network doesn't overfit to whatever just happened.</li>
+      </ul>
+    </figure>
 
     <h2>The Environment: A 20×20 Grid World</h2>
 
@@ -340,7 +357,118 @@
       <li><strong>Distance to the nearest obstacle in 8 directions</strong>, calculated via raycasting.</li>
     </ul>
 
+    <figure class="svg-figure">
+      <svg viewBox="0 0 680 360" width="100%" role="img" aria-label="Snake board annotated with the 24 input features: danger cells, food direction, current heading, and 8 raycasts">
+        <defs>
+          <marker id="ray-arrow" markerWidth="6" markerHeight="6" refX="5" refY="2" orient="auto">
+            <path d="M0,0 L4,2 L0,4 z" fill="#7a1f24"/>
+          </marker>
+        </defs>
+
+        <!-- Title -->
+        <text x="20" y="22" font-family="JetBrains Mono, monospace" font-size="10" font-weight="600" fill="#7a1f24" letter-spacing="0.08em">WHAT THE NETWORK ACTUALLY SEES</text>
+
+        <!-- Mini-board (10x10 for clarity) -->
+        <g transform="translate(40, 50)">
+          <rect x="0" y="0" width="240" height="240" fill="#fffdf6" stroke="#cfc6b3" stroke-width="1"/>
+          <!-- grid lines -->
+          <g stroke="#e8e0cf" stroke-width="0.5">
+            <line x1="24" y1="0" x2="24" y2="240"/><line x1="48" y1="0" x2="48" y2="240"/>
+            <line x1="72" y1="0" x2="72" y2="240"/><line x1="96" y1="0" x2="96" y2="240"/>
+            <line x1="120" y1="0" x2="120" y2="240"/><line x1="144" y1="0" x2="144" y2="240"/>
+            <line x1="168" y1="0" x2="168" y2="240"/><line x1="192" y1="0" x2="192" y2="240"/>
+            <line x1="216" y1="0" x2="216" y2="240"/>
+            <line x1="0" y1="24" x2="240" y2="24"/><line x1="0" y1="48" x2="240" y2="48"/>
+            <line x1="0" y1="72" x2="240" y2="72"/><line x1="0" y1="96" x2="240" y2="96"/>
+            <line x1="0" y1="120" x2="240" y2="120"/><line x1="0" y1="144" x2="240" y2="144"/>
+            <line x1="0" y1="168" x2="240" y2="168"/><line x1="0" y1="192" x2="240" y2="192"/>
+            <line x1="0" y1="216" x2="240" y2="216"/>
+          </g>
+
+          <!-- Snake body (heading right; head at col 5, row 5) -->
+          <rect x="48"  y="120" width="22" height="22" rx="2" fill="#cfc6b3"/>
+          <rect x="72"  y="120" width="22" height="22" rx="2" fill="#cfc6b3"/>
+          <rect x="96"  y="120" width="22" height="22" rx="2" fill="#cfc6b3"/>
+          <!-- Head -->
+          <rect x="120" y="120" width="22" height="22" rx="2" fill="#262320"/>
+          <text x="131" y="136" text-anchor="middle" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="11" fill="#fffdf6">head</text>
+
+          <!-- Food (top-right) -->
+          <circle cx="203" cy="59" r="7" fill="#7a1f24"/>
+          <text x="203" y="46" text-anchor="middle" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="11" fill="#7a1f24">food</text>
+
+          <!-- Three "danger" probe cells: ahead, right, left of head -->
+          <rect x="144" y="120" width="22" height="22" rx="2" fill="rgba(122,31,36,0.18)" stroke="#7a1f24" stroke-width="1.2" stroke-dasharray="3 2"/>
+          <text x="155" y="136" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#7a1f24">▶</text>
+          <rect x="120" y="96"  width="22" height="22" rx="2" fill="rgba(122,31,36,0.18)" stroke="#7a1f24" stroke-width="1.2" stroke-dasharray="3 2"/>
+          <text x="131" y="112" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#7a1f24">▲</text>
+          <rect x="120" y="144" width="22" height="22" rx="2" fill="rgba(122,31,36,0.18)" stroke="#7a1f24" stroke-width="1.2" stroke-dasharray="3 2"/>
+          <text x="131" y="160" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#7a1f24">▼</text>
+
+          <!-- 8-direction rays from head center (131, 131) -->
+          <g stroke="#7a1f24" stroke-width="0.9" opacity="0.55" fill="none" marker-end="url(#ray-arrow)">
+            <line x1="131" y1="131" x2="216" y2="131"/>   <!-- E -->
+            <line x1="131" y1="131" x2="48"  y2="131"/>   <!-- W -->
+            <line x1="131" y1="131" x2="131" y2="48"/>    <!-- N -->
+            <line x1="131" y1="131" x2="131" y2="216"/>   <!-- S -->
+            <line x1="131" y1="131" x2="200" y2="62"/>    <!-- NE -->
+            <line x1="131" y1="131" x2="62"  y2="62"/>    <!-- NW -->
+            <line x1="131" y1="131" x2="200" y2="200"/>   <!-- SE -->
+            <line x1="131" y1="131" x2="62"  y2="200"/>   <!-- SW -->
+          </g>
+        </g>
+
+        <!-- Legend / feature breakdown on the right -->
+        <g transform="translate(310, 60)">
+          <text x="0" y="0" font-family="JetBrains Mono, monospace" font-size="10" font-weight="600" fill="#566068" letter-spacing="0.06em">24 FEATURES, GROUPED</text>
+
+          <!-- danger -->
+          <rect x="0" y="16" width="14" height="14" fill="rgba(122,31,36,0.18)" stroke="#7a1f24" stroke-width="1" stroke-dasharray="3 2"/>
+          <text x="22" y="28" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="14" fill="#262320">danger ahead / right / left  <tspan font-family="JetBrains Mono, monospace" font-size="10" fill="#94a3b8">3</tspan></text>
+
+          <!-- direction one-hot -->
+          <rect x="0" y="42" width="14" height="14" fill="#262320"/>
+          <text x="22" y="54" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="14" fill="#262320">current heading (one-hot N/E/S/W)  <tspan font-family="JetBrains Mono, monospace" font-size="10" fill="#94a3b8">4</tspan></text>
+
+          <!-- food direction -->
+          <circle cx="7" cy="75" r="6" fill="#7a1f24"/>
+          <text x="22" y="80" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="14" fill="#262320">food direction (N / S / E / W bits)  <tspan font-family="JetBrains Mono, monospace" font-size="10" fill="#94a3b8">4</tspan></text>
+
+          <!-- positions -->
+          <rect x="0" y="94" width="14" height="14" fill="#fffdf6" stroke="#cfc6b3" stroke-width="1"/>
+          <text x="22" y="106" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="14" fill="#262320">head pos, food offset, length  <tspan font-family="JetBrains Mono, monospace" font-size="10" fill="#94a3b8">5</tspan></text>
+
+          <!-- raycasts -->
+          <line x1="0" y1="128" x2="14" y2="128" stroke="#7a1f24" stroke-width="1" opacity="0.7"/>
+          <text x="22" y="132" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="14" fill="#262320">8 raycasts to nearest obstacle  <tspan font-family="JetBrains Mono, monospace" font-size="10" fill="#94a3b8">8</tspan></text>
+
+          <!-- total -->
+          <line x1="0" y1="152" x2="320" y2="152" stroke="#cfc6b3" stroke-width="1"/>
+          <text x="0" y="172" font-family="JetBrains Mono, monospace" font-size="11" fill="#7a1f24" font-weight="600">total → 24-dim state vector</text>
+        </g>
+      </svg>
+      <figcaption>The board the network actually "sees" is a 24-number summary, not a grid of pixels. Three danger probes around the head, the current heading, four bits for which side the food is on, a few normalized positions, and eight raycasts that measure distance to the nearest wall or body segment.</figcaption>
+    </figure>
+
     <p>This compact representation gives the network everything it needs to make good decisions without drowning it in irrelevant data. The three outputs correspond to Q-values for each action (straight, right, left). During gameplay, the agent picks the action with the highest Q-value.</p>
+
+    <figure class="svg-figure" style="background: var(--paper); padding: 22px 28px;">
+      <figcaption style="text-align:left; margin: 0 0 12px; font-size:11px; color:var(--accent); letter-spacing:0.08em;">THE Q-LEARNING UPDATE</figcaption>
+      <div style="text-align:center; font-family:var(--serif); font-style:italic; font-size:18px; line-height:1.7; color:var(--ink);">
+        Q(s, a) ← Q(s, a) + α · <span style="background:rgba(122,31,36,0.14); padding:2px 6px; border-radius:3px; color:var(--accent);">[ r + γ · max<sub>a′</sub> Q(s′, a′) − Q(s, a) ]</span>
+      </div>
+      <div style="text-align:center; font-family:var(--serif); font-style:italic; font-size:14px; color:var(--muted); margin-top:8px;">
+        old guess ← old guess + (learning rate) × <span style="color:var(--accent);">[ reward earned + (discounted) best-next-Q  −  old guess ]</span>
+      </div>
+      <div style="font-family:var(--mono); font-size:11px; color:var(--muted); margin-top:14px; line-height:1.7;">
+        <strong style="color:var(--ink); font-weight:500;">α</strong> alpha — learning rate, how big each nudge is &nbsp;·&nbsp;
+        <strong style="color:var(--ink); font-weight:500;">γ</strong> gamma — discount on future rewards (0.99 here) &nbsp;·&nbsp;
+        <strong style="color:var(--ink); font-weight:500;">r</strong> the reward just received &nbsp;·&nbsp;
+        <strong style="color:var(--ink); font-weight:500;">s′</strong> the state we ended up in &nbsp;·&nbsp;
+        <strong style="color:var(--ink); font-weight:500;">max<sub>a′</sub> Q(s′, a′)</strong> the network's best Q-value over the actions available <em>next</em>
+      </div>
+      <p style="margin: 14px 0 0; font-family:var(--serif); font-size:15px; line-height:1.6; color:var(--ink);">In tabular Q-learning this update overwrites a cell. In a DQN the same right-hand side becomes a <em>target</em>; the network is trained — by gradient descent — to make its prediction <em>Q(s, a)</em> match it. That target is sometimes called the <em>Bellman target</em>, and the gap between prediction and target is the <em>TD error</em> — the signal that drives every weight update.</p>
+    </figure>
 
     <h2>The Reward System: How the AI Learns Right from Wrong</h2>
 
@@ -358,7 +486,11 @@
       </tbody>
     </table>
 
-    <p>The +10 / −10 for eating and dying are straightforward. The interesting addition is the <strong>+1 / −1 shaping reward</strong> for moving closer to or farther from the food. Without this, the agent would receive very sparse feedback — it might wander aimlessly for hundreds of steps before stumbling onto food or dying, making learning painfully slow. The proximity reward gives the agent a continuous gradient to follow, dramatically accelerating training.</p>
+    <p>The +10 / −10 for eating and dying are straightforward. The interesting addition is the <strong>+1 / −1 shaping reward</strong> for moving closer to or farther from the food.</p>
+
+    <p>Why bother? Imagine the reward signal were <em>only</em> +10 for food and −10 for death. The agent starts as a random policy. On a 20×20 grid that's 400 cells, with one food cell. The probability of stumbling into food in any given step is roughly <em>1/400</em>; meanwhile the snake usually crashes within a few dozen steps. That means the agent dies hundreds of times — collecting nothing but −10 signals — before it ever <em>tastes</em> a positive reward. With nothing to imitate, the network just learns "everything is bad" and never finds the gradient pointing toward food. This is the <em>sparse-reward problem</em>, and it's the single most common reason RL projects stall.</p>
+
+    <p>The +1 / −1 distance shaping fixes this by handing the agent a small, dense signal on <em>every single step</em>. Every move toward the food is worth a tenth of a meal; every move away costs the same. The agent can now learn "go toward food" long before it has ever eaten one — and once it does eat, the +10 reinforces what was already a sensible policy. The proximity reward isn't strictly necessary in theory; in practice, it cuts training time from "maybe never" to "a couple thousand episodes."</p>
 
     <h2>DQN Improvements: Beyond Vanilla Q-Learning</h2>
 
@@ -371,6 +503,149 @@
       <li><strong>Gradient clipping</strong> (max norm = 1.0) prevents exploding gradients from destabilizing the network.</li>
       <li><strong>Epsilon-greedy exploration</strong> decays from 1.0 to 0.01, starting with nearly random actions and gradually shifting to exploitation as the agent becomes more confident.</li>
     </ul>
+
+    <h3>One step of training, end to end</h3>
+
+    <p>It's worth tracing what actually happens between the moment the agent observes a state and the moment its weights are updated. Every game step is also a training step:</p>
+
+    <figure class="svg-figure">
+      <svg viewBox="0 0 720 360" width="100%" role="img" aria-label="Flow diagram of one training step: environment, state, epsilon-greedy action, environment step, transition stored in replay buffer, minibatch sampled, Bellman target computed, loss and backprop">
+        <defs>
+          <marker id="train-arrow" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto">
+            <path d="M0,0 L7,3 L0,6 z" fill="#566068"/>
+          </marker>
+        </defs>
+
+        <!-- ENV -->
+        <g>
+          <rect x="20" y="40" width="120" height="56" rx="6" fill="#fffdf6" stroke="#262320" stroke-width="1.4"/>
+          <text x="80" y="64" text-anchor="middle" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="15" fill="#262320">environment</text>
+          <text x="80" y="82" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#94a3b8">snake_env.py</text>
+        </g>
+
+        <!-- STATE -->
+        <g>
+          <rect x="180" y="40" width="120" height="56" rx="6" fill="#fffdf6" stroke="#7a1f24" stroke-width="1.4"/>
+          <text x="240" y="64" text-anchor="middle" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="15" fill="#7a1f24">state s</text>
+          <text x="240" y="82" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#94a3b8">24-dim vector</text>
+        </g>
+
+        <!-- AGENT (epsilon-greedy) -->
+        <g>
+          <rect x="340" y="40" width="160" height="56" rx="6" fill="#fffdf6" stroke="#7a1f24" stroke-width="1.4"/>
+          <text x="420" y="62" text-anchor="middle" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="15" fill="#7a1f24">ε-greedy policy</text>
+          <text x="420" y="80" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#94a3b8">argmax Q(s,·) or random</text>
+        </g>
+
+        <!-- ACTION arrow back into env -->
+        <g>
+          <rect x="540" y="40" width="160" height="56" rx="6" fill="#fffdf6" stroke="#262320" stroke-width="1.4"/>
+          <text x="620" y="60" text-anchor="middle" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="15" fill="#262320">env.step(a)</text>
+          <text x="620" y="78" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#94a3b8">→ r, s′, done</text>
+        </g>
+
+        <!-- Top arrows -->
+        <g stroke="#566068" stroke-width="1.2" fill="none" marker-end="url(#train-arrow)">
+          <line x1="140" y1="68" x2="178" y2="68"/>
+          <line x1="300" y1="68" x2="338" y2="68"/>
+          <line x1="500" y1="68" x2="538" y2="68"/>
+        </g>
+
+        <!-- Down arrow from env.step to replay buffer -->
+        <g stroke="#566068" stroke-width="1.2" fill="none" marker-end="url(#train-arrow)">
+          <path d="M620,96 L620,150"/>
+        </g>
+        <text x="630" y="125" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="11" fill="#566068">push (s, a, r, s′)</text>
+
+        <!-- REPLAY BUFFER -->
+        <g>
+          <rect x="500" y="150" width="200" height="60" rx="6" fill="rgba(207,198,179,0.35)" stroke="#262320" stroke-width="1.4"/>
+          <text x="600" y="173" text-anchor="middle" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="15" fill="#262320">replay buffer</text>
+          <text x="600" y="192" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#94a3b8">deque of past transitions</text>
+        </g>
+
+        <!-- Sample minibatch arrow -->
+        <g stroke="#566068" stroke-width="1.2" fill="none" marker-end="url(#train-arrow)">
+          <line x1="500" y1="180" x2="340" y2="180"/>
+        </g>
+        <text x="420" y="172" text-anchor="middle" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="11" fill="#566068">sample 64 random</text>
+
+        <!-- BELLMAN TARGET -->
+        <g>
+          <rect x="180" y="150" width="160" height="60" rx="6" fill="#fffdf6" stroke="#7a1f24" stroke-width="1.4"/>
+          <text x="260" y="172" text-anchor="middle" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="14" fill="#7a1f24">Bellman target</text>
+          <text x="260" y="192" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#94a3b8">y = r + γ · max Q′(s′,·)</text>
+        </g>
+
+        <!-- LOSS + BACKPROP -->
+        <g>
+          <rect x="20" y="150" width="140" height="60" rx="6" fill="#fffdf6" stroke="#262320" stroke-width="1.4"/>
+          <text x="90" y="172" text-anchor="middle" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="14" fill="#262320">loss + backprop</text>
+          <text x="90" y="192" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#94a3b8">Huber( Q(s,a), y )</text>
+        </g>
+
+        <!-- Arrow target → loss -->
+        <g stroke="#566068" stroke-width="1.2" fill="none" marker-end="url(#train-arrow)">
+          <line x1="180" y1="180" x2="160" y2="180"/>
+        </g>
+
+        <!-- Arrow loss → agent (gradient update) -->
+        <g stroke="#7a1f24" stroke-width="1.4" fill="none" marker-end="url(#train-arrow)" stroke-dasharray="4 3">
+          <path d="M90,150 Q 90,120 240,98"/>
+          <path d="M260,150 Q 280,120 420,98"/>
+        </g>
+        <text x="170" y="125" text-anchor="middle" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="11" fill="#7a1f24">gradient update on θ</text>
+
+        <!-- Phase labels -->
+        <text x="370" y="20" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="600" fill="#566068" letter-spacing="0.08em">ACT (online, every step)</text>
+        <text x="360" y="240" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="600" fill="#7a1f24" letter-spacing="0.08em">LEARN (offline, every step)</text>
+
+        <!-- Soft target update note -->
+        <g transform="translate(20, 270)">
+          <rect x="0" y="0" width="680" height="68" fill="rgba(207,198,179,0.25)" stroke="#cfc6b3" stroke-width="0.8" rx="4"/>
+          <text x="14" y="22" font-family="JetBrains Mono, monospace" font-size="10" font-weight="600" fill="#7a1f24" letter-spacing="0.06em">TWO NETWORKS</text>
+          <text x="14" y="42" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="13" fill="#262320">Q (online) is the one being trained. Q′ (target) is a slow-moving copy used only to compute the Bellman target —</text>
+          <text x="14" y="58" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="13" fill="#262320">it's nudged toward Q with a soft update (τ = 0.005) every step. This decoupling keeps the target from chasing itself.</text>
+        </g>
+      </svg>
+      <figcaption>Every frame the agent both <em>acts</em> (top row) and <em>learns</em> (bottom row). Acting is fast: state in, action out. Learning samples the past — a random batch of 64 transitions from the replay buffer — and pushes the network's prediction one small step toward the Bellman target.</figcaption>
+    </figure>
+
+    <p>The two pieces that do the actual work are the replay buffer sample and the loss computation. They're short:</p>
+
+    <pre class="codeblock"><code><span class="ck-comment"># snake_dqn/agent.py — one training step (annotated)</span>
+<span class="ck-cmd">def</span> learn(self):
+    <span class="ck-comment"># 1. Pull a random minibatch of past experiences.</span>
+    <span class="ck-comment">#    Random sampling breaks the temporal correlation between consecutive frames,</span>
+    <span class="ck-comment">#    which would otherwise destabilize gradient descent.</span>
+    batch = self.replay.sample(<span class="ck-str">64</span>)
+    s, a, r, s_next, done = batch
+
+    <span class="ck-comment"># 2. What the network currently thinks Q(s, a) is, for the action we took.</span>
+    q_pred = self.online(s).gather(<span class="ck-str">1</span>, a.unsqueeze(<span class="ck-str">1</span>)).squeeze(<span class="ck-str">1</span>)
+
+    <span class="ck-comment"># 3. The Bellman target — what Q(s, a) *should* be, given what happened next.</span>
+    <span class="ck-comment">#    Double-DQN trick: pick the next action with the online net, evaluate it</span>
+    <span class="ck-comment">#    with the target net. Reduces the overestimation bias of vanilla DQN.</span>
+    <span class="ck-cmd">with</span> torch.no_grad():
+        a_next  = self.online(s_next).argmax(dim=<span class="ck-str">1</span>)
+        q_next  = self.target(s_next).gather(<span class="ck-str">1</span>, a_next.unsqueeze(<span class="ck-str">1</span>)).squeeze(<span class="ck-str">1</span>)
+        y       = r + self.gamma * q_next * (<span class="ck-str">1</span> - done)   <span class="ck-comment"># zero out future term on terminal steps</span>
+
+    <span class="ck-comment"># 4. Huber loss is MSE-like for small errors, MAE-like for big ones — robust to outliers.</span>
+    loss = F.smooth_l1_loss(q_pred, y)
+
+    <span class="ck-comment"># 5. Standard PyTorch update, with gradient clipping to keep things stable.</span>
+    self.optimizer.zero_grad()
+    loss.backward()
+    nn.utils.clip_grad_norm_(self.online.parameters(), max_norm=<span class="ck-str">1.0</span>)
+    self.optimizer.step()
+
+    <span class="ck-comment"># 6. Soft-update the target network: a slow exponential moving average of the online weights.</span>
+    <span class="ck-cmd">for</span> p_t, p_o <span class="ck-cmd">in</span> zip(self.target.parameters(), self.online.parameters()):
+        p_t.data.copy_(self.tau * p_o.data + (<span class="ck-str">1</span> - self.tau) * p_t.data)</code></pre>
+
+    <p>That's the entire learning algorithm. Six numbered steps, repeated tens of thousands of times.</p>
 
     <figure class="svg-figure">
       <svg viewBox="0 0 680 340" width="100%" role="img" aria-label="Training curve showing score improving over 2000 episodes, with peak near 75 and average around 44">
@@ -402,7 +677,7 @@
         <text x="355" y="310" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068">episode</text>
 
         <!-- Raw score scatter (approximate noisy individual episode scores) -->
-        <g fill="#67e8f9" opacity="0.55">
+        <g fill="#cfc6b3" opacity="0.85">
           <circle cx="72"  cy="228" r="1.6"/><circle cx="88"  cy="226" r="1.6"/><circle cx="104" cy="222" r="1.6"/>
           <circle cx="120" cy="224" r="1.6"/><circle cx="136" cy="220" r="1.6"/><circle cx="152" cy="218" r="1.6"/>
           <circle cx="168" cy="214" r="1.6"/><circle cx="184" cy="210" r="1.6"/><circle cx="200" cy="204" r="1.6"/>
@@ -419,19 +694,19 @@
 
         <!-- Rolling-mean curve -->
         <path d="M60,228 C 160,220 220,200 290,178 S 420,138 500,120 T 650,108"
-              stroke="#0891b2" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+              stroke="#7a1f24" stroke-width="2.2" fill="none" stroke-linecap="round"/>
 
         <!-- Peak marker -->
-        <circle cx="616" cy="84" r="4" fill="#d97706"/>
-        <line x1="616" y1="84" x2="616" y2="60" stroke="#d97706" stroke-width="1" stroke-dasharray="2 2"/>
-        <text x="616" y="55" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="600" fill="#d97706">peak: 75</text>
+        <circle cx="616" cy="84" r="4" fill="#7a1f24"/>
+        <line x1="616" y1="84" x2="616" y2="60" stroke="#7a1f24" stroke-width="1" stroke-dasharray="2 2"/>
+        <text x="616" y="55" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="600" fill="#7a1f24">peak: 75</text>
 
         <!-- Average marker -->
-        <line x1="500" y1="132" x2="640" y2="132" stroke="#059669" stroke-width="1.2" stroke-dasharray="4 3"/>
-        <text x="645" y="130" font-family="JetBrains Mono, monospace" font-size="10" font-weight="600" fill="#059669">~44 avg</text>
+        <line x1="500" y1="132" x2="640" y2="132" stroke="#262320" stroke-width="1.2" stroke-dasharray="4 3"/>
+        <text x="645" y="130" font-family="JetBrains Mono, monospace" font-size="10" font-weight="600" fill="#262320">~44 avg</text>
 
         <!-- Title / caption row -->
-        <text x="60" y="24" font-family="Syne, sans-serif" font-size="12" font-weight="700" fill="#111827">Score per episode — 2000 episodes</text>
+        <text x="60" y="24" font-family="JetBrains Mono, monospace" font-size="11" font-weight="600" fill="#262320" letter-spacing="0.06em">SCORE PER EPISODE — 2000 EPISODES</text>
       </svg>
       <figcaption>A rough sketch of a training run. Score climbs fast through the first few hundred episodes as epsilon decays, then the rolling average settles in the mid-forties.</figcaption>
     </figure>
@@ -525,7 +800,7 @@
 
   </article>
 
-<div class="measure">
+<div class="wrap">
   <nav class="post-nav">
     <a href="index.html"><span class="label">archive</span>← all posts</a>
     <a class="next" href="finetuning.html"><span class="label">read next</span>Stop Wrestling with Boilerplate →</a>

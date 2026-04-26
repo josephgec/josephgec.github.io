@@ -65,10 +65,14 @@
   }
 
   const state = {
+    // Default landing state: a small, legible 2 → 4 → 2 net with seed=3 — one sample
+    // already in "backward-done" phase so the user sees the colored gradient edges,
+    // the chain-rule equation, and local derivatives on first load. Pressing Forward →
+    // Backward replays the animation; Train continuously starts learning.
     net: makeNet(3),
     data: makeData(),
     pickIdx: 12,
-    phase: 'idle',
+    phase: 'backward-done',
     training: false,
     timer: null,
     epoch: 0,
@@ -85,6 +89,7 @@
   const accLabel = document.getElementById('acc-label');
   const resetBtn = document.getElementById('reset-btn');
   const lossCanvas = document.getElementById('loss-canvas');
+  const gradBarCanvas = document.getElementById('grad-bar-canvas');
   const canvas = document.getElementById('canvas');
   const decisionCanvas = document.getElementById('decision-canvas');
   const captionEl = document.getElementById('caption');
@@ -104,7 +109,9 @@
   // Step animation
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   animBtn.addEventListener('click', async () => {
-    if (state.phase !== 'idle') return;
+    // Allow re-running from any "settled" phase (idle or the post-backward freeze-frame
+    // we use as the default landing state). Block only mid-animation phases.
+    if (state.phase !== 'idle' && state.phase !== 'backward-done') return;
     const sample = state.data[state.pickIdx % state.data.length];
     const fwd = forward(state.net, [sample.x, sample.y]);
     const grads = backprop(state.net, fwd, sample.label);
@@ -166,8 +173,27 @@
     const showFwd = ['forward', 'forward-done', 'backward', 'backward-done'].includes(state.phase);
     const showBwd = state.phase === 'backward' || state.phase === 'backward-done';
 
-    function drawConns(fromIdx, toIdx, W, dW) {
+    // Identify the largest-magnitude gradient on each layer — only these get a label
+    // so the diagram doesn't get cluttered.
+    function topGradEdges(dW, count) {
+      const flat = [];
+      for (let i = 0; i < dW.length; i++) {
+        for (let j = 0; j < dW[i].length; j++) {
+          flat.push({ i, j, mag: Math.abs(dW[i][j]) });
+        }
+      }
+      flat.sort((a, b) => b.mag - a.mag);
+      const set = new Set();
+      flat.slice(0, count).forEach((e) => set.add(`${e.i},${e.j}`));
+      return set;
+    }
+
+    function drawConns(fromIdx, toIdx, W, dW, labelSet) {
       const fromCol = cols[fromIdx], toCol = cols[toIdx];
+      // Forward-glow particles travel in the [forward, forward-done] phases;
+      // backward-glow particles travel during [backward, backward-done].
+      const fwdActive = state.phase === 'forward';
+      const bwdActive = state.phase === 'backward';
       for (let i = 0; i < toCol.n; i++) {
         for (let j = 0; j < fromCol.n; j++) {
           const w = W[i][j], dw = dW[i][j];
@@ -176,6 +202,7 @@
           let stroke;
           if (showBwd) {
             const gmag = Math.min(1, Math.abs(dw) * 4);
+            // -dw > 0 means the weight will INCREASE → orange/accent
             stroke = -dw > 0
               ? `rgba(122,31,36,${0.2 + gmag * 0.7})`
               : `rgba(58,107,94,${0.2 + gmag * 0.7})`;
@@ -188,12 +215,49 @@
           ctx.beginPath();
           ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
           ctx.stroke();
+
+          // Forward edge glow (left-to-right, accent dot)
+          if (fwdActive) {
+            const t = (Date.now() % 900) / 900;
+            const px = x1 + (x2 - x1) * t, py = y1 + (y2 - y1) * t;
+            ctx.fillStyle = 'rgba(122,31,36,0.85)';
+            ctx.beginPath();
+            ctx.arc(px, py, 2.5 + Math.abs(w) * 1.0, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          // Backward edge glow (right-to-left, green dot)
+          if (bwdActive) {
+            const t = (Date.now() % 900) / 900;
+            const px = x2 + (x1 - x2) * t, py = y2 + (y1 - y2) * t;
+            ctx.fillStyle = 'rgba(58,107,94,0.85)';
+            ctx.beginPath();
+            ctx.arc(px, py, 2.5 + Math.abs(dw) * 4, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+          // Numerical gradient label on TOP-K edges during backward phase.
+          if (showBwd && labelSet && labelSet.has(`${i},${j}`)) {
+            const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+            // Tiny rounded background so number is readable atop the line
+            ctx.font = '10px "JetBrains Mono", monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            const txt = (dw >= 0 ? '+' : '') + dw.toFixed(2);
+            const tw = ctx.measureText(txt).width + 6;
+            ctx.fillStyle = 'rgba(255,253,246,0.92)';
+            ctx.fillRect(mx - tw / 2, my - 7, tw, 13);
+            ctx.fillStyle = -dw > 0 ? '#7a1f24' : '#3a6b5e';
+            ctx.fillText(txt, mx, my);
+          }
         }
       }
     }
 
-    drawConns(0, 1, state.net.W1, grads.dW1);
-    drawConns(1, 2, state.net.W2, grads.dW2);
+    // Show top-3 gradient labels per layer when in backward phase
+    const lab1 = showBwd ? topGradEdges(grads.dW1, 3) : null;
+    const lab2 = showBwd ? topGradEdges(grads.dW2, 3) : null;
+    drawConns(0, 1, state.net.W1, grads.dW1, lab1);
+    drawConns(1, 2, state.net.W2, grads.dW2, lab2);
 
     // Neurons
     for (let ci = 0; ci < cols.length; ci++) {
@@ -231,6 +295,18 @@
           ctx.textBaseline = 'middle';
           ctx.fillText(formatNum(v), x, y);
         }
+
+        // Show local derivative ƒ'(z) on each hidden neuron during backward.
+        // Hidden layer uses tanh, so ƒ'(z) = 1 - tanh²(z) = 1 - a².
+        // Output uses softmax (no per-neuron derivative); skip.
+        if (showBwd && ci === 1) {
+          const fp = 1 - fwd.a1[i] * fwd.a1[i];
+          ctx.fillStyle = '#3a6b5e';
+          ctx.font = 'italic 10px "Source Serif 4", Georgia, serif';
+          ctx.textAlign = 'left';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(`ƒ'(z) = ${fp.toFixed(2)}`, x + 30, y);
+        }
       }
       ctx.fillStyle = INK_FADE;
       ctx.font = '11px "Source Serif 4", Georgia, serif';
@@ -266,6 +342,81 @@
     } else if (state.phase === 'backward' || state.phase === 'backward-done') {
       ctx.fillStyle = '#3a6b5e';
       ctx.fillText('← backward', size.w / 2, 24);
+    }
+
+    // Prominent chain-rule equation during backward phase (bottom of canvas).
+    if (showBwd) {
+      const eqY = size.h - 20;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      // Equation
+      ctx.font = 'italic 14px "Source Serif 4", Georgia, serif';
+      // Compose with colored spans by drawing manually.
+      const parts = [
+        { txt: '∂L/∂wᵢⱼ', color: '#262320' },
+        { txt: ' = ', color: '#262320' },
+        { txt: '∂L/∂outⱼ', color: '#3a6b5e' },
+        { txt: ' · ', color: '#262320' },
+        { txt: "ƒ'(zⱼ)", color: '#7a1f24' },
+        { txt: ' · ', color: '#262320' },
+        { txt: 'xᵢ', color: '#262320' },
+      ];
+      let totalW = 0;
+      parts.forEach((p) => { totalW += ctx.measureText(p.txt).width; });
+      let cx = size.w / 2 - totalW / 2;
+      parts.forEach((p) => {
+        ctx.fillStyle = p.color;
+        ctx.textAlign = 'left';
+        ctx.fillText(p.txt, cx, eqY);
+        cx += ctx.measureText(p.txt).width;
+      });
+    }
+
+    // "Biggest blame" annotation: pin a small label to the single edge with the largest
+    // |∂L/∂w|. Helps the eye lock on which connection matters most this step.
+    if (showBwd) {
+      let bigI = 0, bigJ = 0, bigLayer = 1, bigMag = 0, bigDw = 0;
+      [grads.dW1, grads.dW2].forEach((dW, layer) => {
+        for (let i = 0; i < dW.length; i++) {
+          for (let j = 0; j < dW[i].length; j++) {
+            const m = Math.abs(dW[i][j]);
+            if (m > bigMag) {
+              bigMag = m; bigI = i; bigJ = j; bigDw = dW[i][j]; bigLayer = layer + 1;
+            }
+          }
+        }
+      });
+      if (bigMag > 0.0001) {
+        const fromCol = cols[bigLayer - 1], toCol = cols[bigLayer];
+        const x1 = fromCol.x + 24, y1 = colY(fromCol.n, bigJ);
+        const x2 = toCol.x - 24,   y2 = colY(toCol.n, bigI);
+        const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+        // Connector
+        ctx.strokeStyle = 'rgba(122,31,36,0.55)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(mx, my);
+        ctx.lineTo(mx + 18, my - 22);
+        ctx.stroke();
+        // Tag
+        const tag = 'biggest blame';
+        ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+        const tw = ctx.measureText(tag).width + 12;
+        ctx.fillStyle = 'rgba(255,253,246,0.94)';
+        ctx.strokeStyle = 'rgba(122,31,36,0.55)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.rect(mx + 18, my - 32, tw, 16);
+        ctx.fill(); ctx.stroke();
+        ctx.fillStyle = ACCENT;
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(tag, mx + 18 + tw / 2, my - 24);
+      }
+    }
+
+    // Animate during forward / backward phases — schedule one more frame.
+    if (state.phase === 'forward' || state.phase === 'backward') {
+      requestAnimationFrame(() => canvasCtl.redraw());
     }
   }
 
@@ -310,6 +461,62 @@
     ctx.beginPath();
     ctx.arc(tx(sample.x), ty(sample.y), 9, 0, Math.PI * 2);
     ctx.stroke();
+  }
+
+  // ───────── Gradient bar chart (top weight updates) ─────────
+  function drawGradBars() {
+    const cv = gradBarCanvas;
+    if (!cv) return;
+    const dpr = window.devicePixelRatio || 1;
+    const r = cv.parentElement.getBoundingClientRect();
+    const W = r.width, H = 130;
+    cv.width = W * dpr; cv.height = H * dpr;
+    cv.style.width = W + 'px'; cv.style.height = H + 'px';
+    const ctx = cv.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+
+    const sample = state.data[state.pickIdx % state.data.length];
+    const fwd = forward(state.net, [sample.x, sample.y]);
+    const grads = backprop(state.net, fwd, sample.label);
+
+    // Flatten all weight gradients with labels
+    const all = [];
+    for (let i = 0; i < grads.dW1.length; i++) {
+      for (let j = 0; j < grads.dW1[i].length; j++) {
+        all.push({ name: `W¹[${i}][${j}]`, val: grads.dW1[i][j] });
+      }
+    }
+    for (let i = 0; i < grads.dW2.length; i++) {
+      for (let j = 0; j < grads.dW2[i].length; j++) {
+        all.push({ name: `W²[${i}][${j}]`, val: grads.dW2[i][j] });
+      }
+    }
+    all.sort((a, b) => Math.abs(b.val) - Math.abs(a.val));
+    const top = all.slice(0, 6);
+    const max = Math.max(0.001, ...top.map((t) => Math.abs(t.val)));
+
+    const padL = 60, padR = 8, padT = 4, padB = 12;
+    const rowH = (H - padT - padB) / top.length;
+    top.forEach((t, i) => {
+      const y = padT + i * rowH;
+      // Label
+      ctx.fillStyle = '#262320';
+      ctx.font = '10px "JetBrains Mono", monospace';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(t.name, 2, y + rowH / 2);
+      // Bar
+      const bw = (Math.abs(t.val) / max) * (W - padL - padR);
+      // Color = direction the weight is going (-grad > 0 => increase => accent).
+      ctx.fillStyle = -t.val > 0 ? 'rgba(122,31,36,0.75)' : 'rgba(58,107,94,0.75)';
+      ctx.fillRect(padL, y + 3, bw, rowH - 6);
+      // Value at end
+      ctx.fillStyle = '#262320';
+      ctx.font = '10px "JetBrains Mono", monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText((t.val >= 0 ? '+' : '') + t.val.toFixed(3), padL + bw + 4, y + rowH / 2);
+    });
   }
 
   // ───────── Loss curve ─────────
@@ -378,10 +585,14 @@
     canvasCtl.redraw();
     drawDecision();
     drawLossCurve();
+    drawGradBars();
   }
 
-  // Resize handling for the secondary canvases (loss + decision).
-  new ResizeObserver(() => { drawDecision(); drawLossCurve(); }).observe(decisionCanvas.parentElement);
+  // Resize handling for the secondary canvases (loss + decision + grad-bars).
+  new ResizeObserver(() => { drawDecision(); drawLossCurve(); drawGradBars(); }).observe(decisionCanvas.parentElement);
+  if (gradBarCanvas) {
+    new ResizeObserver(() => drawGradBars()).observe(gradBarCanvas.parentElement);
+  }
 
   render();
 })();

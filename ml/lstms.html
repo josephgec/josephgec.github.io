@@ -64,6 +64,7 @@
       <div class="ml-rail-label">Sequence</div>
       <input id="seq-input" type="text" value="abracadabra" maxlength="14"
              style="width:100%; padding:8px; font-family:var(--mono); font-size:14px; border:1px solid var(--rule); background:var(--paper)" />
+      <div style="font-family:var(--mono); font-size:10px; color:var(--ml-ink-fade); margin-top:6px">chars: a b r c d · space</div>
 
       <div class="ml-rail-label" style="margin-top: 24px">Step</div>
       <input id="step-slider" type="range" min="0" max="11" step="1" value="11" style="width:100%; accent-color:var(--accent)" />
@@ -74,26 +75,46 @@
         <button id="seed-btn" class="ml-sbtn ghost" style="padding:10px 14px; font-family:var(--serif); font-style:italic; font-size:13px">↻</button>
       </div>
 
+      <div class="ml-rail-label" style="margin-top: 24px">Compare</div>
+      <div class="ml-presets" id="compare-toggles"></div>
+
       <div class="ml-rail-label" style="margin-top: 24px">Force gate</div>
       <div class="ml-presets" id="gate-toggles"></div>
     </aside>
 
     <div class="ml-canvas-wrap">
+      <div class="ml-mode-tabs" id="view-tabs"></div>
       <div class="ml-canvas-frame" style="aspect-ratio: 1.5 / 1; padding: 24px">
         <canvas id="canvas"></canvas>
       </div>
-      <div class="ml-caption">
+      <div class="ml-caption" id="caption">
         <span class="ml-cap-num">·</span>
-        Top to bottom: forget gate <em>f</em>, input gate <em>i</em>, output gate <em>o</em>, cell state <em>c</em>, and hidden state <em>h</em>. Each row is one timestep across columns. Notice how the cell state changes more slowly than the hidden state — that's the memory channel staying intact while the working state shifts.
+        <span id="caption-text">The cell-state bus runs across the top — a near-linear conveyor belt for memory. Three sigmoid valves pinch or open it: <em>forget</em> (multiplies the bus), <em>input</em> (gates new candidate memory before it merges), <em>output</em> (gates what leaves as h_t). Each valve's openness is a learned function of the current input and previous hidden state.</span>
       </div>
     </div>
 
     <aside class="right-rail">
       <div class="ml-margin">
         <div class="ml-margin-rule"></div>
+        <div class="ml-margin-h">Before this</div>
+        <p>Vanilla RNNs forgot in 5–10 steps because gradients vanish (or explode) when multiplied through a long chain of tanh derivatives. Hochreiter &amp; Schmidhuber (1997) added a separate cell-state "highway" with three sigmoid gates. The cell state's <em>additive</em> update — instead of multiplicative — lets gradients flow back hundreds of steps. The first practical recipe for long sequences.</p>
+        <div class="ml-margin-rule thin"></div>
         <div class="ml-margin-h">The LSTM equations</div>
-        <div class="ml-equation" style="font-size:13px">f<sub>t</sub> = σ(W<sub>f</sub>·[h, x] + b<sub>f</sub>)<br />i<sub>t</sub> = σ(W<sub>i</sub>·[h, x] + b<sub>i</sub>)<br />c<sub>t</sub> = f·c + i·tanh(W<sub>c</sub>·[h, x])<br />h<sub>t</sub> = o · tanh(c)</div>
-        <p class="quiet">Three gates, all sigmoid. The cell state is a near-linear path through time — that's what saves the gradient.</p>
+        <div class="ml-equation" style="font-size:13px">f<sub>t</sub> = σ(W<sub>f</sub>·[h<sub>t−1</sub>, x<sub>t</sub>] + b<sub>f</sub>)<br />i<sub>t</sub> = σ(W<sub>i</sub>·[h<sub>t−1</sub>, x<sub>t</sub>] + b<sub>i</sub>)<br />o<sub>t</sub> = σ(W<sub>o</sub>·[h<sub>t−1</sub>, x<sub>t</sub>] + b<sub>o</sub>)<br />c̃<sub>t</sub> = tanh(W<sub>c</sub>·[h<sub>t−1</sub>, x<sub>t</sub>] + b<sub>c</sub>)<br />c<sub>t</sub> = f<sub>t</sub> ⊙ c<sub>t−1</sub> + i<sub>t</sub> ⊙ c̃<sub>t</sub><br />h<sub>t</sub> = o<sub>t</sub> ⊙ tanh(c<sub>t</sub>)</div>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Reading the symbols</div>
+        <p class="quiet"><b>σ</b> (sigma) is the sigmoid: squashes a real number into (0, 1). Used for gates because a gate is "how open" — a fraction.</p>
+        <p class="quiet"><b>tanh</b> squashes into (−1, +1). Used to produce signed candidate values added to the cell state.</p>
+        <p class="quiet"><b>⊙</b> is element-wise (Hadamard) product: each gate value scales its matching cell-state slot independently.</p>
+        <p class="quiet"><b>[h<sub>t−1</sub>, x<sub>t</sub>]</b> means concatenation: stack the previous hidden state with the current input into one long vector before multiplying.</p>
+        <p class="quiet"><b>W<sub>f</sub>, W<sub>i</sub>, W<sub>o</sub>, W<sub>c</sub></b> are the learned weight matrices (one per gate plus one for candidate); <b>b</b> are biases.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Gate-by-gate, in English</div>
+        <p class="quiet"><b>f<sub>t</sub> (forget):</b> for each cell-state slot, how much of the old memory to keep (1 = keep all, 0 = wipe).</p>
+        <p class="quiet"><b>i<sub>t</sub> (input):</b> how much of the new candidate to write into each slot.</p>
+        <p class="quiet"><b>c̃<sub>t</sub> (candidate):</b> the new content proposed for the cell state — a tanh-bounded vector.</p>
+        <p class="quiet"><b>o<sub>t</sub> (output):</b> how much of the cell state to expose as this step's hidden output.</p>
+        <p class="quiet"><b>c<sub>t</sub> (cell state):</b> the long-term memory bus. Its update is mostly addition, not multiplication — that's what saves the gradient.</p>
         <div class="ml-margin-rule thin"></div>
         <div class="ml-margin-h sm">GRU</div>
         <p class="quiet">A two-gate simplification. Update gate replaces forget+input; reset gate scales the recurrent context. Often faster and almost as good.</p>

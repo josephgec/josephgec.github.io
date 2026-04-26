@@ -74,15 +74,14 @@
   <section class="ml-stage">
 
     <aside class="left-rail">
-      <div class="ml-rail-label">Racers</div>
-      <div id="racers" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 18px"></div>
+      <div class="ml-rail-label">Racers · per-optimizer η</div>
+      <div id="racers" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 6px"></div>
+      <p style="font-family:var(--serif); font-style:italic; font-size:12px; color:var(--ml-ink-fade); line-height:1.5; margin: 0 0 18px">
+        In practice you tune η per optimizer — Adam wants ≈10× smaller steps than Momentum on the same problem.
+      </p>
 
       <div class="ml-rail-label">Terrain</div>
       <div class="ml-presets" id="terrains"></div>
-
-      <div class="ml-rail-label" style="margin-top: 20px">Learning rate η</div>
-      <input id="lr-slider" type="range" min="0.005" max="0.3" step="0.005" value="0.08" style="width:100%; accent-color:var(--accent)" />
-      <div style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center" id="lr-label">η = 0.080</div>
 
       <div style="display:flex; gap:8px; margin-top: 18px">
         <button id="run-btn" class="ml-sbtn" style="flex:1; padding:10px 14px; font-family:var(--serif); font-style:italic; font-size:14px">▷ Race</button>
@@ -109,6 +108,11 @@
     </div>
 
     <aside class="right-rail">
+      <div class="ml-margin">
+        <div class="ml-margin-rule"></div>
+        <div class="ml-margin-h">Before this</div>
+        <p class="quiet">Before Momentum (Polyak 1964), RMSprop (Hinton 2012), and Adam (Kingma &amp; Ba 2014), training was just SGD — slow and brittle in ill-conditioned landscapes. Each new optimizer fixed a specific failure: momentum for ravines, RMSprop for per-parameter scaling, Adam combining both with bias correction.</p>
+      </div>
       <div class="ml-margin" id="margin"></div>
     </aside>
 
@@ -170,7 +174,7 @@
   <footer class="ml-foot">
     <div class="line"><a href="index.html">← all entries</a> · <a href="loss-landscapes.html">XII. Loss Landscapes</a></div>
     <div class="line eq">SGD · Momentum · RMSprop · Adam</div>
-    <div class="line"></div>
+    <div class="line"><a href="mlp.html">XIV. The MLP Builder →</a></div>
   </footer>
 
 </main>

@@ -78,6 +78,7 @@
       <div class="ml-presets" id="mode-list">
         <button class="ml-preset" data-mode="1d">One variable · f(x)</button>
         <button class="ml-preset" data-mode="2d">Two variables · f(x, y)</button>
+        <button class="ml-preset" data-mode="descend">Descend · −∇f steps</button>
       </div>
 
       <div class="ml-rail-label" style="margin-top: 28px" id="func-label">Function</div>
@@ -96,9 +97,19 @@
         <input id="x-slider" type="range" min="-3" max="3" step="0.01" value="0.8" />
         <span class="step" id="x-label">x = 0.80</span>
       </div>
+      <div class="ml-iter" id="descend-controls" style="display:none">
+        <button id="descend-btn">Drop marble</button>
+        <input id="eta-slider" type="range" min="0.02" max="0.6" step="0.01" value="0.18" />
+        <span class="step" id="eta-label">η = 0.18</span>
+      </div>
     </div>
 
     <aside class="right-rail">
+      <div class="ml-margin">
+        <div class="ml-margin-rule"></div>
+        <div class="ml-margin-h">Before this</div>
+        <p class="quiet">Before calculus formalized derivatives (Newton & Leibniz, 1670s), optimization was guesswork or pure-geometric arguments. The gradient — the multivariable derivative — became the universal tool for "which way is uphill?" Every learning algorithm since (least-squares, logistic regression, neural net training) is some form of "follow the negative gradient."</p>
+      </div>
       <div class="ml-margin" id="margin"></div>
     </aside>
 

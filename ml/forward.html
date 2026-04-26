@@ -107,13 +107,62 @@
     <aside class="right-rail">
       <div class="ml-margin">
         <div class="ml-margin-rule"></div>
-        <div class="ml-margin-h">The math</div>
-        <div class="ml-equation" style="font-size: 14px">a⁽ˡ⁾ = ƒ(W⁽ˡ⁾ a⁽ˡ⁻¹⁾ + b⁽ˡ⁾)</div>
-        <p>Each layer takes the previous activations, applies a linear map, shifts by a bias, and bends through a nonlinearity ƒ.</p>
-        <p class="quiet">Without the nonlinearity, stacking layers would be pointless: a chain of matrix multiplies is just one matrix multiply.</p>
+        <div class="ml-margin-h">Before this</div>
+        <p class="quiet">Before networks, function approximation needed hand-designed feature pipelines — domain experts crafting inputs by hand for every new task. The forward pass formalized "stack many simple operations and the composition will be expressive enough." Hornik (1989) made it a theorem: a network like the one on the right can approximate any continuous function.</p>
         <div class="ml-margin-rule thin"></div>
-        <div class="ml-margin-h sm">Output</div>
-        <p class="quiet">Softmax turns the final scores into a probability distribution — the network's vote for which class.</p>
+        <div class="ml-margin-h">The recipe — one layer</div>
+        <svg viewBox="0 0 220 90" style="width:100%; height:auto; margin: 6px 0 8px" aria-hidden="true">
+          <!-- input -->
+          <rect x="2"   y="35" width="32" height="20" fill="none" stroke="#262320" stroke-width="1"/>
+          <text x="18"  y="49" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#262320">a⁽ˡ⁻¹⁾</text>
+          <!-- linear map W·a -->
+          <rect x="42"  y="30" width="36" height="30" fill="rgba(122,31,36,0.10)" stroke="#7a1f24" stroke-width="1"/>
+          <text x="60"  y="46" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="11" fill="#7a1f24">W·a</text>
+          <text x="60"  y="74" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="rgba(38,35,32,0.6)">linear</text>
+          <!-- bias add -->
+          <rect x="86"  y="30" width="34" height="30" fill="none" stroke="#262320" stroke-width="1"/>
+          <text x="103" y="48" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#262320">+ b</text>
+          <text x="103" y="74" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="rgba(38,35,32,0.6)">shift</text>
+          <!-- nonlinearity -->
+          <rect x="128" y="30" width="38" height="30" fill="none" stroke="#262320" stroke-width="1"/>
+          <text x="147" y="49" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="13" fill="#262320">ƒ( · )</text>
+          <text x="147" y="74" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="rgba(38,35,32,0.6)">bend</text>
+          <!-- output -->
+          <rect x="178" y="35" width="36" height="20" fill="none" stroke="#262320" stroke-width="1"/>
+          <text x="196" y="49" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#262320">a⁽ˡ⁾</text>
+          <!-- arrows -->
+          <line x1="34"  y1="45" x2="42"  y2="45" stroke="#262320" stroke-width="1" marker-end="url(#aarr)"/>
+          <line x1="78"  y1="45" x2="86"  y2="45" stroke="#262320" stroke-width="1" marker-end="url(#aarr)"/>
+          <line x1="120" y1="45" x2="128" y2="45" stroke="#262320" stroke-width="1" marker-end="url(#aarr)"/>
+          <line x1="166" y1="45" x2="178" y2="45" stroke="#262320" stroke-width="1" marker-end="url(#aarr)"/>
+          <defs>
+            <marker id="aarr" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="#262320"/>
+            </marker>
+          </defs>
+        </svg>
+        <div class="ml-equation" style="font-size: 13px">a⁽ˡ⁾ = ƒ(W⁽ˡ⁾ a⁽ˡ⁻¹⁾ + b⁽ˡ⁾)</div>
+        <p class="quiet">Linear map, shift, bend. Repeat. Without the bend, a chain of matrix multiplies would collapse to one matrix multiply.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Legend</div>
+        <div style="display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:11px; color:var(--ml-ink-fade); margin-bottom:4px">
+          <span style="width:14px; height:2px; background:#7a1f24; display:inline-block"></span>
+          <span>positive weight</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:11px; color:var(--ml-ink-fade); margin-bottom:4px">
+          <span style="width:14px; height:2px; background:#262320; display:inline-block"></span>
+          <span>negative weight</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:11px; color:var(--ml-ink-fade)">
+          <span style="width:10px; height:10px; background:rgba(122,31,36,0.85); display:inline-block; border-radius:50%"></span>
+          <span>fill = activation magnitude</span>
+        </div>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Symbols, plainly</div>
+        <p class="quiet"><b>a⁽ˡ⁾</b> = the activations of layer <em>ℓ</em> (a vector of neuron outputs); the superscript is just an index, not an exponent. <b>W⁽ˡ⁾</b> = that layer's weight matrix; <b>b⁽ˡ⁾</b> = its bias vector. <b>ƒ</b> = the activation function (here tanh in hidden layers, softmax at the output). <b>ŷ</b> ("y-hat") = the prediction. The whole equation reads: take the previous layer's outputs, multiply by this layer's weights, add a bias, then bend.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Logits → probabilities</div>
+        <p class="quiet">Softmax turns the final raw scores (<em>logits</em> — pre-softmax linear outputs, can be any real number) into a probability distribution that sums to 1.</p>
         <div class="ml-readout" id="prob-readout" style="margin-top: 14px"></div>
       </div>
     </aside>

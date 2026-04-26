@@ -94,11 +94,107 @@
   </header>
 
   <div class="post-body">
+    <aside class="nb-pullquote" style="border-left-color: var(--accent); margin-top: 0;">
+      <div style="font-family: var(--mono); font-size: 11px; color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 10px; font-style: normal;">Before this</div>
+      <p style="margin: 0; font-style: italic;">In 2020 a "fine-tune" meant updating every weight of a model. A 7B parameter model is 14 GB just for weights in fp16, and the optimizer state for full fine-tuning needs another two-to-four times that — comfortably 60 GB+ of VRAM, which meant multi-GPU clusters and a weekend of plumbing. <strong>LoRA</strong> (2021) cut the trainable parameters by 1000x, and <strong>QLoRA</strong> (2023) made the frozen base 4-bit, putting 7B fine-tunes on a single 24 GB consumer card. The remaining problem was the code: even with LoRA available, a working training loop required wiring together HuggingFace Transformers, PEFT, bitsandbytes, accelerate, and a custom optimizer — typically 300+ lines before a single gradient flowed. <strong>Tinker</strong> (2025) showed that the right surface area was much smaller: four primitives. Local Tinker brings that shape to your own GPU.</p>
+    </aside>
+
     <p>The boilerplate for local fine-tuning is a lot. Wire up HuggingFace Transformers, bolt on PEFT for LoRA, pick a tokenizer, manage your own gradient accumulation, configure mixed-precision training, fight with bitsandbytes quantization flags, handle checkpointing, and hope your VRAM math was right. By the time the actual training loop runs, you've written three hundred lines of glue code that have nothing to do with your experiment.</p>
 
     <p><a href="https://github.com/josephgec/finetuning" target="_blank" rel="noopener noreferrer">Local Tinker</a> is an attempt to collapse all of that into four primitives. It's a high-level, Tinker-style API for LoRA fine-tuning of small LLMs on your own GPU. You bring the model name, the dataset, and the training loop you actually care about. Everything else — quantization, LoRA adapter attachment, optimizer state, checkpointing, memory management — is handled.</p>
 
     <p>It's designed for the <strong>1B–13B</strong> class of models: Llama-3, Qwen, Mistral, and the other open-weight families that fit on a single consumer or prosumer GPU. If you have a 3090, a 4090, an A6000, or an H100, you're in scope. If you're training a 70B model, you want something else.</p>
+
+    <h2>Five Acronyms in One Place</h2>
+    <p>This post uses a few terms that are usually defined three pages apart in three different papers. One-line intuitions, in the order they show up:</p>
+
+    <ul>
+      <li><strong>LoRA</strong> — <em>low-rank adaptation.</em> Freeze the giant pretrained weight matrix <code>W</code> and learn a tiny pair of skinny matrices <code>A</code> and <code>B</code> on the side; the effective weight at inference is <code>W + A·B</code>. You train ~0.1% of the original parameters and recover most of the quality.</li>
+      <li><strong>SFT</strong> — <em>supervised fine-tuning.</em> The vanilla case: show the model an input and the correct output, minimize next-token cross-entropy. This is what "fine-tune on instructions" means.</li>
+      <li><strong>DPO</strong> — <em>direct preference optimization.</em> Given pairs of (preferred, dispreferred) responses, push the model to score the preferred one higher — without ever training a separate reward model.</li>
+      <li><strong>PPO</strong> — <em>proximal policy optimization.</em> Sample completions, score them with a reward model, and nudge the policy toward higher-reward completions while clipping how far it can move per step. The workhorse of RLHF.</li>
+      <li><strong>GRPO</strong> — <em>group relative policy optimization.</em> Sample <em>several</em> completions per prompt, normalize their rewards within the group, and use that as the advantage. No separate value head; cheaper and more stable than PPO for LLMs.</li>
+    </ul>
+
+    <h2>Why Low-Rank Works</h2>
+    <p>The surprising empirical fact behind LoRA is that fine-tuning doesn't actually need much capacity. When you specialize a pretrained model — to a domain, a tone, a task — the weight changes <code>ΔW</code> that take you from "general" to "specialized" live in a very low-dimensional subspace of the full parameter space. The model already knows how to read English; you're nudging it, not rebuilding it.</p>
+
+    <p>So instead of learning a full <code>d × d</code> update matrix <code>ΔW</code> (millions of parameters per layer), LoRA factorizes it as the product of two skinny matrices: <code>ΔW = A · B</code>, where <code>A</code> is <code>d × r</code> and <code>B</code> is <code>r × d</code> with <code>r</code> typically 8–64. The math is forced to find the update inside an <code>r</code>-dimensional subspace. For a 4096-wide layer with rank 16, that's a 256x reduction in trainable parameters per layer. At inference, the original <code>W</code> stays frozen and the small <code>A·B</code> is added on top.</p>
+
+    <figure class="svg-figure">
+      <svg viewBox="0 0 680 360" width="100%" role="img" aria-label="LoRA architecture diagram: a frozen full-rank weight matrix W in parallel with a trainable low-rank A·B factorization, summed at the output">
+        <defs>
+          <marker id="arrow-lora" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6 z" fill="#566068"/>
+          </marker>
+          <marker id="arrow-lora-accent" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6 z" fill="#7a1f24"/>
+          </marker>
+        </defs>
+
+        <!-- Input -->
+        <text x="40" y="180" font-family="Source Serif 4, serif" font-style="italic" font-size="16" fill="#262320">x</text>
+        <line x1="55" y1="176" x2="120" y2="176" stroke="#566068" stroke-width="1.5" marker-end="url(#arrow-lora)"/>
+
+        <!-- Frozen W (large) -->
+        <rect x="130" y="80" width="180" height="180" rx="6" fill="#f5f3ff" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <text x="220" y="60" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="600" fill="#566068" letter-spacing="1.2">FROZEN · PRETRAINED</text>
+        <text x="220" y="170" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="42" font-weight="600" fill="#5b21b6">W</text>
+        <text x="220" y="200" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#7c3aed">d × d</text>
+        <text x="220" y="220" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068">~13B params total</text>
+        <text x="220" y="238" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068">4-bit quantized · no grads</text>
+
+        <!-- Splitter (input goes both ways) -->
+        <circle cx="120" cy="176" r="3" fill="#262320"/>
+        <line x1="120" y1="176" x2="120" y2="320" stroke="#566068" stroke-width="1.5"/>
+        <line x1="120" y1="320" x2="370" y2="320" stroke="#566068" stroke-width="1.5"/>
+
+        <!-- A matrix (skinny tall) -->
+        <rect x="370" y="290" width="40" height="60" rx="4" fill="#fffbeb" stroke="#7a1f24" stroke-width="1.8"/>
+        <text x="390" y="325" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="20" font-weight="600" fill="#7a1f24">A</text>
+        <text x="390" y="368" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#7a1f24">d × r</text>
+
+        <!-- arrow A -> B -->
+        <line x1="412" y1="320" x2="450" y2="320" stroke="#7a1f24" stroke-width="1.5" marker-end="url(#arrow-lora-accent)"/>
+
+        <!-- B matrix (squat wide) -->
+        <rect x="452" y="305" width="60" height="30" rx="4" fill="#fffbeb" stroke="#7a1f24" stroke-width="1.8"/>
+        <text x="482" y="328" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="20" font-weight="600" fill="#7a1f24">B</text>
+        <text x="482" y="356" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#7a1f24">r × d</text>
+
+        <!-- LoRA box label -->
+        <rect x="355" y="276" width="180" height="84" rx="8" fill="none" stroke="#7a1f24" stroke-width="1.2" stroke-dasharray="3 3"/>
+        <text x="540" y="290" text-anchor="start" font-family="JetBrains Mono, monospace" font-size="10" font-weight="600" fill="#7a1f24" letter-spacing="1.2">TRAINABLE</text>
+        <text x="540" y="306" text-anchor="start" font-family="JetBrains Mono, monospace" font-size="10" fill="#7a1f24">ΔW = A·B</text>
+        <text x="540" y="322" text-anchor="start" font-family="JetBrains Mono, monospace" font-size="10" fill="#7a1f24">rank r ≈ 16</text>
+        <text x="540" y="338" text-anchor="start" font-family="JetBrains Mono, monospace" font-size="10" fill="#7a1f24">~8M params</text>
+
+        <!-- W output -->
+        <line x1="310" y1="170" x2="450" y2="170" stroke="#566068" stroke-width="1.5" marker-end="url(#arrow-lora)"/>
+        <text x="380" y="160" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="13" fill="#566068">Wx</text>
+
+        <!-- B output back up -->
+        <line x1="514" y1="320" x2="560" y2="320" stroke="#7a1f24" stroke-width="1.5"/>
+        <line x1="560" y1="320" x2="560" y2="200" stroke="#7a1f24" stroke-width="1.5"/>
+        <line x1="560" y1="200" x2="500" y2="200" stroke="#7a1f24" stroke-width="1.5" marker-end="url(#arrow-lora-accent)"/>
+        <text x="535" y="190" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="13" fill="#7a1f24">ABx</text>
+
+        <!-- Sum node -->
+        <circle cx="475" cy="170" r="14" fill="#fffdf6" stroke="#262320" stroke-width="1.8"/>
+        <text x="475" y="176" text-anchor="middle" font-family="Source Serif 4, serif" font-size="20" fill="#262320">+</text>
+
+        <!-- Output -->
+        <line x1="490" y1="170" x2="630" y2="170" stroke="#566068" stroke-width="1.5" marker-end="url(#arrow-lora)"/>
+        <text x="640" y="175" font-family="Source Serif 4, serif" font-style="italic" font-size="16" fill="#262320">y</text>
+        <text x="558" y="160" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="13" fill="#262320">y = Wx + ABx</text>
+
+        <!-- Param count callout -->
+        <text x="20" y="30" font-family="JetBrains Mono, monospace" font-size="11" font-weight="600" fill="#7a1f24" letter-spacing="1.2">PARAMETER BUDGET</text>
+        <text x="20" y="48" font-family="JetBrains Mono, monospace" font-size="11" fill="#566068">full fine-tune: 13,000,000,000 trainable</text>
+        <text x="20" y="64" font-family="JetBrains Mono, monospace" font-size="11" fill="#7a1f24">LoRA rank 16:        ~8,000,000 trainable  (1600x fewer)</text>
+      </svg>
+      <figcaption>LoRA in one picture. The pretrained matrix <em>W</em> is huge and frozen; the trainable update <em>ΔW = A·B</em> is forced to live in a rank-<em>r</em> subspace. At inference, both branches are added.</figcaption>
+    </figure>
 
     <h2>Why Another Fine-Tuning Tool?</h2>
     <p>Thinking Machines Lab's <strong>Tinker</strong> API made a convincing case that the right abstraction for fine-tuning is very small: <code>forward_backward</code>, <code>optim_step</code>, and <code>sample</code>. Those three calls plus a client object cover supervised learning, reinforcement learning, and everything in between. It's elegant.</p>
@@ -116,26 +212,67 @@
 
     <p><strong>SamplingClient</strong> generates completions from the current (or a saved) checkpoint. It's what you reach for in the middle of an RL loop when you need to roll out trajectories from the current policy, or at the end of training when you want to verify the model actually learned what you told it to.</p>
 
-    <p>A minimal SFT loop looks like this:</p>
+    <p>A minimal SFT loop looks like this — the entire training script, from cold start to a working sampler, in fourteen lines:</p>
 
     <pre class="codeblock"><code><span class="ck-cmd">from</span> local_tinker <span class="ck-cmd">import</span> ServiceClient
 
-service = ServiceClient()
-trainer = service.create_lora_training_client(
+service = ServiceClient()                                  <span class="ck-comment"># 1. discover hardware, pick a backend</span>
+trainer = service.create_lora_training_client(             <span class="ck-comment"># 2. attach a LoRA adapter to a quantized base</span>
     base_model=<span class="ck-str">"meta-llama/Llama-3.2-3B"</span>,
-    rank=<span class="ck-flag">32</span>,
-    quantize=<span class="ck-str">"4bit"</span>,
+    rank=<span class="ck-flag">32</span>,                                            <span class="ck-comment">#    rank of the A·B factorization</span>
+    quantize=<span class="ck-str">"4bit"</span>,                                     <span class="ck-comment">#    base model in 4-bit, adapter in bf16</span>
 )
 
 <span class="ck-cmd">for</span> batch <span class="ck-cmd">in</span> dataloader:
-    loss = trainer.forward_backward(batch)
-    trainer.optim_step()
+    loss = trainer.forward_backward(batch)                 <span class="ck-comment"># 3. forward + backward, grads accumulate</span>
+    trainer.optim_step()                                   <span class="ck-comment"># 4. apply, clip, advance optimizer</span>
     <span class="ck-cmd">print</span>(<span class="ck-str">f"loss: {loss:.4f}"</span>)
 
-sampler = trainer.save_weights_and_get_sampling_client()
+sampler = trainer.save_weights_and_get_sampling_client()   <span class="ck-comment"># 5. snapshot weights for inference</span>
 output = sampler.sample(<span class="ck-str">"Explain gradient descent simply:"</span>)</code></pre>
 
     <p>Three imports, one loop, one optim step, one sampling call at the end. That's the whole thing.</p>
+
+    <h3>Without Local Tinker, you'd write…</h3>
+    <p>For comparison — here is roughly the same SFT setup expressed directly against HuggingFace, PEFT, and bitsandbytes. This is the boilerplate Local Tinker absorbs:</p>
+
+    <pre class="codeblock"><code><span class="ck-cmd">import</span> torch
+<span class="ck-cmd">from</span> transformers <span class="ck-cmd">import</span> AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+<span class="ck-cmd">from</span> peft <span class="ck-cmd">import</span> LoraConfig, get_peft_model, prepare_model_for_kbit_training
+
+bnb = BitsAndBytesConfig(                                <span class="ck-comment"># quantization config</span>
+    load_in_4bit=<span class="ck-flag">True</span>,
+    bnb_4bit_compute_dtype=torch.bfloat16,
+    bnb_4bit_quant_type=<span class="ck-str">"nf4"</span>,
+    bnb_4bit_use_double_quant=<span class="ck-flag">True</span>,
+)
+model = AutoModelForCausalLM.from_pretrained(
+    <span class="ck-str">"meta-llama/Llama-3.2-3B"</span>, quantization_config=bnb, device_map=<span class="ck-str">"auto"</span>,
+)
+model = prepare_model_for_kbit_training(model)            <span class="ck-comment"># gradient checkpointing, fp32 layernorms…</span>
+peft_cfg = LoraConfig(                                    <span class="ck-comment"># LoRA wiring</span>
+    r=<span class="ck-flag">32</span>, lora_alpha=<span class="ck-flag">64</span>, lora_dropout=<span class="ck-flag">0.05</span>,
+    target_modules=[<span class="ck-str">"q_proj"</span>,<span class="ck-str">"k_proj"</span>,<span class="ck-str">"v_proj"</span>,<span class="ck-str">"o_proj"</span>],
+    bias=<span class="ck-str">"none"</span>, task_type=<span class="ck-str">"CAUSAL_LM"</span>,
+)
+model = get_peft_model(model, peft_cfg)
+tok = AutoTokenizer.from_pretrained(<span class="ck-str">"meta-llama/Llama-3.2-3B"</span>)
+optim = torch.optim.AdamW(<span class="ck-cmd">filter</span>(<span class="ck-cmd">lambda</span> p: p.requires_grad, model.parameters()), lr=<span class="ck-flag">2e-4</span>)
+scaler = torch.cuda.amp.GradScaler()                      <span class="ck-comment"># mixed-precision plumbing</span>
+
+accum = <span class="ck-flag">8</span>
+<span class="ck-cmd">for</span> step, batch <span class="ck-cmd">in</span> <span class="ck-cmd">enumerate</span>(dataloader):                 <span class="ck-comment"># manual gradient accumulation</span>
+    batch = {k: v.to(model.device) <span class="ck-cmd">for</span> k, v <span class="ck-cmd">in</span> batch.items()}
+    <span class="ck-cmd">with</span> torch.cuda.amp.autocast(dtype=torch.bfloat16):
+        out = model(**batch); loss = out.loss / accum
+    scaler.scale(loss).backward()
+    <span class="ck-cmd">if</span> (step + <span class="ck-flag">1</span>) % accum == <span class="ck-flag">0</span>:
+        scaler.unscale_(optim)
+        torch.nn.utils.clip_grad_norm_(model.parameters(), <span class="ck-flag">1.0</span>)
+        scaler.step(optim); scaler.update(); optim.zero_grad()
+<span class="ck-comment"># …plus checkpointing, eval hooks, an inference path that re-merges adapters, etc.</span></code></pre>
+
+    <p>Everything in that block is real work that someone has to do. Local Tinker's contribution is doing it once, in the library, so you don't keep doing it on every project.</p>
 
     <h2>Two-Phase Design: Gradient Accumulation and LoRA</h2>
     <p>Why two phases? The reason is memory.</p>
@@ -212,7 +349,96 @@ output = sampler.sample(<span class="ck-str">"Explain gradient descent simply:"<
 
     <p>Local Tinker has a loss function hierarchy that supports <strong>SFT</strong> (default), <strong>DPO</strong> for preference pairs, <strong>PPO</strong> for advantage-weighted updates with an internal value head, and <strong>GRPO</strong> for group-relative policy optimization. You pick the loss by passing <code>loss_fn="grpo"</code> (or <code>"dpo"</code>, <code>"ppo"</code>) to <code>forward_backward</code>. The client handles the bookkeeping.</p>
 
-    <p>A GRPO loop looks like this:</p>
+    <p>The four objectives share a skeleton. The differences are entirely in what you feed <code>forward_backward</code> and what loss it computes — the surrounding loop is the same:</p>
+
+    <figure class="svg-figure">
+      <svg viewBox="0 0 700 420" width="100%" role="img" aria-label="Comparison of SFT, DPO, PPO, and GRPO training loops sharing the same skeleton with different inputs and loss functions">
+        <defs>
+          <marker id="arrow-comp" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6 z" fill="#566068"/>
+          </marker>
+        </defs>
+
+        <!-- Header row -->
+        <text x="60"  y="34" font-family="JetBrains Mono, monospace" font-size="11" font-weight="600" fill="#566068" letter-spacing="1.4">STEP</text>
+        <text x="195" y="34" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-weight="700" font-size="14" fill="#5b21b6">SFT</text>
+        <text x="320" y="34" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-weight="700" font-size="14" fill="#0e7490">DPO</text>
+        <text x="445" y="34" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-weight="700" font-size="14" fill="#92400e">PPO</text>
+        <text x="595" y="34" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-weight="700" font-size="14" fill="#7a1f24">GRPO</text>
+
+        <line x1="20" y1="48" x2="680" y2="48" stroke="#262320" stroke-width="1"/>
+
+        <!-- Row 1: input -->
+        <text x="20"  y="84" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068">1. input</text>
+        <rect x="135" y="64" width="120" height="36" rx="4" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.2"/>
+        <text x="195" y="80" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#5b21b6">(prompt,</text>
+        <text x="195" y="93" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#5b21b6">target answer)</text>
+
+        <rect x="260" y="64" width="120" height="36" rx="4" fill="#ecfeff" stroke="#67e8f9" stroke-width="1.2"/>
+        <text x="320" y="80" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#0e7490">(prompt, chosen,</text>
+        <text x="320" y="93" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#0e7490">rejected)</text>
+
+        <rect x="385" y="64" width="120" height="36" rx="4" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.2"/>
+        <text x="445" y="80" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#92400e">prompt only</text>
+        <text x="445" y="93" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#92400e">(roll out 1)</text>
+
+        <rect x="535" y="64" width="120" height="36" rx="4" fill="#fef2f2" stroke="#fca5a5" stroke-width="1.2"/>
+        <text x="595" y="80" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#7a1f24">prompt only</text>
+        <text x="595" y="93" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#7a1f24">(roll out N)</text>
+
+        <!-- Row 2: signal -->
+        <text x="20"  y="146" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068">2. signal</text>
+        <rect x="135" y="126" width="120" height="36" rx="4" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.2"/>
+        <text x="195" y="142" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#5b21b6">teacher tokens</text>
+        <text x="195" y="155" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#5b21b6">are gold</text>
+
+        <rect x="260" y="126" width="120" height="36" rx="4" fill="#ecfeff" stroke="#67e8f9" stroke-width="1.2"/>
+        <text x="320" y="142" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#0e7490">human preference</text>
+        <text x="320" y="155" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#0e7490">(implicit reward)</text>
+
+        <rect x="385" y="126" width="120" height="36" rx="4" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.2"/>
+        <text x="445" y="142" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#92400e">scalar reward</text>
+        <text x="445" y="155" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#92400e">+ value baseline</text>
+
+        <rect x="535" y="126" width="120" height="36" rx="4" fill="#fef2f2" stroke="#fca5a5" stroke-width="1.2"/>
+        <text x="595" y="142" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#7a1f24">scalar reward,</text>
+        <text x="595" y="155" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#7a1f24">group-normalized</text>
+
+        <!-- Row 3: loss -->
+        <text x="20"  y="208" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068">3. loss</text>
+        <rect x="135" y="188" width="120" height="36" rx="4" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.2"/>
+        <text x="195" y="210" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#5b21b6">−log p(target)</text>
+
+        <rect x="260" y="188" width="120" height="36" rx="4" fill="#ecfeff" stroke="#67e8f9" stroke-width="1.2"/>
+        <text x="320" y="204" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#0e7490">log-ratio gap</text>
+        <text x="320" y="217" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#0e7490">(chosen − rejected)</text>
+
+        <rect x="385" y="188" width="120" height="36" rx="4" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.2"/>
+        <text x="445" y="204" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#92400e">clipped surrogate</text>
+        <text x="445" y="217" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#92400e">× advantage</text>
+
+        <rect x="535" y="188" width="120" height="36" rx="4" fill="#fef2f2" stroke="#fca5a5" stroke-width="1.2"/>
+        <text x="595" y="204" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#7a1f24">clipped surrogate</text>
+        <text x="595" y="217" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#7a1f24">× group advantage</text>
+
+        <!-- Row 4: forward_backward -->
+        <text x="20"  y="270" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068">4. fwd_bwd</text>
+        <rect x="135" y="250" width="520" height="36" rx="4" fill="#fffdf6" stroke="#262320" stroke-width="1.4"/>
+        <text x="395" y="273" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="600" fill="#262320">trainer.forward_backward(batch, loss_fn="…")</text>
+
+        <!-- Row 5: optim_step -->
+        <text x="20"  y="332" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068">5. step</text>
+        <rect x="135" y="312" width="520" height="36" rx="4" fill="#fffdf6" stroke="#262320" stroke-width="1.4"/>
+        <text x="395" y="335" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="600" fill="#262320">trainer.optim_step()</text>
+
+        <!-- Caption row -->
+        <line x1="20" y1="368" x2="680" y2="368" stroke="#cfc6b3" stroke-width="1"/>
+        <text x="350" y="392" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="13" fill="#566068">Steps 1–3 differ across objectives. Steps 4–5 are identical: the same two primitives carry every loss.</text>
+      </svg>
+      <figcaption>Same skeleton, four objectives. SFT learns from gold answers; DPO from preference pairs; PPO from a reward model + value baseline; GRPO from a group of rollouts whose rewards are normalized within the group.</figcaption>
+    </figure>
+
+    <p>A GRPO loop in code — the most involved of the four, but still the same shape:</p>
 
     <pre class="codeblock"><code><span class="ck-cmd">from</span> local_tinker <span class="ck-cmd">import</span> ServiceClient
 
@@ -220,14 +446,14 @@ service = ServiceClient()
 trainer = service.create_lora_training_client(<span class="ck-str">"Qwen/Qwen2.5-7B"</span>, rank=<span class="ck-flag">16</span>)
 
 <span class="ck-cmd">for</span> step <span class="ck-cmd">in</span> <span class="ck-cmd">range</span>(max_steps):
-    <span class="ck-comment"># roll out completions from the current policy</span>
+    <span class="ck-comment"># 1. roll out N completions per prompt from the current policy</span>
     sampler = trainer.save_weights_and_get_sampling_client()
-    completions = sampler.sample_batch(prompts, n=<span class="ck-flag">8</span>)
+    completions = sampler.sample_batch(prompts, n=<span class="ck-flag">8</span>)        <span class="ck-comment">#    8 = the "group" in GRPO</span>
 
-    <span class="ck-comment"># score with YOUR reward function (regex, test, classifier, judge LLM...)</span>
+    <span class="ck-comment"># 2. score with YOUR reward function (regex, unit test, classifier, judge LLM…)</span>
     rewards = [reward_fn(p, c) <span class="ck-cmd">for</span> p, c <span class="ck-cmd">in</span> <span class="ck-cmd">zip</span>(prompts, completions)]
 
-    <span class="ck-comment"># GRPO update — same two-phase primitives</span>
+    <span class="ck-comment"># 3. GRPO update — group normalization happens inside the loss</span>
     trainer.forward_backward(completions, rewards, loss_fn=<span class="ck-str">"grpo"</span>)
     trainer.optim_step()</code></pre>
 
@@ -247,12 +473,12 @@ trainer = service.create_lora_training_client(<span class="ck-str">"Qwen/Qwen2.5
 
     <h2>Getting Started</h2>
 
-    <p><strong>Step 1 — clone and install:</strong></p>
+    <p><strong>Step 1 — clone and install</strong> (the package is editable so you can patch a recipe and rerun without reinstalling):</p>
     <pre class="codeblock"><code><span class="ck-cmd">git</span> clone https://github.com/josephgec/finetuning.git
 <span class="ck-cmd">cd</span> finetuning
 <span class="ck-cmd">pip</span> install -e .</code></pre>
 
-    <p><strong>Step 2 — see which models you can train on your current hardware:</strong></p>
+    <p><strong>Step 2 — see which models you can train on your current hardware.</strong> The CLI inspects your GPU and prints VRAM estimates next to a status flag for each base model in the catalog:</p>
     <pre class="codeblock"><code>$ <span class="ck-cmd">local-tinker</span> models
 
 MODEL                          PARAMS    QUANT   VRAM     STATUS
@@ -264,7 +490,7 @@ meta-llama/Llama-3.1-13B       13.0B     4bit    ~16 GB   <span class="ck-commen
 
     <p>The status column is the useful one. <code>ready</code> means the model and a reasonable batch size fit comfortably. <code>tight</code> means it'll work but you may need to reduce micro-batch size or LoRA rank. <code>OOM</code> means don't bother — it won't fit on this card.</p>
 
-    <p><strong>Step 3 — launch a training run:</strong></p>
+    <p><strong>Step 3 — launch a training run.</strong> The CLI is a thin wrapper around the same primitives shown above; everything it does, you can do from Python:</p>
     <pre class="codeblock"><code><span class="ck-cmd">local-tinker</span> run \
   <span class="ck-flag">--model</span> meta-llama/Llama-3.2-3B \
   <span class="ck-flag">--dataset</span> ./data/instructions.jsonl \
@@ -319,7 +545,7 @@ meta-llama/Llama-3.1-13B       13.0B     4bit    ~16 GB   <span class="ck-commen
 
   </article>
 
-<div class="measure">
+<div class="wrap">
   <nav class="post-nav">
     <a href="index.html"><span class="label">archive</span>← all posts</a>
     <a class="next" href="arc-swarm.html"><span class="label">read next</span>When Swarms Write Code →</a>

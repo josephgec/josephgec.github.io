@@ -52,9 +52,9 @@
     <div class="ml-try">
       <div class="ml-eyebrow accent">Try this</div>
       <ol>
-        <li>Hit <em>Step through</em>. Watch the residual stream pass through each block — attention writes its update, then the FFN writes its update, then we move to the next layer.</li>
-        <li>Toggle <em>multi-head</em>. With one head, attention has a single pattern; with four heads, you can see each head specialize in a different relationship (syntax, position, etc.).</li>
-        <li>Switch the input prompt. Watch how a different prompt activates a different attention pattern at each layer — the network's "thought process" varies with content.</li>
+        <li>Open <em>One block · step through</em> (or click the canvas to replay). Watch the residual stream pick up two updates: attention writes once, then the FFN writes once. The little dot riding down the dashed line is what every layer would carry through a real model.</li>
+        <li>Open <em>Heads at one layer</em>, then drag the <em>heads</em> slider from 1 to 4. With one head, attention has a single pattern; with four heads you can see each head specialize — previous-token, first-token, content match, local window.</li>
+        <li>Open <em>Across layers · one query</em>. Click the canvas to cycle the query word and scrub the <em>layer</em> slider. Early layers tend to look locally; later ones reach further. The "thought process" varies with content and depth.</li>
       </ol>
     </div>
   </section>
@@ -84,6 +84,7 @@
     </aside>
 
     <div class="ml-canvas-wrap">
+      <div class="ml-mode-tabs" id="view-tabs"></div>
       <div class="ml-canvas-frame" style="aspect-ratio: 1.4 / 1; padding: 24px">
         <canvas id="canvas"></canvas>
       </div>
@@ -93,11 +94,60 @@
     <aside class="right-rail">
       <div class="ml-margin">
         <div class="ml-margin-rule"></div>
-        <div class="ml-margin-h">The block</div>
-        <p>Two sub-blocks per layer: <em>attention</em> mixes information across token positions; the <em>FFN</em> processes each token independently. The residual stream is the highway — every block reads it and writes back into it.</p>
+        <div class="ml-margin-h">Before this</div>
+        <p class="quiet">RNNs and LSTMs were sequential — slow to train, struggling past hundreds of tokens. Transformers (Vaswani 2017) ditched recurrence entirely and made everything attention plus parallel processing. GPUs love parallelism; the result was 10–100× training speedup and far longer effective context. Every modern LLM is a stack of transformer blocks.</p>
+
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h">The architecture</div>
+        <svg viewBox="0 0 220 280" style="width:100%; max-width:220px; display:block; margin:6px 0 10px">
+          <!-- Stack of N blocks -->
+          <text x="110" y="14" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="rgba(38,35,32,0.55)">tokens in</text>
+          <line x1="110" y1="18" x2="110" y2="32" stroke="#262320" stroke-width="1"/>
+
+          <!-- Block 1 -->
+          <rect x="40" y="32" width="140" height="60" fill="rgba(122,31,36,0.04)" stroke="#7a1f24" stroke-width="1"/>
+          <text x="48" y="46" font-family="JetBrains Mono, monospace" font-size="8" fill="rgba(38,35,32,0.55)">BLOCK 1</text>
+          <rect x="50" y="50" width="55" height="14" fill="rgba(38,35,32,0.06)" stroke="rgba(38,35,32,0.4)"/>
+          <text x="77" y="60" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="#262320">LN→attn</text>
+          <rect x="115" y="50" width="55" height="14" fill="rgba(38,35,32,0.06)" stroke="rgba(38,35,32,0.4)"/>
+          <text x="142" y="60" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="#262320">LN→FFN</text>
+          <text x="105" y="85" text-anchor="middle" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="9" fill="rgba(38,35,32,0.55)">+ residual after each</text>
+          <line x1="110" y1="92" x2="110" y2="100" stroke="#262320" stroke-width="1"/>
+
+          <!-- Block 2 -->
+          <rect x="40" y="100" width="140" height="40" fill="rgba(122,31,36,0.04)" stroke="#7a1f24" stroke-width="1"/>
+          <text x="110" y="123" text-anchor="middle" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="11" fill="#262320">BLOCK 2</text>
+          <line x1="110" y1="140" x2="110" y2="148" stroke="#262320" stroke-width="1"/>
+
+          <!-- ellipsis -->
+          <text x="110" y="162" text-anchor="middle" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="14" fill="rgba(38,35,32,0.55)">…</text>
+          <line x1="110" y1="170" x2="110" y2="178" stroke="#262320" stroke-width="1"/>
+
+          <!-- Block N -->
+          <rect x="40" y="178" width="140" height="40" fill="rgba(122,31,36,0.04)" stroke="#7a1f24" stroke-width="1"/>
+          <text x="110" y="201" text-anchor="middle" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="11" fill="#262320">BLOCK N</text>
+          <line x1="110" y1="218" x2="110" y2="226" stroke="#262320" stroke-width="1"/>
+
+          <!-- output -->
+          <text x="110" y="240" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="rgba(38,35,32,0.55)">output logits</text>
+
+          <!-- residual highway -->
+          <line x1="32" y1="32" x2="32" y2="226" stroke="rgba(122,31,36,0.4)" stroke-width="1.5" stroke-dasharray="2,3"/>
+          <text x="22" y="130" text-anchor="middle" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="9" fill="rgba(122,31,36,0.7)" transform="rotate(-90 22 130)">residual stream</text>
+
+          <text x="110" y="262" text-anchor="middle" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="10" fill="rgba(38,35,32,0.55)">shape preserving:</text>
+          <text x="110" y="275" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="rgba(38,35,32,0.55)">input dim = output dim</text>
+        </svg>
+
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">The block, in one line</div>
+        <div class="ml-equation" style="font-size:12px">out = LN(x + FFN(LN(x + Attn(x))))</div>
+        <p class="quiet"><em>x</em>: input embedding. <em>Attn(x)</em>: attention mixes context across tokens. The <em>+</em> is addition (a "residual"). <em>LN</em>: LayerNorm — re-standardizes values so they don't blow up. <em>FFN</em>: a small token-wise MLP. The whole sandwich repeats N times.</p>
+
         <div class="ml-margin-rule thin"></div>
         <div class="ml-margin-h sm">Multi-head</div>
-        <p class="quiet">Run several attention operations in parallel with different learned Q/K/V projections. Heads tend to specialize: one tracks subject-verb agreement, another tracks coreference, another just attends to the previous token.</p>
+        <p class="quiet">Run several attention operations in parallel with different learned Q/K/V projections. Heads tend to specialize — one tracks the previous token, another the first token, another content similarity.</p>
+
         <div class="ml-margin-rule thin"></div>
         <div class="ml-margin-h sm">Positional encoding</div>
         <p class="quiet">Attention is permutation-invariant by default. Positional encodings (sinusoidal in the original, RoPE in modern transformers) inject "this is token #3" information.</p>

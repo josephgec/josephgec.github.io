@@ -97,28 +97,200 @@
     <p><strong>TL;DR</strong> — Standard LLM agents, when faced with novel reasoning puzzles, tend to get stuck in repetitive generation cycles — a phenomenon that's structurally equivalent to converging on a local minimum in optimization. A <a href="https://github.com/josephgec/arc-agi-search" target="_blank" rel="noopener noreferrer">new open-source project</a> attacks this problem by replacing the single-agent loop with a <em>swarm</em> of specialized LLM-powered particles governed by Particle Swarm Optimization. The result is a system that searches the space of possible programs systematically rather than randomly, and rewards "near misses" rather than demanding perfection at every step.</p>
 
     <h2>Why ARC-AGI Breaks Chain-of-Thought</h2>
-    <p>François Chollet's <a href="https://github.com/fchollet/ARC-AGI" target="_blank" rel="noopener noreferrer">Abstraction and Reasoning Corpus</a> remains one of the most unforgiving benchmarks in AI. Each task consists of a handful of input–output grid pairs that demonstrate some visual transformation rule — rotate, recolor, tile, fill, extract — and the solver must infer that rule from as few as two or three examples, then apply it to an unseen test input. There are no training distributions to memorize, no statistical shortcuts. The benchmark is a direct test of <em>fluid intelligence</em>: the ability to solve problems you have never seen before.</p>
+    <p>François Chollet's <a href="https://github.com/fchollet/ARC-AGI" target="_blank" rel="noopener noreferrer">Abstraction and Reasoning Corpus</a> (ARC-AGI) remains one of the most unforgiving benchmarks in AI. Each task is a handful of small coloured grids organised into <em>input–output pairs</em>. Together the pairs demonstrate some visual transformation rule — rotate, recolor, tile, fill, extract a sub-shape — and the solver has to infer that rule from as few as two or three examples, then apply it to an unseen test input. There are no training distributions to memorize, no statistical shortcuts. The benchmark is a direct test of <em>fluid intelligence</em>: the ability to solve problems you have never seen before.</p>
 
-    <p>Large Language Models, despite their remarkable breadth, struggle here. The standard approach — wrap a model in a Chain-of-Thought agent loop, generate a candidate program, test it, feed the error back, and try again — works for well-structured tasks but collapses on ARC. The failure mode is predictable: the agent proposes a hypothesis, discovers it's wrong, tweaks it slightly, discovers it's still wrong, tweaks it again along the same axis, and spirals into a repetitive generation cycle. Anyone who has watched an LLM debug its own code recognizes the pattern. In optimization terms, the agent has converged on a <strong>local minimum</strong> — a region of solution space that's locally attractive but globally suboptimal — and lacks the mechanism to escape.</p>
+    <figure class="svg-figure">
+      <svg viewBox="0 0 680 320" width="100%" role="img" aria-label="Anatomy of an ARC-AGI puzzle showing two training input-output pairs and one test input that the solver must predict">
+        <defs>
+          <marker id="arrow-arc-puzzle" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6 z" fill="#566068"/>
+          </marker>
+        </defs>
+
+        <!-- Header -->
+        <text x="40" y="32" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#566068" letter-spacing="1.2">ANATOMY OF AN ARC-AGI PUZZLE</text>
+        <text x="40" y="50" font-family="Source Serif 4, serif" font-style="italic" font-size="13" fill="#3e484d">A training pair reveals the rule. A held-out test input must be solved.</text>
+
+        <!-- Training pair 1 -->
+        <text x="180" y="84" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="600" fill="#7a1f24">train · input → output</text>
+        <!-- input grid 1: cross on left -->
+        <g transform="translate(40,96)">
+          <rect width="120" height="120" fill="#ffffff" stroke="#3e484d" stroke-width="1"/>
+          <g stroke="#cdd5db" stroke-width="0.6">
+            <line x1="0" y1="40" x2="120" y2="40"/><line x1="0" y1="80" x2="120" y2="80"/>
+            <line x1="40" y1="0" x2="40" y2="120"/><line x1="80" y1="0" x2="80" y2="120"/>
+          </g>
+          <rect x="40" y="40" width="40" height="40" fill="#0891b2"/>
+          <rect x="0"  y="40" width="40" height="40" fill="#0891b2"/>
+          <rect x="80" y="40" width="40" height="40" fill="#0891b2"/>
+          <rect x="40" y="0"  width="40" height="40" fill="#0891b2"/>
+          <rect x="40" y="80" width="40" height="40" fill="#0891b2"/>
+        </g>
+        <line x1="166" y1="156" x2="194" y2="156" stroke="#566068" stroke-width="1.5" marker-end="url(#arrow-arc-puzzle)"/>
+        <!-- output grid 1: cross rotated/recoloured red -->
+        <g transform="translate(200,96)">
+          <rect width="120" height="120" fill="#ffffff" stroke="#3e484d" stroke-width="1"/>
+          <g stroke="#cdd5db" stroke-width="0.6">
+            <line x1="0" y1="40" x2="120" y2="40"/><line x1="0" y1="80" x2="120" y2="80"/>
+            <line x1="40" y1="0" x2="40" y2="120"/><line x1="80" y1="0" x2="80" y2="120"/>
+          </g>
+          <rect x="40" y="40" width="40" height="40" fill="#7a1f24"/>
+          <rect x="0"  y="40" width="40" height="40" fill="#7a1f24"/>
+          <rect x="80" y="40" width="40" height="40" fill="#7a1f24"/>
+          <rect x="40" y="0"  width="40" height="40" fill="#7a1f24"/>
+          <rect x="40" y="80" width="40" height="40" fill="#7a1f24"/>
+        </g>
+        <text x="100" y="240" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#566068">input</text>
+        <text x="260" y="240" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#566068">output</text>
+
+        <!-- Test pair -->
+        <text x="500" y="84" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#7a1f24">test · solve me</text>
+        <!-- test input: L-shape blue -->
+        <g transform="translate(390,96)">
+          <rect width="120" height="120" fill="#ffffff" stroke="#3e484d" stroke-width="1"/>
+          <g stroke="#cdd5db" stroke-width="0.6">
+            <line x1="0" y1="40" x2="120" y2="40"/><line x1="0" y1="80" x2="120" y2="80"/>
+            <line x1="40" y1="0" x2="40" y2="120"/><line x1="80" y1="0" x2="80" y2="120"/>
+          </g>
+          <rect x="0"  y="0"  width="40" height="40" fill="#0891b2"/>
+          <rect x="0"  y="40" width="40" height="40" fill="#0891b2"/>
+          <rect x="0"  y="80" width="40" height="40" fill="#0891b2"/>
+          <rect x="40" y="80" width="40" height="40" fill="#0891b2"/>
+        </g>
+        <line x1="516" y1="156" x2="544" y2="156" stroke="#566068" stroke-width="1.5" marker-end="url(#arrow-arc-puzzle)" stroke-dasharray="3 3"/>
+        <!-- expected output: same shape, red -->
+        <g transform="translate(550,96)">
+          <rect width="120" height="120" fill="#ffffff" stroke="#3e484d" stroke-width="1.2" stroke-dasharray="4 3"/>
+          <g stroke="#cdd5db" stroke-width="0.6">
+            <line x1="0" y1="40" x2="120" y2="40"/><line x1="0" y1="80" x2="120" y2="80"/>
+            <line x1="40" y1="0" x2="40" y2="120"/><line x1="80" y1="0" x2="80" y2="120"/>
+          </g>
+          <text x="60" y="68" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#94a3b8">?</text>
+        </g>
+        <text x="450" y="240" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#566068">test input</text>
+        <text x="610" y="240" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#566068">predict this</text>
+
+        <!-- Inferred rule -->
+        <rect x="40" y="262" width="600" height="40" rx="6" fill="#fbf6ec" stroke="#cdc4ad" stroke-width="1"/>
+        <text x="60" y="286" font-family="JetBrains Mono, monospace" font-size="10" font-weight="600" fill="#7a1f24" letter-spacing="1.2">INFERRED RULE</text>
+        <text x="200" y="286" font-family="Source Serif 4, serif" font-style="italic" font-size="13" fill="#3e484d">recolour every cyan cell to oxblood, leave shape and position untouched.</text>
+      </svg>
+      <figcaption>An ARC-AGI puzzle. The solver sees a few input–output examples, must infer the transformation rule, and then apply it to an unseen test input. Grids are tiny (often 3&times;3 to 30&times;30) and use a 10-colour palette.</figcaption>
+    </figure>
+
+    <p>Large Language Models, despite their remarkable breadth, struggle here. The standard approach — wrap a model in a Chain-of-Thought agent loop, generate a candidate program, test it, feed the error back, and try again — works for well-structured tasks but collapses on ARC. The failure mode is predictable: the agent proposes a hypothesis, discovers it's wrong, tweaks it slightly, discovers it's still wrong, tweaks it again along the same axis, and spirals into a repetitive generation cycle. Anyone who has watched an LLM debug its own code recognizes the pattern. In optimization terms, the agent has converged on a <strong>local minimum</strong> — a point in solution space surrounded by worse-looking neighbours, so every small step looks like a regression even though a much better solution lives just over the next ridge — and lacks the mechanism to escape.</p>
+
+    <blockquote>
+      <strong style="font-style: normal; font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; color: var(--accent); display: block; margin-bottom: 6px;">BEFORE THIS</strong>
+      Earlier ARC attempts pushed on the single-agent recipe in three ways. <em>Self-Refine</em>-style reflection loops (Madaan et al., 2023) had one model critique its own code and rewrite it; useful for shallow bugs but blind to its own reasoning ruts. Brute sampling at scale — Greenblatt's <em>GPT-4o + ~8k samples per task</em> approach — set a 50% SoTA, but at thousands of dollars per puzzle and effectively no learning signal between samples. Tree search variants (MCTS over edits, AlphaCode-style program enumeration) explored more aggressively, but the binary pass/fail evaluation gave the search no gradient: a program that gets 90% of pixels right and one that gets 5% right look identical. All three failures share a shape: <strong>one trajectory at a time, no continuous progress signal.</strong>
+    </blockquote>
 
     <p>The <a href="https://github.com/josephgec/arc-agi-search" target="_blank" rel="noopener noreferrer">ARC-AGI PSO Swarm Solver</a> is built on a single insight: <strong>if the problem is convergence to local minima, the solution is an optimizer specifically designed to avoid them.</strong> Particle Swarm Optimization is exactly that optimizer.</p>
 
     <h2>Swarm vs. Single Agent</h2>
 
     <h3>Why PSO?</h3>
-    <p>PSO, introduced by Kennedy and Eberhart in 1995, simulates a flock of birds searching for food. Each "particle" in the swarm maintains its own position and velocity in a search space. Particles are pulled in two directions simultaneously: toward their own <strong>personal best</strong> (<code>pbest</code>) — the best solution they have individually discovered — and toward the <strong>global best</strong> (<code>gbest</code>) — the best solution any particle in the swarm has found. An inertia term keeps particles from oscillating too aggressively. The interplay between personal memory and social information sharing is what gives PSO its ability to escape local minima: even if one particle gets stuck, the social pull from a better-performing neighbor can yank it into a more promising region.</p>
+    <p>Particle Swarm Optimization (PSO), introduced by Kennedy and Eberhart in 1995, simulates a flock of birds searching for food in an unfamiliar landscape. The vocabulary is worth pinning down once, because everything that follows uses it:</p>
 
-    <p>The update equations, as implemented in <code>pso_orchestrator.py</code>, are:</p>
+    <ul>
+      <li><strong>Particle</strong> — a candidate solution plus its memory. In standard PSO it's a point in some real-valued space; in this project it's <em>an LLM persona holding the current Python program, that program's embedding, its velocity, and its personal-best score so far</em>.</li>
+      <li><strong>Position</strong> (<code>x_i</code>) — where particle <em>i</em> currently is, expressed as a 768-dimensional embedding of its current program.</li>
+      <li><strong>Velocity</strong> (<code>v_i</code>) — the direction and magnitude of the particle's last step. It carries momentum from the previous iteration.</li>
+      <li><strong>Personal best</strong> (<code>pbest_i</code>) — the best position particle <em>i</em> has personally seen so far, by the fitness function below.</li>
+      <li><strong>Global best</strong> (<code>gbest</code>) — the best position any particle in the swarm has reported. Shared across the whole swarm.</li>
+      <li><strong>Inertia</strong> (<code>w</code>), <strong>cognitive weight</strong> (<code>c1</code>), <strong>social weight</strong> (<code>c2</code>) — three knobs that control, respectively, how much a particle keeps drifting in its current direction, how much it pulls back to its own best memory, and how much it follows the swarm.</li>
+    </ul>
 
-    <pre class="codeblock"><code><span class="ck-comment"># velocity and target update — one step per iteration, per particle</span>
+    <p>At every iteration, each particle is pulled in two directions simultaneously: toward its own <code>pbest</code> (its memory) and toward the swarm's <code>gbest</code> (the social signal). The inertia term keeps it from oscillating wildly. <strong>That dual pull is the entire reason PSO escapes local minima:</strong> even if one particle has settled into a flat region, the social tug from a better-performing neighbour can yank it out — the way a bird that smells food calls the rest of the flock over.</p>
+
+    <p>Compare this to a single-agent loop. <strong>Single agent stuck:</strong> one trajectory, no peers, no memory of where else it has been. Each "tweak" is a small step from the current wrong answer; if the local error landscape says <em>every</em> small step is worse, the agent rephrases the same idea and loops. <strong>Swarm escapes:</strong> six trajectories starting in different places, each remembering its own best, all listening to the swarm's best. When one particle finds a better basin, the social pull <em>gradually</em> bends every other particle toward it without forcing instant collapse — diversity is preserved long enough to keep exploring.</p>
+
+    <p>The update equations, as implemented in <code>pso_orchestrator.py</code>, are two lines:</p>
+
+    <pre class="codeblock"><code><span class="ck-comment"># one step per iteration, per particle i</span>
 v_i      <span class="ck-cmd">=</span>  w · v_i  <span class="ck-cmd">+</span>  c1 · r1 · (pbest_i <span class="ck-cmd">-</span> x_i)  <span class="ck-cmd">+</span>  c2 · r2 · (gbest <span class="ck-cmd">-</span> x_i)
+                <span class="ck-comment">↑              ↑                          ↑</span>
+                <span class="ck-comment">inertia        cognitive (pull to        social (pull to</span>
+                <span class="ck-comment">(keep going)   own best memory)          swarm's best)</span>
+
 target_i <span class="ck-cmd">=</span>  normalize(x_i <span class="ck-cmd">+</span> v_i)
+                <span class="ck-comment">↑</span>
+                <span class="ck-comment">project onto the 768-d unit sphere — that's where embeddings live</span>
 
-<span class="ck-comment"># w  = 0.5        inertia</span>
-<span class="ck-comment"># c1 = c2 = 1.5   cognitive and social coefficients</span>
-<span class="ck-comment"># r1, r2 ~ U[0,1] stochastic jitter</span></code></pre>
+<span class="ck-comment"># w  = 0.5         inertia weight</span>
+<span class="ck-comment"># c1 = c2 = 1.5    cognitive and social coefficients (equal pull)</span>
+<span class="ck-comment"># r1, r2 ~ U[0,1]  fresh random scalars each step → stochastic jitter</span></code></pre>
 
-    <p>The result is a target point on a 768-dimensional unit sphere — a direction the particle should move toward.</p>
+    <p>Read in plain English, line one says: <em>"my next direction is some of where I was already going (<code>w · v_i</code>), plus a noisy nudge back toward my own best memory (<code>c1·r1·(pbest_i − x_i)</code>), plus a noisy nudge toward the swarm's best (<code>c2·r2·(gbest − x_i)</code>)."</em> Line two adds that direction to the current position and renormalizes — every particle position is a unit vector on the 768-d embedding sphere. The output is a single <em>target point</em>: a direction the particle should now try to occupy.</p>
+
+    <figure class="svg-figure">
+      <svg viewBox="0 0 680 280" width="100%" role="img" aria-label="Step-by-step diagram of one PSO iteration for a single particle">
+        <defs>
+          <marker id="arrow-iter" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6 z" fill="#566068"/>
+          </marker>
+        </defs>
+
+        <text x="340" y="28" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#566068" letter-spacing="1.4">ONE PSO ITERATION · PER PARTICLE</text>
+
+        <!-- Step 1: Run program -->
+        <g>
+          <rect x="20" y="60" width="120" height="100" rx="8" fill="#ecfeff" stroke="#0891b2" stroke-width="1.4"/>
+          <text x="80" y="84" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#0e7490">1 · run</text>
+          <text x="80" y="106" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-weight="600" font-size="12" fill="#0e7490">execute program</text>
+          <text x="80" y="124" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#0891b2">on training pairs</text>
+          <text x="80" y="142" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#0891b2">in sandbox</text>
+        </g>
+        <line x1="142" y1="110" x2="166" y2="110" stroke="#566068" stroke-width="1.4" marker-end="url(#arrow-iter)"/>
+
+        <!-- Step 2: Score -->
+        <g>
+          <rect x="170" y="60" width="120" height="100" rx="8" fill="#fff7ed" stroke="#d97706" stroke-width="1.4"/>
+          <text x="230" y="84" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#92400e">2 · score</text>
+          <text x="230" y="106" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-weight="600" font-size="12" fill="#92400e">continuous fitness</text>
+          <text x="230" y="124" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#d97706">dim · color · pixel</text>
+          <text x="230" y="142" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#d97706">∈ [0, 1]</text>
+        </g>
+        <line x1="292" y1="110" x2="316" y2="110" stroke="#566068" stroke-width="1.4" marker-end="url(#arrow-iter)"/>
+
+        <!-- Step 3: Update velocity -->
+        <g>
+          <rect x="320" y="60" width="120" height="100" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.4"/>
+          <text x="380" y="84" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#5b21b6">3 · update v</text>
+          <text x="380" y="106" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-weight="600" font-size="12" fill="#5b21b6">PSO equation</text>
+          <text x="380" y="124" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#7c3aed">w·v + c1·(pbest−x)</text>
+          <text x="380" y="142" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#7c3aed">+ c2·(gbest−x)</text>
+        </g>
+        <line x1="442" y1="110" x2="466" y2="110" stroke="#566068" stroke-width="1.4" marker-end="url(#arrow-iter)"/>
+
+        <!-- Step 4: Move (LLM generates) -->
+        <g>
+          <rect x="470" y="60" width="120" height="100" rx="8" fill="#fef2f2" stroke="#7a1f24" stroke-width="1.4"/>
+          <text x="530" y="84" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#7a1f24">4 · move</text>
+          <text x="530" y="106" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-weight="600" font-size="12" fill="#7a1f24">LLM rewrites code</text>
+          <text x="530" y="124" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#7a1f24">project nearest</text>
+          <text x="530" y="142" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#7a1f24">candidate</text>
+        </g>
+        <line x1="592" y1="110" x2="616" y2="110" stroke="#566068" stroke-width="1.4" marker-end="url(#arrow-iter)"/>
+
+        <!-- Step 5: Report -->
+        <g>
+          <rect x="620" y="60" width="50" height="100" rx="8" fill="#ecfdf5" stroke="#059669" stroke-width="1.4"/>
+          <text x="645" y="84" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#065f46">5</text>
+          <text x="645" y="106" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-weight="600" font-size="11" fill="#065f46">report</text>
+          <text x="645" y="124" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#059669">pbest</text>
+          <text x="645" y="142" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#059669">gbest</text>
+        </g>
+
+        <!-- Loop back arrow -->
+        <path d="M 645,162 Q 645,210 340,210 Q 80,210 80,162" stroke="#94a3b8" stroke-width="1.4" stroke-dasharray="4 3" fill="none" marker-end="url(#arrow-iter)"/>
+        <text x="340" y="232" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#94a3b8">repeat until fitness = 1.0 or budget exhausted</text>
+
+        <!-- Side notes -->
+        <text x="340" y="262" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="11" fill="#566068">All six particles run steps 1–5 in parallel each iteration. Step 5 updates the shared <tspan font-family="JetBrains Mono, monospace" font-size="10" fill="#92400e">gbest</tspan> that step 3 reads next iteration.</text>
+      </svg>
+      <figcaption>One PSO iteration, broken out per particle. The expensive parts are step 1 (sandboxed code execution) and step 4 (LLM generation). Steps 2 and 3 are cheap arithmetic on embedding vectors.</figcaption>
+    </figure>
 
     <h3>The Inverse Mapping Problem</h3>
     <p>There's a catch. PSO operates in continuous space — real-valued vectors. But the "solutions" in ARC are <em>programs</em>: discrete sequences of Python code. You can easily embed code into a continuous vector (that's what embedding models do), but you <em>cannot</em> decode an arbitrary floating-point vector back into valid Python. The mapping is one-directional. This is the <strong>Inverse Mapping Problem</strong>, and it's the central technical obstacle the project had to solve.</p>
@@ -301,11 +473,12 @@ target_i <span class="ck-cmd">=</span>  normalize(x_i <span class="ck-cmd">+</sp
     <h2>The Continuous Fitness Function: Rewarding Near Misses</h2>
     <p>Perhaps the most consequential design choice in the entire system is the decision to replace ARC's native binary evaluation (pass/fail) with a <strong>continuous fitness function</strong>. PSO needs a gradient — not in the calculus sense, but in the sense that it needs to know whether a particle is <em>getting warmer</em>. A binary signal provides no information about how close a wrong answer actually was.</p>
 
-    <p>The continuous fitness function, implemented in <code>evaluate.py</code>, decomposes correctness into three weighted components:</p>
+    <p>A <strong>fitness function</strong>, in optimization vocabulary, is just a number you can compute on any candidate that says "how good is this." Bigger is better. The whole job of the swarm is to climb the fitness function. The continuous fitness function used here, implemented in <code>evaluate.py</code>, decomposes correctness into three weighted components:</p>
 
-    <pre class="codeblock"><code>fitness <span class="ck-cmd">=</span>  <span class="ck-flag">0.20</span> · dim_score
-          <span class="ck-cmd">+</span> <span class="ck-flag">0.30</span> · color_score
-          <span class="ck-cmd">+</span> <span class="ck-flag">0.50</span> · pixel_score</code></pre>
+    <pre class="codeblock"><code>fitness <span class="ck-cmd">=</span>  <span class="ck-flag">0.20</span> · dim_score      <span class="ck-comment"># is the output the right shape?</span>
+          <span class="ck-cmd">+</span> <span class="ck-flag">0.30</span> · color_score    <span class="ck-comment"># are the right colours present?</span>
+          <span class="ck-cmd">+</span> <span class="ck-flag">0.50</span> · pixel_score    <span class="ck-comment"># are individual cells correct?</span>
+          <span class="ck-cmd">-</span> ast_complexity_penalty   <span class="ck-comment"># up to −0.15 for hardcoded lookup tables</span></code></pre>
 
     <p><strong>Dimension score (20%)</strong> measures whether the output grid has the right shape. If the predicted grid is 5×3 but the target is 5×5, this component penalizes proportionally rather than returning zero.</p>
 
@@ -327,14 +500,17 @@ target_i <span class="ck-cmd">=</span>  normalize(x_i <span class="ck-cmd">+</sp
     <p>Each step is meaningful. Each step gives the swarm a direction.</p>
 
     <figure class="svg-figure">
-      <svg viewBox="0 0 680 380" width="100%" role="img" aria-label="Fitness landscape showing local maxima trapping a single-agent search while a swarm distributes across the landscape and finds the global optimum">
+      <svg viewBox="0 0 680 420" width="100%" role="img" aria-label="Fitness landscape comparing a single-agent search trapped in a local maximum to a swarm that distributes across the landscape, with each particle's personal best marked and the global best at the highest peak">
         <defs>
           <marker id="arrow-land" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
             <path d="M0,0 L8,3 L0,6 z" fill="#566068"/>
           </marker>
+          <marker id="arrow-pull" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6 z" fill="#7a1f24"/>
+          </marker>
           <linearGradient id="land-grad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#ecfeff" stop-opacity="0.8"/>
-            <stop offset="100%" stop-color="#ecfeff" stop-opacity="0.2"/>
+            <stop offset="0%" stop-color="#ecfeff" stop-opacity="0.7"/>
+            <stop offset="100%" stop-color="#ecfeff" stop-opacity="0.15"/>
           </linearGradient>
         </defs>
 
@@ -359,14 +535,13 @@ target_i <span class="ck-cmd">=</span>  normalize(x_i <span class="ck-cmd">+</sp
           <line x1="60" y1="253" x2="640" y2="253"/>
         </g>
 
-        <!-- Landscape curve (higher y = lower fitness). Filled -->
+        <!-- Landscape curve (lower y on screen = higher fitness). Filled -->
         <path d="M 60,310 C 90,295 110,220 140,215 C 170,212 190,285 215,280 C 245,270 260,150 295,148 C 320,148 345,260 380,258 C 410,257 440,215 470,210 C 500,205 520,75 555,70 C 585,68 605,165 640,185 L 640,320 L 60,320 Z"
               fill="url(#land-grad)" stroke="none"/>
         <path d="M 60,310 C 90,295 110,220 140,215 C 170,212 190,285 215,280 C 245,270 260,150 295,148 C 320,148 345,260 380,258 C 410,257 440,215 470,210 C 500,205 520,75 555,70 C 585,68 605,165 640,185"
-              stroke="#0891b2" stroke-width="1.8" fill="none"/>
+              stroke="#0891b2" stroke-width="1.6" fill="none"/>
 
         <!-- Peak annotations -->
-        <!-- Local max 1 -->
         <circle cx="140" cy="215" r="3" fill="#566068"/>
         <text x="140" y="204" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#566068">local max</text>
 
@@ -374,27 +549,87 @@ target_i <span class="ck-cmd">=</span>  normalize(x_i <span class="ck-cmd">+</sp
         <circle cx="295" cy="148" r="4" fill="#d97706"/>
         <text x="295" y="136" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#d97706">single-agent trap</text>
 
-        <!-- Global max -->
-        <circle cx="555" cy="70" r="5" fill="#059669"/>
-        <text x="555" y="56" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#059669">global optimum</text>
+        <!-- Global max — gbest -->
+        <polygon points="555,52 561,66 576,66 564,75 569,90 555,81 541,90 546,75 534,66 549,66" fill="#7a1f24" stroke="#4d1417" stroke-width="1"/>
+        <text x="555" y="44" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#7a1f24">gbest · global optimum</text>
 
-        <!-- Single-agent path: stuck at trap peak -->
-        <path d="M 85,300 Q 170,240 280,155" stroke="#d97706" stroke-width="1.8" stroke-dasharray="4 3" fill="none" marker-end="url(#arrow-land)"/>
-        <text x="140" y="298" font-family="JetBrains Mono, monospace" font-size="9" fill="#d97706">single-agent: gets stuck</text>
+        <!-- Single-agent trail (orange, dashed): wanders, climbs trap, oscillates -->
+        <g opacity="0.95">
+          <circle cx="85"  cy="300" r="2.5" fill="#d97706" opacity="0.45"/>
+          <circle cx="120" cy="280" r="2.5" fill="#d97706" opacity="0.55"/>
+          <circle cx="170" cy="240" r="2.5" fill="#d97706" opacity="0.65"/>
+          <circle cx="220" cy="200" r="2.5" fill="#d97706" opacity="0.75"/>
+          <circle cx="270" cy="170" r="2.5" fill="#d97706" opacity="0.85"/>
+          <circle cx="295" cy="148" r="3.5" fill="#d97706"/>
+          <!-- Oscillation around trap (re-tries) -->
+          <circle cx="305" cy="156" r="2" fill="#d97706" opacity="0.6"/>
+          <circle cx="285" cy="158" r="2" fill="#d97706" opacity="0.6"/>
+          <circle cx="298" cy="152" r="2" fill="#d97706" opacity="0.6"/>
+          <path d="M 85,300 Q 200,210 290,150" stroke="#d97706" stroke-width="1.4" stroke-dasharray="4 3" fill="none"/>
+        </g>
+        <text x="160" y="312" font-family="JetBrains Mono, monospace" font-size="9" fill="#d97706">single agent · climbs once, oscillates</text>
 
-        <!-- Swarm particles scattered, with one reaching global -->
-        <circle cx="100" cy="290" r="4" fill="#0891b2"/>
-        <circle cx="185" cy="255" r="4" fill="#7c3aed"/>
-        <circle cx="260" cy="200" r="4" fill="#e11d48"/>
-        <circle cx="390" cy="260" r="4" fill="#ea580c"/>
-        <circle cx="470" cy="180" r="4" fill="#059669"/>
-        <circle cx="550" cy="90"  r="5" fill="#0891b2" stroke="#0e7490" stroke-width="1.5"/>
+        <!-- Swarm: 6 particles, each with a trail and a pbest marker, plus social pull arrow toward gbest -->
+        <!-- particle 1 (cyan / geom) -->
+        <g>
+          <path d="M 100,295 C 200,260 280,210 470,180 Q 510,130 545,82" stroke="#0891b2" stroke-width="1.2" stroke-dasharray="2 2" fill="none" opacity="0.7"/>
+          <circle cx="100" cy="295" r="2.5" fill="#0891b2" opacity="0.4"/>
+          <circle cx="220" cy="240" r="2.5" fill="#0891b2" opacity="0.6"/>
+          <circle cx="380" cy="220" r="2.5" fill="#0891b2" opacity="0.8"/>
+          <!-- current position: at gbest -->
+          <circle cx="545" cy="82" r="5" fill="#0891b2" stroke="#0e7490" stroke-width="1.5"/>
+        </g>
+        <!-- pbest of cyan particle: at gbest itself -->
+        <rect x="540" y="95" width="10" height="3" fill="#0e7490"/>
+        <text x="555" y="100" font-family="JetBrains Mono, monospace" font-size="8" fill="#0e7490">pbest₁</text>
 
-        <!-- Swarm path: wider search ending at global max -->
-        <path d="M 100,290 Q 200,260 300,230 Q 400,200 460,150 Q 510,105 545,85" stroke="#0891b2" stroke-width="1.5" stroke-dasharray="2 2" fill="none" opacity="0.7"/>
-        <text x="395" y="135" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#0891b2">swarm: spreads &amp; finds global</text>
+        <!-- particle 2 (violet / color) -->
+        <g>
+          <path d="M 80,310 Q 190,255 260,200" stroke="#7c3aed" stroke-width="1.2" stroke-dasharray="2 2" fill="none" opacity="0.7"/>
+          <circle cx="80"  cy="310" r="2.5" fill="#7c3aed" opacity="0.4"/>
+          <circle cx="170" cy="270" r="2.5" fill="#7c3aed" opacity="0.6"/>
+          <circle cx="260" cy="200" r="5" fill="#7c3aed" stroke="#5b21b6" stroke-width="1.5"/>
+        </g>
+        <rect x="255" y="213" width="10" height="3" fill="#5b21b6"/>
+        <text x="270" y="218" font-family="JetBrains Mono, monospace" font-size="8" fill="#5b21b6">pbest₂</text>
+        <!-- social pull arrow -->
+        <line x1="265" y1="195" x2="535" y2="90" stroke="#7a1f24" stroke-width="0.9" stroke-dasharray="3 2" marker-end="url(#arrow-pull)" opacity="0.55"/>
+
+        <!-- particle 3 (emerald / object) -->
+        <g>
+          <path d="M 380,310 Q 420,260 470,210" stroke="#059669" stroke-width="1.2" stroke-dasharray="2 2" fill="none" opacity="0.7"/>
+          <circle cx="380" cy="310" r="2.5" fill="#059669" opacity="0.4"/>
+          <circle cx="430" cy="245" r="2.5" fill="#059669" opacity="0.6"/>
+          <circle cx="470" cy="210" r="5" fill="#059669" stroke="#065f46" stroke-width="1.5"/>
+        </g>
+        <rect x="465" y="222" width="10" height="3" fill="#065f46"/>
+        <text x="480" y="227" font-family="JetBrains Mono, monospace" font-size="8" fill="#065f46">pbest₃</text>
+        <line x1="475" y1="205" x2="540" y2="92" stroke="#7a1f24" stroke-width="0.9" stroke-dasharray="3 2" marker-end="url(#arrow-pull)" opacity="0.55"/>
+
+        <!-- particle 4 (rose / rule) — trapped in left local max but pulled out next iteration -->
+        <g>
+          <path d="M 110,300 Q 130,250 140,215" stroke="#e11d48" stroke-width="1.2" stroke-dasharray="2 2" fill="none" opacity="0.7"/>
+          <circle cx="110" cy="300" r="2.5" fill="#e11d48" opacity="0.4"/>
+          <circle cx="140" cy="215" r="5" fill="#e11d48" stroke="#9f1239" stroke-width="1.5"/>
+        </g>
+        <line x1="148" y1="212" x2="535" y2="93" stroke="#7a1f24" stroke-width="0.9" stroke-dasharray="3 2" marker-end="url(#arrow-pull)" opacity="0.55"/>
+
+        <!-- Legend boxes inside plot -->
+        <g transform="translate(420,46)">
+          <rect width="210" height="60" rx="6" fill="#ffffff" stroke="#e5e7eb" stroke-width="1"/>
+          <circle cx="14" cy="18" r="4" fill="#0891b2"/>
+          <text x="26" y="22" font-family="JetBrains Mono, monospace" font-size="9" fill="#3e484d">particle (current x)</text>
+          <rect x="10" y="32" width="10" height="3" fill="#0e7490"/>
+          <text x="26" y="38" font-family="JetBrains Mono, monospace" font-size="9" fill="#3e484d">pbest · particle's own best</text>
+          <line x1="6" y1="50" x2="20" y2="50" stroke="#7a1f24" stroke-width="0.9" stroke-dasharray="3 2" marker-end="url(#arrow-pull)"/>
+          <text x="26" y="53" font-family="JetBrains Mono, monospace" font-size="9" fill="#3e484d">social pull → gbest</text>
+        </g>
+
+        <!-- Caption strip below -->
+        <rect x="60" y="376" width="580" height="36" rx="6" fill="#fbf6ec" stroke="#cdc4ad" stroke-width="1"/>
+        <text x="350" y="397" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="12" fill="#3e484d">Single-agent climbs the nearest hill and oscillates. The swarm holds <tspan font-family="JetBrains Mono, monospace" font-size="10" fill="#566068">six</tspan> trajectories, each remembering its <tspan font-family="JetBrains Mono, monospace" font-size="10" fill="#0e7490">pbest</tspan>, all gently pulled toward <tspan font-family="JetBrains Mono, monospace" font-size="10" fill="#7a1f24">gbest</tspan>.</text>
       </svg>
-      <figcaption>A 1-D cross-section of the fitness landscape. A single-agent, greedy-ascent search climbs to the nearest local maximum and stops. The swarm spreads across the landscape and some particles eventually find the global optimum.</figcaption>
+      <figcaption>A 1-D cross-section of the fitness landscape. A single-agent search climbs to the nearest local maximum and oscillates around it. The swarm spreads particles across the landscape; each remembers its personal best, all are pulled toward the swarm-wide global best, and at least one particle finds the true peak.</figcaption>
     </figure>
 
     <h2>The Tech Stack</h2>
@@ -559,7 +794,7 @@ target_i <span class="ck-cmd">=</span>  normalize(x_i <span class="ck-cmd">+</sp
 
   </article>
 
-<div class="measure">
+<div class="wrap">
   <nav class="post-nav">
     <a href="index.html"><span class="label">archive</span>← all posts</a>
     <a class="next" href="evolution-arena.html"><span class="label">read next</span>When AI Becomes Its Own Scientist →</a>

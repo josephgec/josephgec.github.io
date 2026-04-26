@@ -94,6 +94,12 @@
 
       <div class="ml-rail-label" style="margin-top: 18px">Loss curve</div>
       <canvas id="loss-canvas" style="width:100%; height:80px; display:block"></canvas>
+
+      <div class="ml-rail-label" style="margin-top: 18px">Top weight updates</div>
+      <canvas id="grad-bar-canvas" style="width:100%; height:130px; display:block"></canvas>
+      <p style="font-family:var(--serif); font-style:italic; font-size:12px; color:var(--ml-ink-fade); line-height:1.5; margin-top: 6px">
+        Which weights are about to change the most. Bar = |∂L/∂w|.
+      </p>
     </aside>
 
     <div class="ml-canvas-wrap">
@@ -115,12 +121,41 @@
     <aside class="right-rail">
       <div class="ml-margin">
         <div class="ml-margin-rule"></div>
+        <div class="ml-margin-h">Before this</div>
+        <p class="quiet">Before backpropagation (Werbos 1974, Rumelhart-Hinton-Williams 1986), nobody knew how to train multi-layer networks at scale. Each weight got an arbitrary little nudge; learning was glacial. Backprop computed every gradient in one efficient pass — the engine of every deep model since.</p>
+        <div class="ml-margin-rule thin"></div>
         <div class="ml-margin-h">Chain rule</div>
-        <div class="ml-equation" style="font-size:14px">∂L/∂W⁽ˡ⁾ = δ⁽ˡ⁾ a⁽ˡ⁻¹⁾ᵀ</div>
-        <p>The error δ at each layer is the upstream error multiplied by the local derivative — that's it. Backprop is just the chain rule applied recursively.</p>
+        <div class="ml-equation" style="font-size:14px; line-height:1.4">∂L/∂wᵢⱼ = <span style="color:#3a6b5e">∂L/∂outⱼ</span> · <span style="color:#7a1f24">ƒ′(zⱼ)</span> · <span style="color:#262320">xᵢ</span></div>
+        <p style="font-family:var(--serif); font-style:italic; font-size:13px; line-height:1.55; color:var(--ml-ink-fade); margin-top: 6px">
+          The gradient on a single weight is three things multiplied: the <span style="color:#3a6b5e">upstream error</span> coming back through the network, the <span style="color:#7a1f24">local derivative</span> of the activation at that neuron, and the <span style="color:#262320">input</span> that flowed through that weight.
+        </p>
+        <p>Why three? Each weight gets blamed in proportion to <em>(a)</em> how much its neuron's output mattered downstream, <em>(b)</em> how responsive the neuron was to a nudge (its slope), and <em>(c)</em> how big the input it scaled was. Multiply, and you've assigned blame all the way down.</p>
+        <p class="quiet">The error δ at each layer is the upstream error multiplied by the local derivative — that's it. Backprop is just the chain rule applied recursively, output → input.</p>
         <div class="ml-margin-rule thin"></div>
         <div class="ml-margin-h sm">Reading the picture</div>
-        <p class="quiet">Connections turn <em style="color:var(--accent)">orange</em> when their weight will increase, green when it will decrease. Thickness reflects gradient magnitude — how much that weight is "blamed" for the error.</p>
+        <div style="display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:11px; color:var(--ml-ink-fade); margin-bottom:4px">
+          <span style="width:14px; height:2px; background:#7a1f24; display:inline-block"></span>
+          <span>weight will <b>increase</b> (gradient is negative, so −η·∇ pushes up)</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:11px; color:var(--ml-ink-fade); margin-bottom:4px">
+          <span style="width:14px; height:2px; background:#3a6b5e; display:inline-block"></span>
+          <span>weight will <b>decrease</b></span>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:11px; color:var(--ml-ink-fade); margin-bottom:4px">
+          <span style="width:14px; height:2px; background:rgba(122,31,36,0.8); display:inline-block; box-shadow: 0 2px 0 rgba(122,31,36,0.8)"></span>
+          <span>thicker line = bigger blame ( |∂L/∂w| )</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:11px; color:var(--ml-ink-fade); margin-bottom:4px">
+          <span style="width:10px; height:10px; border:2px solid #3a6b5e; border-radius:50%; display:inline-block"></span>
+          <span>green halo on a neuron = how much error δ flows through it</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:11px; color:var(--ml-ink-fade)">
+          <span style="width:10px; height:10px; border:2px dashed #3a6b5e; border-radius:50%; display:inline-block"></span>
+          <span>dashed green = the true target class</span>
+        </div>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Symbols, plainly</div>
+        <p class="quiet"><b>∂</b> (partial-d) means partial derivative — "if I nudge this single weight by a hair, how much does L change?" <b>L</b> = the loss (a single number measuring how wrong we are). <b>w</b> = a weight. <b>z</b> = the pre-activation (the weighted sum before the bend), <b>ƒ′(z)</b> = the slope of the activation at that <em>z</em> — near zero, the gradient gets killed and learning stalls. <b>δ</b> (delta) = the error flowing back through a neuron; the footer's recursion <em>δ ← W⁽ˡ⁺¹⁾ᵀ δ⁽ˡ⁺¹⁾</em> reads "this layer's error = upstream error pulled back through the next layer's transposed weights."</p>
         <div class="ml-margin-rule thin"></div>
         <div class="ml-margin-h sm">Decision boundary</div>
         <p class="quiet">The contour map below shows the network's current confidence over the input plane. As you train, watch it warp to fit the data.</p>

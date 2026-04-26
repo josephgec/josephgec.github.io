@@ -52,17 +52,25 @@
     <div class="ml-try">
       <div class="ml-eyebrow accent">Try this</div>
       <ol>
-        <li>Try the <em>king/queen/man/woman</em> analogy. The arrow from <em>man</em> to <em>woman</em> is parallel to the arrow from <em>king</em> to <em>queen</em>. That parallelism is the gender direction in embedding space.</li>
-        <li>Try the <em>Paris/France/Italy</em> analogy. Same shape, different content — the country→capital vector is its own direction.</li>
-        <li>Click any word to see its 5 nearest neighbors (by cosine similarity). Words with related meanings cluster; the geometric closeness <em>is</em> the semantic similarity.</li>
+        <li>Pick the <em>king − man + woman</em> preset. The faint arrow from <em>man → king</em> is parallel to the bright arrow from <em>woman → queen</em>. That parallelism is the "gender" direction in embedding space — a literal vector you can add to any other word.</li>
+        <li>Pick the <em>Paris − France + Italy</em> preset. Same parallelogram shape, different content — country→capital is its own direction. Same trick generalizes to verb tense, comparatives, plurals.</li>
+        <li>Open <em>Build your own · A − B + C</em>. Click three words on the canvas to set A, B, C. The result vector snaps to the closest word — try it on any cluster.</li>
+        <li>Hover any word to see its 5 nearest neighbors (by cosine similarity). Words with related meanings cluster; the geometric closeness <em>is</em> the semantic similarity.</li>
       </ol>
     </div>
   </section>
 
   <section class="ml-stage">
     <aside class="left-rail">
-      <div class="ml-rail-label">Analogy</div>
+      <div class="ml-rail-label">Preset analogy</div>
       <div class="ml-presets" id="analogies"></div>
+
+      <div id="builder-pane" style="margin-top:18px; display:none">
+        <div class="ml-rail-label">Build your own · A − B + C</div>
+        <p style="font-family:var(--serif); font-style:italic; font-size:12px; color:var(--ml-ink-fade); line-height:1.5">Click three words on the canvas to set <em>A</em>, <em>B</em>, <em>C</em>. The result vector A − B + C will snap to the closest word.</p>
+        <div id="builder-readout" style="font-family:var(--mono); font-size:11px; color:var(--ml-ink-fade); margin-top:8px"></div>
+        <button id="builder-clear" class="ml-sbtn ghost" style="width:100%; padding:8px 10px; margin-top:6px; font-family:var(--serif); font-style:italic; font-size:13px">↺ Clear</button>
+      </div>
 
       <div class="ml-rail-label" style="margin-top: 24px">Highlighted word</div>
       <div id="hover-info" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade)">Hover or click a word</div>
@@ -72,6 +80,7 @@
     </aside>
 
     <div class="ml-canvas-wrap">
+      <div class="ml-mode-tabs" id="view-tabs"></div>
       <div class="ml-canvas-frame">
         <canvas id="canvas"></canvas>
       </div>
@@ -81,11 +90,55 @@
     <aside class="right-rail">
       <div class="ml-margin">
         <div class="ml-margin-rule"></div>
-        <div class="ml-margin-h">Word2Vec</div>
-        <p>Train a network to predict a word from its surrounding context (or vice versa). The hidden layer's weights become the word vectors. Mikolov's 2013 paper showed that this simple objective gives semantic geometry for free.</p>
+        <div class="ml-margin-h">Before this</div>
+        <p class="quiet">Before learned embeddings (Word2Vec 2013, GloVe 2014), words were one-hot vectors — orthogonal, ignorant of meaning. <em>King</em> and <em>queen</em> were as related as <em>king</em> and <em>asphalt</em>. Embeddings packed semantic similarity into geometry: similar words near each other, analogies as vector arithmetic. The conceptual leap that made modern NLP possible.</p>
+
         <div class="ml-margin-rule thin"></div>
-        <div class="ml-margin-h sm">Cosine similarity</div>
-        <p class="quiet">Similarity = cos(angle between vectors) = u·v / (‖u‖‖v‖). Length is mostly noise; direction encodes meaning. This is the metric every retrieval system uses.</p>
+        <div class="ml-margin-h">Embedding space</div>
+        <svg viewBox="0 0 220 150" style="width:100%; max-width:220px; display:block; margin:6px 0 10px">
+          <!-- Lookup table -->
+          <text x="6" y="14" font-family="JetBrains Mono, monospace" font-size="9" fill="rgba(38,35,32,0.55)">word</text>
+          <text x="64" y="14" font-family="JetBrains Mono, monospace" font-size="9" fill="rgba(38,35,32,0.55)">→ vector</text>
+          <text x="6" y="28" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="11" fill="#262320">king</text>
+          <rect x="40" y="20" width="60" height="10" fill="rgba(122,31,36,0.10)" stroke="rgba(122,31,36,0.4)" stroke-width="0.5"/>
+          <text x="42" y="28" font-family="JetBrains Mono, monospace" font-size="7" fill="#7a1f24">[0.21, −0.5, …]</text>
+          <text x="6" y="44" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="11" fill="#262320">queen</text>
+          <rect x="40" y="36" width="60" height="10" fill="rgba(122,31,36,0.10)" stroke="rgba(122,31,36,0.4)" stroke-width="0.5"/>
+          <text x="42" y="44" font-family="JetBrains Mono, monospace" font-size="7" fill="#7a1f24">[0.18, +0.6, …]</text>
+          <text x="6" y="60" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="11" fill="#262320">cat</text>
+          <rect x="40" y="52" width="60" height="10" fill="rgba(122,31,36,0.10)" stroke="rgba(122,31,36,0.4)" stroke-width="0.5"/>
+          <text x="42" y="60" font-family="JetBrains Mono, monospace" font-size="7" fill="#7a1f24">[−0.4, 0.9, …]</text>
+
+          <!-- Arrow → space -->
+          <line x1="105" y1="40" x2="124" y2="60" stroke="#262320" stroke-width="0.7" marker-end="url(#earrow)"/>
+
+          <!-- Tiny scatter "space" -->
+          <rect x="125" y="32" width="80" height="80" fill="rgba(38,35,32,0.04)" stroke="rgba(38,35,32,0.4)" stroke-width="0.5"/>
+          <circle cx="155" cy="55" r="2.5" fill="#7a1f24"/>
+          <circle cx="160" cy="60" r="2.5" fill="#7a1f24"/>
+          <text x="148" y="48" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="7" fill="#7a1f24">king·queen</text>
+          <circle cx="180" cy="90" r="2.5" fill="#262320"/>
+          <circle cx="185" cy="95" r="2.5" fill="#262320"/>
+          <text x="170" y="105" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="7" fill="#262320">cat·dog</text>
+
+          <text x="110" y="135" text-anchor="middle" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="9" fill="rgba(38,35,32,0.55)">similar meanings → nearby points</text>
+          <text x="110" y="146" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="7" fill="rgba(38,35,32,0.55)">real spaces are 768+ dims; this is 2D</text>
+          <defs>
+            <marker id="earrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+              <path d="M0,0 L10,5 L0,10 z" fill="#262320"/>
+            </marker>
+          </defs>
+        </svg>
+        <p class="quiet" style="font-size:12px">Words go through a <em>lookup table</em>: each word has a learned vector. The geometry between vectors encodes semantic relationships nobody hand-coded.</p>
+
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Symbol gloss</div>
+        <p class="quiet"><em>embedding</em>: a vector — a list of numbers — assigned to each word.<br /><em>cosine similarity</em>: cos(angle between two vectors) — <em>1</em> = parallel (very similar), <em>0</em> = perpendicular (unrelated), <em>−1</em> = opposite.<br /><em>vector arithmetic</em>: just add and subtract the vectors as lists of numbers; the result is another point in the same space.</p>
+
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Word2Vec</div>
+        <p class="quiet">Train a network to predict a word from its surrounding context (or vice versa). The hidden layer's weights become the word vectors. Mikolov's 2013 paper showed this simple objective gives semantic geometry for free.</p>
+
         <div class="ml-margin-rule thin"></div>
         <div class="ml-margin-h sm">Modern embeddings</div>
         <p class="quiet">Today's text embeddings come from large pre-trained transformers — OpenAI's text-embedding-3, Cohere, Voyage, etc. Same geometry idea, just trained on much more data with much bigger models.</p>

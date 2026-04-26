@@ -112,11 +112,16 @@
     <aside class="right-rail">
       <div class="ml-margin">
         <div class="ml-margin-rule"></div>
+        <div class="ml-margin-h">Before this</div>
+        <p class="quiet">Before linear algebra unified geometric operations (Cayley, Sylvester, mid-1800s), rotations, scalings, and shears each had separate trigonometric machinery. The matrix view made all of them — and combinations of them — a single multiplication. Computer graphics, robotics, and ML's billion-parameter weight tensors all rest on this one idea.</p>
+
+        <div class="ml-margin-rule thin"></div>
         <div class="ml-margin-h">In the margin</div>
         <p>Where do the basis vectors go?</p>
         <div class="ml-equation">A = [ î′ &nbsp; ĵ′ ]</div>
+        <p class="quiet" style="margin-top:-8px"><em>î</em> (read "<em>i-hat</em>") is the unit arrow along x; <em>ĵ</em> ("<em>j-hat</em>") is the unit arrow along y. The primes <em>î′, ĵ′</em> are where they end up after A. The brackets just say "stack these two columns into a matrix".</p>
         <p>The first column of A says where the unit x-vector lands. The second column says where the unit y-vector lands. Every other vector follows from these two by linearity.</p>
-        <p class="quiet"><em>det(A)</em> measures how much the unit square's area changes. Negative determinant means the orientation flips — the letter F lands mirror-image.</p>
+        <p class="quiet"><em>det(A)</em> ("<em>determinant of A</em>") measures how much the unit square's area changes — a single number. <em>tr(A)</em> ("<em>trace</em>") is just the sum of the diagonal entries A₁₁ + A₂₂. Negative determinant means the orientation flips — the letter F lands mirror-image.</p>
 
         <div class="ml-margin-rule thin"></div>
         <div class="ml-margin-h sm">Linearity</div>

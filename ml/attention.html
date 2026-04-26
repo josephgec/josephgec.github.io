@@ -40,8 +40,8 @@
       <div class="ml-intro-block">
         <div class="ml-eyebrow">The concept</div>
         <p class="lead"><span class="term">Attention</span> lets each position in a sequence look at every other position and choose what to absorb.</p>
-        <p>Each token emits three vectors: a <em>query</em> (what am I looking for?), a <em>key</em> (what do I represent?), and a <em>value</em> (what would I contribute?). To compute attention for a query: take its dot product with every key, scale, softmax — that gives a weight per token. The output is the weighted sum of values.</p>
-        <p>Written in math: <em>Attention(Q, K, V) = softmax(QKᵀ / √d) V</em>. One operation. One equation. The mechanism that ate machine learning.</p>
+        <p>Each token gets three roles, one learned vector each: a <em>query</em> (what am I looking for?), a <em>key</em> (what do I represent?), and a <em>value</em> (what would I contribute?). To compute attention for one query: take its dot product with every key — that's a similarity score — then <span class="term">softmax</span> turns the scores into a list of probabilities that sum to 1. The output is those probabilities used as weights on the values.</p>
+        <p>Written in math: <em>Attention(Q, K, V) = softmax(QKᵀ / √d) V</em>. The √d just keeps the numbers from blowing up at large dimension. One operation. One equation. The mechanism that ate machine learning.</p>
       </div>
       <div class="ml-intro-block">
         <div class="ml-eyebrow">Why ML cares</div>
@@ -53,8 +53,8 @@
       <div class="ml-eyebrow accent">Try this</div>
       <ol>
         <li>Click <em>bank</em> in "river bank flooded." The bars show <em>bank</em> attending strongly to <em>river</em> and <em>flooded</em> — context disambiguates word sense.</li>
-        <li>Try <em>bat</em> in "swung the bat and hit a homer." It attends to <em>swung</em>, <em>hit</em>, <em>homer</em> — all baseball. The model doesn't know baseball; it just learns which words tend to co-occur.</li>
-        <li>Click each word in turn. Watch how function words (<em>the</em>, <em>a</em>) attend almost uniformly, while content words have sharp distributions.</li>
+        <li>Switch to <em>All pairs · matrix</em>. Now you see every word's attention pattern at once. Click any row to make that word the query. Function words (<em>the</em>, <em>a</em>) light up rows roughly uniformly; content words make sharper, more selective rows.</li>
+        <li>Switch to <em>The output · weighted blend</em>. The bar shows what <em>bank</em> actually <em>becomes</em> after attention: a literal mix of the words it attended to. Each segment's width is its softmax weight.</li>
       </ol>
     </div>
   </section>
@@ -71,23 +71,31 @@
     </aside>
 
     <div class="ml-canvas-wrap">
+      <div class="ml-mode-tabs" id="view-tabs"></div>
       <div class="ml-canvas-frame" style="aspect-ratio: 1.4 / 1; padding: 36px 28px">
         <canvas id="canvas"></canvas>
       </div>
-      <div class="ml-caption">
+      <div class="ml-caption" id="caption">
         <span class="ml-cap-num">·</span>
-        The query word "looks at" the others through learned similarity. Strong matches get high weights; weak matches fade. The query then gets re-described as a weighted blend of everything it attended to.
+        <span id="caption-text">The query word "looks at" the others through learned similarity. Strong matches get high weights; weak matches fade. The query then gets re-described as a weighted blend of everything it attended to.</span>
       </div>
     </div>
 
     <aside class="right-rail">
       <div class="ml-margin">
         <div class="ml-margin-rule"></div>
+        <div class="ml-margin-h">Before this</div>
+        <p class="quiet">Before attention, sequence-to-sequence models had to compress an entire sentence into one fixed-size vector. Long inputs degraded badly. Attention (Bahdanau 2014, Vaswani 2017) replaced compression with content-addressed lookup: every output token can re-read every input token. Memory squeeze became database lookup; long contexts became tractable.</p>
+
+        <div class="ml-margin-rule thin"></div>
         <div class="ml-margin-h">A library, not a list</div>
         <p>Old recurrent models read tokens one at a time and squeezed everything into a single hidden state. Attention lets each token reach back to <em>any</em> prior token, with weights determined by what the model is currently looking for.</p>
         <div class="ml-margin-rule thin"></div>
         <div class="ml-margin-h sm">Q, K, V</div>
-        <p class="quiet">Each token emits three vectors: a <em>query</em> (what am I looking for?), a <em>key</em> (what do I represent?), and a <em>value</em> (what do I contribute?). Match queries against keys, blend values.</p>
+        <p class="quiet">Each token emits three vectors — query, key, value — by passing its embedding through three small learned matrices. Match queries against keys, blend values. The matrices are what training shapes.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Softmax, plainly</div>
+        <p class="quiet">Take any list of scores. Exponentiate each, divide by the sum. The result is a list of weights between 0 and 1 that sum to 1 — a probability distribution. Big scores end up <em>much</em> bigger than small ones; that's why attention concentrates on a few keys, not everyone.</p>
         <div class="ml-margin-rule thin"></div>
         <div class="ml-margin-h sm">In practice</div>
         <p class="quiet">Real attention learns these patterns from data — no hand-coded semantics. Different attention heads in a trained model end up specializing in syntax, coreference, position, and stranger things.</p>

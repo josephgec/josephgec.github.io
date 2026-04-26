@@ -54,6 +54,7 @@
         <p class="lead">A <span class="term">probability distribution</span> is a function that assigns a number — a probability — to each possible outcome of a random process.</p>
         <p>For continuous outcomes (height, temperature) it's a <em>density</em> — a curve <em>f(x)</em> whose area under each interval is the chance the value falls there. For discrete outcomes (coin flip, count) it's a <em>mass function</em> — a number <em>P(k)</em> for each outcome that sums to 1.</p>
         <p>Most distributions are described by one or two parameters. The Gaussian's mean and standard deviation; the Bernoulli's success probability <em>p</em>; the Poisson's rate <em>λ</em>. Change the parameters and the curve breathes.</p>
+        <p class="quiet" style="margin-top:10px; font-size:13px"><strong>Reading the Greek.</strong> <em>μ</em> ("mu") is the mean — the center of the distribution. <em>σ</em> ("sigma") is the standard deviation — the spread. <em>λ</em> ("lambda") is a rate — events per unit time. <em>π</em> ("pi") is the constant 3.14159…; <em>e</em> is Euler's number, 2.71828…. <em>k</em> is a discrete count; <em>n</em> is the number of trials.</p>
       </div>
       <div class="ml-intro-block">
         <div class="ml-eyebrow">Why ML cares</div>
@@ -64,9 +65,9 @@
     <div class="ml-try">
       <div class="ml-eyebrow accent">Try this</div>
       <ol>
-        <li>Open <em>Gaussian</em>, drag <em>μ</em> right and watch the bell shift; drag <em>σ</em> up and watch it fatten. Hit <em>+1000</em> and see the grey histogram pour into the orange curve.</li>
-        <li>Open <em>Binomial</em> with <em>n = 30, p = 0.5</em> — a discrete shape that already looks suspiciously bell-curved. That's the de Moivre–Laplace theorem in action.</li>
-        <li>Open <em>Poisson</em>, set <em>λ = 1</em>, sample 1000 times. The mean equals the variance — the Poisson's defining peculiarity.</li>
+        <li>Open <em>Gaussian</em>. The shaded band is <em>μ ± σ</em> — that's variance made visible. Drag <em>σ</em> wider and the band breathes with it.</li>
+        <li>Hit <em>+1000</em>. Samples drop in over a second instead of all-at-once; watch the inset trace pin the running mean to μ. That's the law of large numbers as a heartbeat.</li>
+        <li>Switch to <em>Binomial</em>. Notice the lollipop stems with gaps between integers — discrete distributions live <em>only</em> on whole numbers, and the visual finally says so.</li>
       </ol>
     </div>
   </section>
@@ -98,7 +99,7 @@
       </div>
       <div class="ml-caption">
         <span class="ml-cap-num">·</span>
-        The <span class="ml-ink-orange">accent curve</span> is the true distribution. Grey bars are random samples drawn from it. With enough samples, the histogram fills in the shape — that is the law of large numbers, made visual.
+        Continuous distributions render as a <span class="ml-ink-orange">filled curve</span>; discrete distributions render as lollipop stems on integer outcomes. The shaded band is <span class="ml-ink-orange">μ ± σ</span> — variance, visually. The inset traces the running sample mean as it converges to μ.
       </div>
       <div class="ml-preset-blurb" id="dist-blurb" style="margin-top: 18px; max-width: 580px"></div>
     </div>

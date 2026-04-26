@@ -52,6 +52,7 @@
       <div class="ml-intro-block">
         <div class="ml-eyebrow">The concept</div>
         <p class="lead"><span class="term">Bayes' theorem</span> tells you how to update your belief about an event A after observing evidence B: <em>P(A | B) = P(B | A) · P(A) / P(B)</em>.</p>
+        <p><strong>Reading the notation.</strong> <em>P(A)</em> means "the probability of A." The vertical bar <em>|</em> reads "given that" — so <em>P(A | B)</em> is "the probability of A, given that B happened." A and B stand for events, claims, or hypotheses ("has the disease"; "test came back positive"). Bayes' rule swaps the order of the conditional: it lets you compute <em>P(A | B)</em> when what you actually know is <em>P(B | A)</em>.</p>
         <p>Read left to right: the chance of <em>A given B</em> equals the chance of <em>B given A</em>, re-weighted by how plausible A was to begin with (the <em>prior</em>), and normalized by how often B occurs at all (the <em>evidence</em>).</p>
         <p>The most counter-intuitive consequence is the <em>base rate fallacy</em>: even a 95%-accurate test for a 1% disease produces only ~16% probability of disease given a positive result. Most positives are false positives — simply because healthy people vastly outnumber sick ones.</p>
       </div>
@@ -64,9 +65,9 @@
     <div class="ml-try">
       <div class="ml-eyebrow accent">Try this</div>
       <ol>
-        <li>Open <em>Medical test</em>. Note the posterior is ~16% — a positive test on a 1% disease is mostly a false positive. Now drag the prior up to <em>0.5</em>. The posterior leaps to ~95%.</li>
-        <li>In <em>Spam filter</em>, slide the false-positive rate to <em>0</em>. The posterior pins to 100% — perfect detector when there are zero false positives.</li>
-        <li>Switch to the <em>Area square</em> view. The orange area divided by the total orange equals the posterior. The whole equation becomes one ratio of areas.</li>
+        <li>Open <em>Medical test</em>. Switch to <em>Population view</em>. Out of 100,000 people the test flags ~5,950 — but only ~950 actually have the disease. <em>P(disease | positive) ≈ 16%</em>. The base-rate fallacy made visible.</li>
+        <li>In <em>Tree mode</em>, watch the posterior as a giant collapsing fraction: numerator is the highlighted A∩B leaf; denominator is A∩B + ¬A∩B. The whole rule is a ratio of two leaves.</li>
+        <li>Drag <em>Prior</em> up to 0.5. In Population view the bright dots overwhelm the faint ones — posterior leaps to ~95%. The test didn't change; the prior did.</li>
       </ol>
     </div>
   </section>
@@ -88,7 +89,8 @@
     <div class="ml-canvas-wrap">
       <div class="ml-mode-tabs" id="mode-tabs">
         <button data-mode="tree">I. Probability tree</button>
-        <button data-mode="square">II. Area square</button>
+        <button data-mode="population">II. Population view</button>
+        <button data-mode="square">III. Area square</button>
       </div>
       <div class="ml-canvas-frame" id="canvas-frame">
         <canvas id="canvas"></canvas>
@@ -99,6 +101,9 @@
     <aside class="right-rail">
       <div class="ml-margin">
         <div class="ml-margin-rule"></div>
+        <div class="ml-margin-h" style="font-family:var(--mono); font-size:11px; letter-spacing:0.22em; text-transform:uppercase; color:var(--accent)">Before this</div>
+        <p class="quiet" style="font-style:italic">Before Bayes (1763, popularized by Laplace), updating beliefs with evidence had no formula — people argued by intuition. Bayes' rule turned belief-updating into a single equation. It is why a doctor reading a 95%-accurate test should still mostly <em>not</em> believe the patient is sick — base rates dominate.</p>
+        <div class="ml-margin-rule thin"></div>
         <div class="ml-margin-h">In the margin</div>
         <div class="ml-equation">P(A | B) = P(B | A) P(A) / P(B)</div>
         <p>In words: the chance of <em>A given B</em> is the chance of <em>B given A</em>, re-weighted by how plausible A was to begin with, and normalized by how often B happens at all.</p>

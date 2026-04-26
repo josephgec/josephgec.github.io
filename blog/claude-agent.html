@@ -96,11 +96,15 @@
   <div class="post-body">
     <p>LLMs are remarkable at taking a bounded request and producing code. But real software engineering isn't bounded. Building a feature means planning, coding, testing, discovering you got it wrong, and trying again. It's iterative by nature.</p>
 
-    <p>Tools like Claude Code already iterate internally — gather context, take action, verify, repeat. But they mix planning and coding in a single context window. When one instance does both, there's a strong bias toward jumping to code even when the right move is to stop and think. What if you could split the roles and give each one room to do its job fully?</p>
+    <p>Tools like Claude Code are already <em>agents</em> — large language models running inside a loop, allowed to read files, run shell commands, and check results before responding. They iterate internally: gather context, take action, verify, repeat. But the same instance does both the planning and the coding inside a single context window. When one model holds both jobs at once, there's a strong bias toward jumping to code even when the right move is to stop and think. What if you split the roles and gave each one room to do its job fully?</p>
 
-    <p>I wanted to see what would happen if I closed the loop myself. Not a fancy multi-agent framework. Not a task tree. Just two Claude Code instances wired together in a cycle, with an orchestrator forwarding context, diffs, and test results between them until the job is done.</p>
+    <p>I wanted to see what would happen if I closed the loop myself. Not a fancy <em>multi-agent</em> framework with five or seven specialised roles arguing through structured artifacts. Not a task tree. Just two Claude Code instances wired together in a cycle, with an orchestrator forwarding context, <em>git diffs</em> (the textual record of what changed in the code, line by line), and test results between them until the job is done.</p>
 
     <p>What I found, both in my own experiments and in the surprisingly large body of research that already exists on this question, is that the architecture matters less than I expected — and the engineering decisions around it matter much more.</p>
+
+    <blockquote>
+      <strong style="font-style:normal;">Before this.</strong> Earlier coding agents fell into two camps. The first was the single-agent loop: one LLM in a long-running ReAct cycle, gathering context, calling tools, and editing files until it declared done. As the conversation grew, the model's context window filled up with raw tool output, "lost in the middle" effects kicked in, and the agent forgot what it was originally doing. The second camp was the multi-agent swarm — MetaGPT, ChatDev, AutoGen — five to seven role-played agents passing structured artifacts through a virtual software company. They produced impressive demos but spent most of their tokens on inter-agent ceremony, and an Anthropic post-mortem on agent failures (2025) traced most of the wasted compute to coordination overhead, not to the underlying coding work. The two-agent split is the smallest architecture that gets the benefit of separation without paying the swarm tax.
+    </blockquote>
 
     <h2>The Landscape</h2>
     <p>Before I started, I wanted to understand what others had built. The space turns out to be larger and more contradictory than it looks.</p>
@@ -115,7 +119,87 @@
 
     <p>So why bother with two agents at all? Two reasons, both grounded in research.</p>
 
+    <figure class="svg-figure">
+      <svg viewBox="0 0 720 360" width="100%" role="img" aria-label="Comparison of a single-agent loop with a bloating context window against a two-agent split where planning and implementation are separated">
+        <defs>
+          <marker id="arrow-cmp" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6 z" fill="#566068"/>
+          </marker>
+          <marker id="arrow-cmp-acc" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6 z" fill="#7a1f24"/>
+          </marker>
+        </defs>
+
+        <text x="170" y="28" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-weight="600" font-size="14" fill="#1a1a1a">Single-agent loop</text>
+        <text x="170" y="46" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068">one Claude · plans &amp; codes &amp; tests</text>
+
+        <rect x="40" y="62" width="260" height="220" rx="10" fill="#f7f3ec" stroke="#d4c9b3" stroke-width="1.2"/>
+        <text x="170" y="84" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#8a8270" letter-spacing="1">CONTEXT WINDOW</text>
+
+        <rect x="56" y="96" width="228" height="22" rx="4" fill="#ecfeff" stroke="#67e8f9" stroke-width="1"/>
+        <text x="170" y="111" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#0e7490">user goal</text>
+
+        <rect x="56" y="122" width="228" height="22" rx="4" fill="#fffbeb" stroke="#fcd34d" stroke-width="1"/>
+        <text x="170" y="137" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#92400e">tool: ls / read / grep ... ×40</text>
+
+        <rect x="56" y="148" width="228" height="22" rx="4" fill="#fffbeb" stroke="#fcd34d" stroke-width="1"/>
+        <text x="170" y="163" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#92400e">raw file contents · 12k tokens</text>
+
+        <rect x="56" y="174" width="228" height="22" rx="4" fill="#fffbeb" stroke="#fcd34d" stroke-width="1"/>
+        <text x="170" y="189" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#92400e">stack traces · diffs · stdout</text>
+
+        <rect x="56" y="200" width="228" height="22" rx="4" fill="#fdf2f8" stroke="#f9a8d4" stroke-width="1"/>
+        <text x="170" y="215" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#9d174d">"wait — what was the goal again?"</text>
+
+        <rect x="56" y="226" width="228" height="22" rx="4" fill="#fdf2f8" stroke="#f9a8d4" stroke-width="1"/>
+        <text x="170" y="241" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#9d174d">middle of context · 30%+ accuracy drop</text>
+
+        <text x="170" y="270" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="11" fill="#7a1f24">context bloats · planning gets buried</text>
+
+        <text x="170" y="305" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#566068" font-weight="600">FAILURE MODE</text>
+        <text x="170" y="322" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="11" fill="#1a1a1a">jumps to code · loses the plot · loops forever</text>
+
+        <text x="540" y="28" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-weight="600" font-size="14" fill="#1a1a1a">Two-agent split</text>
+        <text x="540" y="46" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068">planner ↔ implementer · separate windows</text>
+
+        <rect x="380" y="62" width="150" height="100" rx="10" fill="#f7f3ec" stroke="#d4c9b3" stroke-width="1.2"/>
+        <text x="455" y="82" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#8a8270" letter-spacing="1">PLANNER CTX</text>
+        <rect x="392" y="92" width="126" height="18" rx="3" fill="#ecfeff" stroke="#67e8f9" stroke-width="1"/>
+        <text x="455" y="105" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#0e7490">goal · tree · README</text>
+        <rect x="392" y="114" width="126" height="18" rx="3" fill="#ecfeff" stroke="#67e8f9" stroke-width="1"/>
+        <text x="455" y="127" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#0e7490">last diff + test result</text>
+        <text x="455" y="152" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="10" fill="#566068">small · stable · re-built each turn</text>
+
+        <rect x="550" y="62" width="150" height="100" rx="10" fill="#f7f3ec" stroke="#d4c9b3" stroke-width="1.2"/>
+        <text x="625" y="82" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#8a8270" letter-spacing="1">IMPL CTX</text>
+        <rect x="562" y="92" width="126" height="18" rx="3" fill="#fffbeb" stroke="#fcd34d" stroke-width="1"/>
+        <text x="625" y="105" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#92400e">one directive</text>
+        <rect x="562" y="114" width="126" height="18" rx="3" fill="#fffbeb" stroke="#fcd34d" stroke-width="1"/>
+        <text x="625" y="127" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#92400e">tool calls × N (this task only)</text>
+        <text x="625" y="152" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="10" fill="#566068">deep · narrow · disposable</text>
+
+        <line x1="530" y1="112" x2="550" y2="112" stroke="#7a1f24" stroke-width="1.5" marker-end="url(#arrow-cmp-acc)"/>
+        <path d="M550,132 L530,132" stroke="#7a1f24" stroke-width="1.5" marker-end="url(#arrow-cmp-acc)" fill="none"/>
+        <text x="540" y="100" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="#7a1f24">plan</text>
+        <text x="540" y="146" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="#7a1f24">diff</text>
+
+        <text x="540" y="195" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="11" fill="#7a1f24">what to do · vs · how to do it</text>
+
+        <rect x="380" y="215" width="320" height="50" rx="8" fill="#fffaf0" stroke="#d4c9b3" stroke-width="1"/>
+        <text x="540" y="235" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="11" fill="#1a1a1a">planner holds the project in its head ·</text>
+        <text x="540" y="252" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="11" fill="#1a1a1a">implementer holds only the next step</text>
+
+        <text x="540" y="295" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#566068" font-weight="600">RESULT</text>
+        <text x="540" y="312" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="11" fill="#1a1a1a">each model specialises · neither overloads</text>
+      </svg>
+      <figcaption>Single-agent loops are remarkable until the context fills up; the two-agent split keeps each window small and on-topic by separating <em>what to do</em> from <em>how to do it</em>.</figcaption>
+    </figure>
+
     <h2>Why Separate Planning from Execution</h2>
+    <p>The central insight is small but load-bearing. In a single-agent loop, the model is asked to do two qualitatively different things at once — hold the long-range plan in mind <em>and</em> grind through dozens of low-level tool calls (read this file, run this test, fix that line). Tool output is verbose; plans are terse; verbose-and-stale always beats terse-and-fresh in a long conversation. Once the plan is buried under 40 turns of stack traces and file contents, it stops steering the work.</p>
+
+    <p>Splitting the roles fixes that asymmetry. The Planner sees a small, freshly built packet — file tree, README, last diff, last test output — and decides what should happen next. It never makes a tool call. The Implementer gets exactly one directive and a clean context window in which to make as many tool calls as it needs. Each model specialises: one carries the project in its head, the other carries only the current task. Neither has to fight for context room.</p>
+
     <p>The case for splitting planning from execution — even just into two roles — is empirically strong. Several independent research lines converge on the same finding:</p>
 
     <ul>
@@ -132,63 +216,150 @@
     <p>There's also a practical reason. A single Claude instance asked to both plan and code has a strong bias toward writing code, even when the right move is to stop and think. Splitting the roles forces each instance to do its job fully before handing off. I noticed this within an hour of testing — the moment I gave one model both jobs, it stopped reasoning about whether the previous step was actually correct.</p>
 
     <h2>Two Roles, One Goal</h2>
-    <p>The architecture is the simplest thing that works: two Claude Code instances, each with a different system prompt, each specialized for one part of the cycle.</p>
+    <p>The architecture is the simplest thing that works: two Claude Code instances, each with a different system prompt, each specialised for one part of the cycle.</p>
 
-    <p><strong>The Planner</strong> is the senior tech lead. It sees the current state of the repository — file tree, README, recent git log, the last diff produced, the test output — and decides what needs to happen next. It doesn't write code. Its job is to think, explain, and hand off a clear instruction. Its output is a natural-language directive like <em>"add a JWT middleware at <code>src/auth/jwt.ts</code> that validates the access token and sets <code>req.user</code>. Don't touch the refresh flow yet — we'll do that next."</em></p>
+    <p><strong>The Planner</strong> is the senior tech lead. It sees the current state of the repository — file tree, README, recent git log, the last diff produced, the test output — and decides what needs to happen next. It doesn't write code; it doesn't make tool calls at all. Its job is to think, explain, and hand off a clear instruction. Its output is a natural-language <em>directive</em> like <em>"add a JWT middleware at <code>src/auth/jwt.ts</code> that validates the access token and sets <code>req.user</code>. Don't touch the refresh flow yet — we'll do that next."</em></p>
 
     <p><strong>The Implementer</strong> is the engineer. It receives the directive from the Planner and executes it. It reads the files it needs, makes the edits, runs the tests, and reports back what it changed. It does not second-guess the plan. Its job is to make the diff happen cleanly.</p>
 
+    <p>That's the whole separation: the Planner has full project context but no hands; the Implementer has hands but only the current task in its head. Neither has to do both jobs at once, which is exactly the failure mode of the single-agent loop.</p>
+
     <h2>Architecture</h2>
-    <p>The orchestrator is a thin Python shim. It holds the conversation state for each role, captures git diffs and test output between rounds, and forwards a curated context packet to each Planner turn.</p>
+    <p>The <em>orchestrator</em> is the thin Python shim that wires everything together. It holds the conversation state for each role, captures git diffs and test output between rounds, and forwards a curated context packet to each Planner turn. It is not an "agent" itself — it doesn't reason, it just routes messages and runs subprocesses.</p>
 
     <figure class="svg-figure">
-      <svg viewBox="0 0 680 460" width="100%" role="img" aria-label="Architecture diagram showing the cyclic Planner / Implementer feedback loop">
+      <svg viewBox="0 0 720 500" width="100%" role="img" aria-label="Architecture diagram showing the Planner and Implementer exchanging plans and diffs, with a git repo and test runner underneath">
         <defs>
-          <marker id="arrow-arch" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+          <marker id="arrow-down" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6 z" fill="#7a1f24"/>
+          </marker>
+          <marker id="arrow-up" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
             <path d="M0,0 L8,3 L0,6 z" fill="#566068"/>
           </marker>
-          <marker id="arrow-loop" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
-            <path d="M0,0 L8,3 L0,6 z" fill="#0891b2"/>
+          <marker id="arrow-tool" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6 z" fill="#1a1a1a"/>
           </marker>
         </defs>
 
-        <rect x="270" y="20" width="140" height="48" rx="10" fill="#f0f2f5" stroke="#d4d8e0" stroke-width="1.5"/>
-        <text x="340" y="50" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="14" fill="#111827">User Goal</text>
+        <rect x="290" y="22" width="140" height="44" rx="22" fill="#fffaf0" stroke="#d4c9b3" stroke-width="1.5"/>
+        <text x="360" y="42" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-weight="600" font-size="13" fill="#1a1a1a">user goal</text>
+        <text x="360" y="58" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#566068">"add JWT auth"</text>
 
-        <line x1="340" y1="68" x2="340" y2="108" stroke="#566068" stroke-width="1.5" marker-end="url(#arrow-arch)"/>
+        <line x1="360" y1="66" x2="360" y2="92" stroke="#1a1a1a" stroke-width="1.2" marker-end="url(#arrow-tool)"/>
 
-        <rect x="100" y="115" width="480" height="64" rx="10" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.5"/>
-        <text x="340" y="143" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="15" fill="#5b21b6">Orchestrator</text>
-        <text x="340" y="161" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#7c3aed">gather context · forward diffs &amp; tests</text>
+        <rect x="60" y="98" width="600" height="52" rx="10" fill="#f7f3ec" stroke="#d4c9b3" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <text x="360" y="120" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-weight="600" font-size="13" fill="#1a1a1a">orchestrator</text>
+        <text x="360" y="138" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068">~200 lines of Python · routes messages · runs subprocess · no reasoning</text>
 
-        <path d="M260,179 Q200,205 175,228" stroke="#566068" stroke-width="1.5" fill="none" marker-end="url(#arrow-arch)"/>
-        <text x="148" y="208" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068">context packet</text>
+        <text x="360" y="178" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#8a8270" letter-spacing="1.2">— THE TWO AGENTS —</text>
 
-        <rect x="60" y="232" width="220" height="72" rx="10" fill="#ecfeff" stroke="#67e8f9" stroke-width="1.5"/>
-        <text x="170" y="263" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="15" fill="#0e7490">Planner</text>
-        <text x="170" y="282" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#0891b2">decide the next step</text>
+        <rect x="60" y="194" width="270" height="110" rx="10" fill="#ecfeff" stroke="#67e8f9" stroke-width="1.5"/>
+        <text x="195" y="220" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-weight="700" font-size="16" fill="#0e7490">Planner</text>
+        <text x="195" y="238" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#0891b2">decides what to do next</text>
+        <line x1="80" y1="252" x2="310" y2="252" stroke="#67e8f9" stroke-width="1" stroke-dasharray="2 2"/>
+        <text x="195" y="270" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="11" fill="#1a1a1a">full project context</text>
+        <text x="195" y="287" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="11" fill="#1a1a1a">no tool calls</text>
 
-        <line x1="285" y1="268" x2="395" y2="268" stroke="#566068" stroke-width="1.5" marker-end="url(#arrow-arch)"/>
-        <text x="340" y="262" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068">directive</text>
+        <path d="M335,232 L390,232" stroke="#7a1f24" stroke-width="1.6" marker-end="url(#arrow-down)"/>
+        <text x="362" y="225" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#7a1f24" font-weight="600">plan</text>
+        <text x="362" y="248" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="9" fill="#7a1f24">flows down</text>
 
-        <rect x="400" y="232" width="220" height="72" rx="10" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.5"/>
-        <text x="510" y="263" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="15" fill="#92400e">Implementer</text>
-        <text x="510" y="282" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#d97706">make the changes</text>
+        <path d="M390,272 L335,272" stroke="#566068" stroke-width="1.6" marker-end="url(#arrow-up)"/>
+        <text x="362" y="290" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#566068" font-weight="600">diff</text>
+        <text x="362" y="265" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="9" fill="#566068">flows up</text>
 
-        <path d="M500,308 Q450,335 425,360" stroke="#566068" stroke-width="1.5" fill="none" marker-end="url(#arrow-arch)"/>
+        <rect x="390" y="194" width="270" height="110" rx="10" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.5"/>
+        <text x="525" y="220" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-weight="700" font-size="16" fill="#92400e">Implementer</text>
+        <text x="525" y="238" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#d97706">makes the change</text>
+        <line x1="410" y1="252" x2="640" y2="252" stroke="#fcd34d" stroke-width="1" stroke-dasharray="2 2"/>
+        <text x="525" y="270" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="11" fill="#1a1a1a">narrow scope · this task only</text>
+        <text x="525" y="287" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="11" fill="#1a1a1a">all tool calls</text>
 
-        <rect x="240" y="362" width="220" height="60" rx="10" fill="#f0f2f5" stroke="#d4d8e0" stroke-width="1.5"/>
-        <text x="350" y="388" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="14" fill="#111827">Feedback</text>
-        <text x="350" y="406" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068">git diff · test results · output</text>
+        <path d="M525,304 L525,348" stroke="#1a1a1a" stroke-width="1.4" marker-end="url(#arrow-tool)"/>
+        <path d="M525,348 L525,304" stroke="#1a1a1a" stroke-width="1.4" marker-end="url(#arrow-tool)"/>
+        <text x="540" y="328" font-family="JetBrains Mono, monospace" font-size="9" fill="#1a1a1a">tool calls</text>
 
-        <path d="M240,392 C 50,392 18,300 60,268" stroke="#0891b2" stroke-width="1.5" stroke-dasharray="4 3" fill="none" marker-end="url(#arrow-loop)"/>
-        <text x="20" y="335" font-family="JetBrains Mono, monospace" font-size="10" fill="#0891b2">next</text>
-        <text x="20" y="348" font-family="JetBrains Mono, monospace" font-size="10" fill="#0891b2">iteration</text>
+        <text x="360" y="378" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#8a8270" letter-spacing="1.2">— THE WORLD UNDER TEST —</text>
 
-        <text x="475" y="395" font-family="JetBrains Mono, monospace" font-size="10" fill="#059669">— or</text>
-        <text x="475" y="409" font-family="JetBrains Mono, monospace" font-size="10" fill="#059669" font-weight="700">GOAL COMPLETE → exit</text>
+        <rect x="60" y="394" width="270" height="80" rx="10" fill="#f9f5ee" stroke="#d4c9b3" stroke-width="1.5"/>
+        <text x="195" y="418" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-weight="700" font-size="14" fill="#1a1a1a">git repository</text>
+        <text x="195" y="436" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068">files · history · diffs</text>
+        <text x="195" y="454" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="10" fill="#566068">source of truth for "what changed"</text>
+
+        <rect x="390" y="394" width="270" height="80" rx="10" fill="#f9f5ee" stroke="#d4c9b3" stroke-width="1.5"/>
+        <text x="525" y="418" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-weight="700" font-size="14" fill="#1a1a1a">test runner</text>
+        <text x="525" y="436" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068">pytest · npm test · cargo test</text>
+        <text x="525" y="454" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="10" fill="#566068">source of truth for "did it work"</text>
+
+        <path d="M195,394 C 195,360 195,330 200,310" stroke="#566068" stroke-width="1" stroke-dasharray="3 3" fill="none" marker-end="url(#arrow-up)"/>
+        <path d="M525,394 C 525,360 525,330 520,310" stroke="#566068" stroke-width="1" stroke-dasharray="3 3" fill="none" marker-end="url(#arrow-up)"/>
+        <text x="60" y="358" font-family="JetBrains Mono, monospace" font-size="9" fill="#566068">git diff</text>
+        <text x="615" y="358" font-family="JetBrains Mono, monospace" font-size="9" fill="#566068">test results</text>
       </svg>
-      <figcaption>The cycle. Each pass produces a diff and a fresh test result, both of which feed the next Planner turn.</figcaption>
+      <figcaption>The full architecture. Plans flow down (oxblood), diffs flow back up (grey). The Implementer is the only side allowed to touch the world; the Planner only ever reads the trail it leaves behind.</figcaption>
+    </figure>
+
+    <p>That asymmetry — only the Implementer can act, only the Planner can plan — is the whole design. Everything else is logistics.</p>
+
+    <h3>One task, end to end</h3>
+    <p>Here's what a single round looks like, message by message, from the moment the user types a goal to the moment a diff lands in the repo:</p>
+
+    <figure class="svg-figure">
+      <svg viewBox="0 0 720 460" width="100%" role="img" aria-label="Sequence diagram of one task moving through user, planner, implementer, tools, and back">
+        <defs>
+          <marker id="arrow-seq" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6 z" fill="#1a1a1a"/>
+          </marker>
+          <marker id="arrow-seq-acc" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6 z" fill="#7a1f24"/>
+          </marker>
+        </defs>
+
+        <text x="80" y="36" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068" letter-spacing="1">USER</text>
+        <text x="220" y="36" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#0e7490" letter-spacing="1">PLANNER</text>
+        <text x="380" y="36" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#92400e" letter-spacing="1">IMPLEMENTER</text>
+        <text x="540" y="36" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#1a1a1a" letter-spacing="1">TOOLS / REPO</text>
+        <text x="660" y="36" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068" letter-spacing="1">ORCHESTRATOR</text>
+
+        <line x1="80"  y1="46" x2="80"  y2="430" stroke="#d4c9b3" stroke-width="1" stroke-dasharray="3 3"/>
+        <line x1="220" y1="46" x2="220" y2="430" stroke="#67e8f9" stroke-width="1" stroke-dasharray="3 3"/>
+        <line x1="380" y1="46" x2="380" y2="430" stroke="#fcd34d" stroke-width="1" stroke-dasharray="3 3"/>
+        <line x1="540" y1="46" x2="540" y2="430" stroke="#d4c9b3" stroke-width="1" stroke-dasharray="3 3"/>
+        <line x1="660" y1="46" x2="660" y2="430" stroke="#d4c9b3" stroke-width="1" stroke-dasharray="3 3"/>
+
+        <line x1="80" y1="74" x2="216" y2="74" stroke="#1a1a1a" stroke-width="1.2" marker-end="url(#arrow-seq)"/>
+        <text x="148" y="68" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#1a1a1a">"add JWT auth"</text>
+
+        <rect x="200" y="86" width="40" height="34" fill="#ecfeff" stroke="#67e8f9" stroke-width="1"/>
+        <text x="220" y="106" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="10" fill="#0e7490">read</text>
+
+        <line x1="220" y1="138" x2="376" y2="138" stroke="#7a1f24" stroke-width="1.4" marker-end="url(#arrow-seq-acc)"/>
+        <text x="298" y="132" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="10" fill="#7a1f24">directive: scaffold middleware at src/auth/jwt.ts</text>
+
+        <line x1="380" y1="170" x2="536" y2="170" stroke="#1a1a1a" stroke-width="1.2" marker-end="url(#arrow-seq)"/>
+        <text x="458" y="164" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#1a1a1a">read · edit · run</text>
+
+        <rect x="520" y="180" width="40" height="80" fill="#f7f3ec" stroke="#d4c9b3" stroke-width="1"/>
+        <text x="540" y="206" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="10" fill="#1a1a1a">tool</text>
+        <text x="540" y="222" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="10" fill="#1a1a1a">calls</text>
+        <text x="540" y="240" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="10" fill="#1a1a1a">× N</text>
+
+        <line x1="540" y1="278" x2="384" y2="278" stroke="#1a1a1a" stroke-width="1.2" marker-end="url(#arrow-seq)"/>
+        <text x="462" y="272" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#1a1a1a">file contents · stdout · errors</text>
+
+        <line x1="380" y1="306" x2="664" y2="306" stroke="#1a1a1a" stroke-width="1.2" marker-end="url(#arrow-seq)"/>
+        <text x="522" y="300" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#1a1a1a">"done — see diff"</text>
+
+        <rect x="640" y="316" width="40" height="40" fill="#f7f3ec" stroke="#d4c9b3" stroke-width="1"/>
+        <text x="660" y="332" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="9" fill="#1a1a1a">git diff</text>
+        <text x="660" y="346" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="9" fill="#1a1a1a">+ pytest</text>
+
+        <line x1="660" y1="378" x2="224" y2="378" stroke="#566068" stroke-width="1.4" marker-end="url(#arrow-seq)"/>
+        <text x="442" y="372" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="10" fill="#566068">next packet · diff + test result</text>
+
+        <text x="360" y="416" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="11" fill="#566068">— loop, until Planner emits GOAL COMPLETE —</text>
+      </svg>
+      <figcaption>One task, five lanes. Plans flow right; tool calls and diffs flow back. The orchestrator is the only entity that talks to both agents.</figcaption>
     </figure>
 
     <h2>Context Engineering</h2>
@@ -310,10 +481,11 @@
     <h2>Running It</h2>
     <p>A full run looks like this:</p>
 
-    <pre class="codeblock"><code><span class="ck-cmd">python3</span> claude_loop.py ./my-app <span class="ck-str">"Add JWT auth with refresh tokens"</span> \
-  <span class="ck-flag">--effort</span> max \
-  <span class="ck-flag">--planner-model</span> opus \
-  <span class="ck-flag">--impl-model</span> opus</code></pre>
+    <pre class="codeblock"><code><span class="ck-comment"># entry point          target repo            natural-language goal</span>
+<span class="ck-cmd">python3</span> claude_loop.py ./my-app <span class="ck-str">"Add JWT auth with refresh tokens"</span> \
+  <span class="ck-flag">--effort</span> max          <span class="ck-comment"># thinking budget per turn (low | medium | max)</span>
+  <span class="ck-flag">--planner-model</span> opus  <span class="ck-comment"># model for the planner — opus = careful</span>
+  <span class="ck-flag">--impl-model</span> opus     <span class="ck-comment"># model for the implementer — same here</span></code></pre>
 
     <p>The key options:</p>
     <ul>
@@ -388,7 +560,56 @@
     <p>If you try it on something interesting, I'd love to hear what worked and what broke. The most valuable feedback so far has been about the termination criterion — the Planner's <code>GOAL COMPLETE</code> call is fuzzy, and there's a more principled version hiding somewhere in the validation-gate plus no-change-detection combination.</p>
 
     <h2>References</h2>
-    <p class="references-intro">A reference list of the research, blog posts, and open-source projects this article draws on. Most arXiv links open directly to the paper.</p>
+    <p class="references-intro">A reference list of the research, blog posts, and open-source projects this article draws on. The literature on coding agents fragments into four loosely connected camps — multi-agent systems, iterative self-refinement, planning &amp; execution, and the supporting work on context management and benchmarks. Most arXiv links open directly to the paper.</p>
+
+    <figure class="svg-figure">
+      <svg viewBox="0 0 720 360" width="100%" role="img" aria-label="Cluster diagram grouping the cited references into four research areas around the two-agent loop">
+        <defs>
+          <marker id="arrow-ref" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6 z" fill="#7a1f24"/>
+          </marker>
+        </defs>
+
+        <circle cx="360" cy="180" r="62" fill="#fffaf0" stroke="#7a1f24" stroke-width="1.6"/>
+        <text x="360" y="174" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-weight="700" font-size="13" fill="#7a1f24">Two-agent</text>
+        <text x="360" y="190" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-weight="700" font-size="13" fill="#7a1f24">loop</text>
+        <text x="360" y="208" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#7a1f24">this essay</text>
+
+        <rect x="20" y="40" width="200" height="100" rx="10" fill="#ecfeff" stroke="#67e8f9" stroke-width="1.4"/>
+        <text x="120" y="62" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-weight="700" font-size="13" fill="#0e7490">Multi-agent systems</text>
+        <text x="120" y="82" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#0e7490">role-based · pipelined</text>
+        <text x="120" y="100" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="10" fill="#1a1a1a">MetaGPT · ChatDev · AutoGen</text>
+        <text x="120" y="118" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="10" fill="#1a1a1a">Magentic-One · SWE-Agent</text>
+        <text x="120" y="134" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="10" fill="#1a1a1a">Aider Architect/Editor</text>
+        <line x1="220" y1="124" x2="305" y2="168" stroke="#7a1f24" stroke-width="1.2" marker-end="url(#arrow-ref)" opacity="0.6"/>
+
+        <rect x="500" y="40" width="200" height="100" rx="10" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.4"/>
+        <text x="600" y="62" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-weight="700" font-size="13" fill="#92400e">Iterative self-refinement</text>
+        <text x="600" y="82" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#92400e">feedback · debug · reflect</text>
+        <text x="600" y="100" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="10" fill="#1a1a1a">Self-Refine · Self-Debug</text>
+        <text x="600" y="118" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="10" fill="#1a1a1a">Reflexion · LATS · AlphaCodium</text>
+        <text x="600" y="134" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="10" fill="#1a1a1a">Cannot-Self-Correct · RLEF</text>
+        <line x1="500" y1="124" x2="416" y2="168" stroke="#7a1f24" stroke-width="1.2" marker-end="url(#arrow-ref)" opacity="0.6"/>
+
+        <rect x="20" y="220" width="200" height="100" rx="10" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.4"/>
+        <text x="120" y="242" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-weight="700" font-size="13" fill="#5b21b6">Planning &amp; execution</text>
+        <text x="120" y="262" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#5b21b6">decompose · then act</text>
+        <text x="120" y="280" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="10" fill="#1a1a1a">Plan-and-Solve · ADaPT</text>
+        <text x="120" y="298" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="10" fill="#1a1a1a">ReWOO · LLMCompiler</text>
+        <text x="120" y="314" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="10" fill="#1a1a1a">GoalAct · Plan-and-Act</text>
+        <line x1="220" y1="240" x2="305" y2="196" stroke="#7a1f24" stroke-width="1.2" marker-end="url(#arrow-ref)" opacity="0.6"/>
+
+        <rect x="500" y="220" width="200" height="100" rx="10" fill="#ecfdf5" stroke="#86efac" stroke-width="1.4"/>
+        <text x="600" y="242" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-weight="700" font-size="13" fill="#065f46">Context · termination · evals</text>
+        <text x="600" y="262" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#065f46">what to keep · what to cut</text>
+        <text x="600" y="280" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="10" fill="#1a1a1a">Lost in the Middle · JetBrains</text>
+        <text x="600" y="298" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="10" fill="#1a1a1a">SWE-bench · LiveCodeBench</text>
+        <text x="600" y="314" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="10" fill="#1a1a1a">FeatureBench · Failure Taxonomy</text>
+        <line x1="500" y1="240" x2="416" y2="196" stroke="#7a1f24" stroke-width="1.2" marker-end="url(#arrow-ref)" opacity="0.6"/>
+      </svg>
+      <figcaption>Fifty-plus papers, four conversations. The two-agent loop sits at the intersection: it borrows the role split from multi-agent work, the iteration discipline from self-refinement, the decomposition habit from planning research, and the don't-bloat-the-context lesson from the long-context literature.</figcaption>
+    </figure>
+
 
     <h3>Multi-agent coding systems</h3>
     <ul class="references">
@@ -444,7 +665,7 @@
 
   </article>
 
-<div class="measure">
+<div class="wrap">
   <nav class="post-nav">
     <a href="index.html"><span class="label">archive</span>← all posts</a>
     <a class="next" href="deepsnake.html"><span class="label">read next</span>Building an AI That Masters Snake →</a>

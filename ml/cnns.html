@@ -72,29 +72,58 @@
 
       <div class="ml-rail-label" style="margin-top: 24px">Kernel weights</div>
       <div id="kernel-grid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:4px; max-width:140px; font-family:var(--mono); font-size:12px"></div>
+      <div style="display:flex; gap:10px; margin-top:8px; font-family:var(--mono); font-size:10px; color:var(--ml-ink-fade)">
+        <span><span style="display:inline-block; width:10px; height:10px; background:rgba(122,31,36,0.65); vertical-align:middle; margin-right:4px"></span>positive</span>
+        <span><span style="display:inline-block; width:10px; height:10px; background:rgba(38,35,32,0.55); vertical-align:middle; margin-right:4px"></span>negative</span>
+      </div>
+      <div id="kernel-meaning" style="font-family:var(--serif); font-style:italic; font-size:12px; color:var(--ml-ink-fade); margin-top:10px; line-height:1.45"></div>
+
+      <div class="ml-rail-label" style="margin-top: 24px">Sliding window</div>
+      <input id="pos-slider" type="range" min="0" max="900" step="1" value="405" style="width:100%; accent-color:var(--accent); cursor:ew-resize" />
+      <div id="pos-label" style="font-family:var(--mono); font-size:11px; color:var(--ml-ink-fade); text-align:center">window @ (15, 14)</div>
+      <div style="display:flex; gap:8px; margin-top:10px">
+        <button id="play-btn" class="ml-sbtn" style="flex:1; padding:8px 10px; font-family:var(--serif); font-style:italic; font-size:13px">▷ Auto-slide</button>
+      </div>
     </aside>
 
     <div class="ml-canvas-wrap">
+      <div class="ml-mode-tabs" id="view-tabs"></div>
       <div class="ml-canvas-frame" style="aspect-ratio: 2.4 / 1; padding: 20px">
         <canvas id="canvas"></canvas>
       </div>
-      <div class="ml-caption">
+      <div class="ml-caption" id="caption">
         <span class="ml-cap-num">·</span>
-        Left: input image. Middle: result of one convolution + ReLU (negative values clipped to 0). Right: 2×2 max-pool, halving the spatial resolution. Each downstream layer in a real CNN takes the previous map's output as <em>its</em> input.
+        <span id="caption-text">Left: input image. Middle: result of one convolution + ReLU. Right: 2×2 max-pool. The yellow box on the input is the kernel's current sliding-window position; the lit cell on the output is the value just computed.</span>
       </div>
+
+      <section style="margin-top: 32px; width: 100%">
+        <div style="font-family:var(--mono); font-size:11px; letter-spacing:0.22em; text-transform:uppercase; color:var(--ml-ink-fade); text-align:center; margin-bottom: 14px">
+          CNN architecture · the typical recipe
+        </div>
+        <canvas id="arch-canvas" style="width:100%; height:140px; display:block; background: var(--paper); border: 1px solid var(--rule)"></canvas>
+      </section>
     </div>
 
     <aside class="right-rail">
       <div class="ml-margin">
         <div class="ml-margin-rule"></div>
-        <div class="ml-margin-h">Why convolution</div>
+        <div class="ml-margin-h">Before this</div>
+        <p>Before convolutions, image models had to learn position-specific weights — a separate detector for "edge at pixel (5,7)" versus "edge at pixel (5,8)". With millions of pixels per image, that was hopeless. Convolutions <em>share</em> one kernel across every position — slashing parameters by orders of magnitude and giving translation equivariance for free.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h">The convolution equation</div>
+        <div class="ml-equation" style="font-size:14px">out[i,j] = Σ<sub>m,n</sub> in[i+m, j+n] · K[m,n]</div>
+        <p>The output at position (i, j) is a weighted sum over a small window of the input, weighted by the kernel <b>K</b>. Slide that window across every position and you've performed convolution. <b>Σ (sigma)</b> is just "sum"; <b>m, n</b> index the kernel's rows and columns.</p>
+        <p class="quiet">Concretely, for a 3×3 kernel: 9 element-wise multiplications, then add them up — that gives <em>one</em> number for the output. Slide one pixel right, repeat. The yellow box on the canvas shows exactly which 9 inputs feed the currently-lit output cell.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Why convolution</div>
         <p>Reusing one kernel across the whole image cuts parameters by orders of magnitude vs a fully-connected layer — and bakes in <em>translation equivariance</em>: shift the input, the output shifts the same way.</p>
         <div class="ml-margin-rule thin"></div>
-        <div class="ml-margin-h sm">Pooling</div>
-        <p class="quiet">Max-pool throws away exact positions and keeps the strongest activation in each 2×2 window. After several layers, a single output unit "sees" a large region of the original image — its <em>receptive field</em>.</p>
+        <div class="ml-margin-h sm">ReLU &amp; pooling</div>
+        <p class="quiet"><b>ReLU(x) = max(0, x)</b>: clips negatives to zero. Cheap, useful, prevents the conv output from carrying negative "anti-features."</p>
+        <p class="quiet"><b>2×2 max-pool</b>: in each 2×2 window of the feature map, keep only the largest value. Halves the resolution; bakes in small-shift invariance.</p>
         <div class="ml-margin-rule thin"></div>
         <div class="ml-margin-h sm">Hierarchy</div>
-        <p class="quiet">Layer 1 learns edge detectors (like the ones above). Layer 5 learns part detectors (eyes, wheels). Layer 12 learns whole-object detectors. The hierarchy emerges from the data — nobody specifies it.</p>
+        <p class="quiet">Layer 1 learns edge detectors (like the presets here). Layer 5 learns part detectors (eyes, wheels). Layer 12 learns whole-object detectors. The hierarchy emerges from the data — nobody specifies it.</p>
       </div>
     </aside>
   </section>

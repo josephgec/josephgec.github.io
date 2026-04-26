@@ -89,7 +89,7 @@
       <div class="ml-readout" id="readout" style="margin-top: 18px"></div>
 
       <div style="font-style:italic; font-family:var(--serif); font-size:13px; color:var(--ml-ink-fade); margin-top:14px; line-height:1.5">
-        Click anywhere on the map to drop the marble there.
+        The map is a top-down view: <em>x, y</em> are two weights, color is the loss at that pair (cream = low, oxblood = high). Contour rings join points of equal loss. Click anywhere to drop the marble there.
       </div>
     </aside>
 
@@ -104,6 +104,11 @@
     </div>
 
     <aside class="right-rail">
+      <div class="ml-margin">
+        <div class="ml-margin-rule"></div>
+        <div class="ml-margin-h">Before this</div>
+        <p class="quiet">Before optimization theory framed training as descent through high-dimensional terrain, neural networks felt mysterious — "why does this work?" Loss-landscape research (Dauphin et al. 2014, Goodfellow et al. 2015, Li et al. 2018) showed there's geometry: bowls, ravines, saddles, and (in overparameterized nets) a forgiving abundance of mostly-good local minima.</p>
+      </div>
       <div class="ml-margin" id="margin"></div>
     </aside>
 

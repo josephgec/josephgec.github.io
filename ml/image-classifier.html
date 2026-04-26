@@ -85,6 +85,14 @@
     </aside>
 
     <div class="ml-canvas-wrap">
+      <section style="margin-bottom: 18px; width: 100%">
+        <div style="font-family:var(--mono); font-size:11px; letter-spacing:0.22em; text-transform:uppercase; color:var(--ml-ink-fade); text-align:center; margin-bottom: 12px">
+          LeNet-style architecture · shape annotations
+        </div>
+        <canvas id="arch-canvas" style="width:100%; height:120px; display:block; background: var(--paper); border: 1px solid var(--rule)"></canvas>
+      </section>
+
+      <div class="ml-mode-tabs" id="view-tabs"></div>
       <div class="ml-canvas-frame" style="aspect-ratio: 1.6 / 1; padding: 24px">
         <canvas id="canvas"></canvas>
       </div>
@@ -95,7 +103,15 @@
     <aside class="right-rail">
       <div class="ml-margin">
         <div class="ml-margin-rule"></div>
-        <div class="ml-margin-h">Receptive field</div>
+        <div class="ml-margin-h">Before this</div>
+        <p>Before deep CNNs (LeCun's LeNet in 1989, AlexNet in 2012), image classification used hand-engineered features — SIFT, HOG, colour histograms — fed to a linear classifier. Accuracy was capped because the features were hand-picked. CNNs learn features end-to-end; ImageNet 2012 ended the hand-engineering era overnight.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h">From logits to probabilities</div>
+        <p><b>Logit</b> = the raw, unnormalized score the network assigns to one class. Any real number — positive, negative, big, small. The dense layer at the end produces one logit per class. Softmax is what turns those into probabilities.</p>
+        <div class="ml-equation" style="font-size:14px; margin-top:6px">p<sub>i</sub> = e<sup>z<sub>i</sub></sup> / Σ<sub>j</sub> e<sup>z<sub>j</sub></sup></div>
+        <p>Exponentiate each logit — that's <em>e<sup>z</sup></em>, the natural exponential — then divide each result by the sum of all of them. Result: a list of positive numbers that add to 1. The largest input ends up the most likely class. <b>Σ (sigma)</b> is "sum over j" — the normalizer.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Receptive field</div>
         <p>Each output unit "sees" a region of the original image — its receptive field. After pooling once, one unit covers 2×2 input pixels; after twice, 4×4; deep layers can see almost the whole image.</p>
         <div class="ml-margin-rule thin"></div>
         <div class="ml-margin-h sm">Channel count grows</div>

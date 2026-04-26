@@ -39,23 +39,34 @@
     <div class="ml-intro-grid">
       <div class="ml-intro-block">
         <div class="ml-eyebrow">The concept</div>
-        <p class="lead"><span class="term">SHAP</span> values assign each feature an additive contribution to a single prediction. Sum the contributions plus the baseline and you get the model's output, exactly.</p>
-        <p>The math is borrowed from cooperative game theory: each feature is a "player," the prediction is the "payout," and SHAP values distribute credit fairly using the Shapley value formula. Each feature's contribution averages over every possible coalition of features it could join.</p>
-        <p><span class="term">LIME</span> takes a different angle: fit a simple, interpretable model (a linear regression) to the local neighborhood of a single prediction. The simple model's coefficients become the explanation.</p>
+        <p class="lead">For a single prediction, ask: <em>"if I remove this feature, what happens?"</em> That difference, averaged over every possible combination of the other features, is each feature's <span class="term">SHAP value</span> — its fair share of the prediction.</p>
+        <p>SHAP values are <em>additive</em>: start from the model's baseline (its average prediction across the dataset), add each feature's contribution, and you land exactly on the model's output for this case. It's a literal accounting trail.</p>
+        <p><span class="term">LIME</span> takes a different angle: fit a simple, interpretable model (a small linear regression) to the local neighborhood of one prediction. The simple model's coefficients are the explanation.</p>
       </div>
       <div class="ml-intro-block">
         <div class="ml-eyebrow">Why ML cares</div>
         <p>Regulated industries — credit scoring (Equal Credit Opportunity Act), insurance, healthcare, hiring — require <em>per-decision</em> explanations. SHAP became the de facto standard because it satisfies a clean axiomatic foundation while being computationally feasible.</p>
-        <p>Even outside regulated settings, interpretability matters for debugging ("why did my fraud model flag this transaction?"), trust ("why does the doctor's model recommend this treatment?"), and discovering biases ("does our hiring model rely on zip code?"). Every deployed ML team eventually needs at least one of these tools.</p>
+        <p>Even outside regulated settings, interpretability matters for debugging ("why did my fraud model flag this?"), trust ("why does the model recommend this treatment?"), and discovering bias ("does our hiring model rely on zip code?"). Every deployed ML team eventually needs one of these tools.</p>
       </div>
     </div>
     <div class="ml-try">
       <div class="ml-eyebrow accent">Try this</div>
       <ol>
-        <li>Pick a sample customer. The right side shows the SHAP waterfall: each feature pushes the prediction up (oxblood) or down (ink) from the average. The total equals the model's prediction.</li>
-        <li>Try the <em>fraud — high-risk</em> sample. The "transaction amount" and "device new" features push fraud-probability sharply up; "user age" and "country match" push down.</li>
-        <li>Switch to the <em>credit — denied</em> sample. The same model, different inputs, different SHAP attributions. SHAP gives one explanation per prediction — not a global summary.</li>
+        <li>Pick a sample case. The waterfall starts at the baseline E[f(x)] (model's average) and walks step-by-step through each feature's SHAP value, ending at this case's actual prediction. Bars are sorted by magnitude — biggest pushers at the top.</li>
+        <li>Switch to <em>What-if</em>. Click any feature toggle to "remove" it (replace with its average) and watch the prediction shift. The size of that shift is roughly that feature's SHAP value — a tiny taste of how Shapley values are actually computed.</li>
+        <li>Switch to <em>LIME bars</em>. Same case, different method: a local linear surrogate's coefficients. Magnitudes line up with SHAP for clear-cut features but can diverge for interacting ones.</li>
       </ol>
+    </div>
+
+    <div class="ml-try" style="margin-top:14px; background: rgba(38,35,32,0.025); border-left: 2px solid rgba(38,35,32,0.18); padding-left: 14px">
+      <div class="ml-eyebrow">Plain-English math</div>
+      <ul style="font-family:var(--serif); font-style:italic; font-size:14px; line-height:1.65; color:var(--ink); margin:6px 0 0; padding-left:18px">
+        <li><b>f(x)</b> · the model's prediction for this case (e.g., 0.83 = 83% fraud probability).</li>
+        <li><b>E[f(x)]</b> · the model's average prediction over the entire dataset — the "baseline" or starting point of the waterfall.</li>
+        <li><b>φ<sub>i</sub></b> (phi-i) · the SHAP value for feature <em>i</em> in this case. Positive = pushed the prediction up; negative = pushed it down.</li>
+        <li><b>The accounting</b>: f(x) = E[f(x)] + Σ φ<sub>i</sub>. The baseline plus the sum of all feature contributions equals the prediction, exactly.</li>
+        <li><b>The intuition</b>: imagine asking "if I drop feature i, what happens?" SHAP averages that question across <em>every possible coalition</em> of other features. The answer is feature <em>i</em>'s fair share.</li>
+      </ul>
     </div>
   </section>
 
@@ -64,8 +75,11 @@
       <div class="ml-rail-label">Sample case</div>
       <div class="ml-presets" id="cases"></div>
 
-      <div class="ml-rail-label" style="margin-top: 24px">View</div>
+      <div class="ml-rail-label" style="margin-top: 18px">View</div>
       <div class="ml-presets" id="views"></div>
+
+      <div class="ml-rail-label" id="whatif-rail-label" style="margin-top: 18px; display:none">What-if · feature toggles</div>
+      <div id="whatif-toggles" style="display:none; flex-direction:column; gap:6px; margin-top: 6px"></div>
 
       <div class="ml-readout" id="readout" style="margin-top: 18px"></div>
     </aside>
@@ -76,21 +90,60 @@
       </div>
       <div class="ml-caption">
         <span class="ml-cap-num">·</span>
-        <em>SHAP waterfall:</em> start from the model's average prediction (left). Each feature is a step up or down based on its contribution to <em>this</em> sample's prediction. The final stop on the right is the model's actual output. <em>LIME view:</em> shows the local linear approximation around the same point.
+        <em>SHAP waterfall:</em> start from the model's average prediction (left). Each feature is a step up (oxblood) or down (ink) based on its contribution to <em>this</em> sample's prediction. The final stop on the right is the model's actual output. <em>What-if:</em> turn features off in the left panel; the waterfall recomputes against the remaining set. <em>LIME bars:</em> coefficients of a local linear approximation around the same point.
       </div>
     </div>
 
     <aside class="right-rail">
       <div class="ml-margin">
         <div class="ml-margin-rule"></div>
-        <div class="ml-margin-h">Shapley axioms</div>
-        <p>SHAP values are the <em>only</em> attribution method satisfying four reasonable properties: efficiency (sum to the prediction), symmetry (same role → same value), null-player (no contribution → zero value), and additivity (over linear combinations).</p>
+        <div class="ml-margin-h">Before this</div>
+        <p class="quiet">Before SHAP (Lundberg &amp; Lee 2017) and LIME (Ribeiro 2016), explaining a model's prediction was hand-waving. As ML moved into high-stakes domains — credit, medicine, criminal justice — regulators demanded per-decision reasons. SHAP grounded attribution in cooperative game theory: each feature's "fair share" of credit. It's now built into XGBoost, scikit-learn, and AWS SageMaker; the waterfall on the right is the standard plot.</p>
+
         <div class="ml-margin-rule thin"></div>
-        <div class="ml-margin-h sm">SHAP vs LIME</div>
-        <p class="quiet">SHAP is theoretically grounded but expensive (O(2^d) in features without approximations). LIME is faster but heuristic, and explanations can shift with the random sampling.</p>
+        <div class="ml-margin-h">A prediction, told as a story</div>
+        <svg viewBox="0 0 220 200" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; margin:6px 0 4px">
+          <!-- Vertical rail showing how a prediction builds up -->
+          <line x1="40" y1="14" x2="40" y2="186" stroke="rgba(38,35,32,0.35)" stroke-width="0.6"/>
+          <!-- baseline -->
+          <circle cx="40" cy="20" r="3.5" fill="rgba(38,35,32,0.55)"/>
+          <text x="50" y="22" font-family="JetBrains Mono, monospace" font-size="7" fill="#262320">baseline E[f]</text>
+          <text x="50" y="32" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="8" fill="rgba(38,35,32,0.55)">model's average prediction</text>
+          <!-- step 1: positive push -->
+          <line x1="40" y1="44" x2="40" y2="60" stroke="rgba(122,31,36,0.7)" stroke-width="3"/>
+          <polygon points="40,42 36,50 44,50" fill="rgba(122,31,36,0.7)"/>
+          <text x="50" y="56" font-family="JetBrains Mono, monospace" font-size="7" fill="#262320">+ feature₁  (push up)</text>
+          <text x="50" y="66" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="8" fill="rgba(38,35,32,0.55)">e.g., transaction = $2,500</text>
+          <!-- step 2: positive push -->
+          <line x1="40" y1="78" x2="40" y2="92" stroke="rgba(122,31,36,0.7)" stroke-width="3"/>
+          <polygon points="40,76 36,84 44,84" fill="rgba(122,31,36,0.7)"/>
+          <text x="50" y="88" font-family="JetBrains Mono, monospace" font-size="7" fill="#262320">+ feature₂  (push up)</text>
+          <text x="50" y="98" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="8" fill="rgba(38,35,32,0.55)">device new = yes</text>
+          <!-- step 3: negative push -->
+          <line x1="40" y1="110" x2="40" y2="120" stroke="rgba(38,35,32,0.55)" stroke-width="3"/>
+          <polygon points="40,122 36,114 44,114" fill="rgba(38,35,32,0.55)"/>
+          <text x="50" y="120" font-family="JetBrains Mono, monospace" font-size="7" fill="#262320">− feature₃  (push down)</text>
+          <text x="50" y="130" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="8" fill="rgba(38,35,32,0.55)">country match = no</text>
+          <!-- ellipsis -->
+          <text x="50" y="148" font-family="JetBrains Mono, monospace" font-size="7" fill="rgba(38,35,32,0.45)">… (more features) …</text>
+          <!-- final -->
+          <circle cx="40" cy="170" r="5" fill="#7a1f24"/>
+          <text x="50" y="172" font-family="JetBrains Mono, monospace" font-size="7" fill="#7a1f24">f(x)  prediction</text>
+          <text x="50" y="182" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="8" fill="rgba(38,35,32,0.65)">baseline + Σ φᵢ</text>
+        </svg>
+        <p class="quiet" style="margin-top:6px">A SHAP explanation reads top-to-bottom like a story: start with the model's average, then each feature is one chapter that pushes the prediction up or down. The bottom of the rail is exactly this case's prediction.</p>
+
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">SHAP vs LIME, inline</div>
+        <p class="quiet"><b>SHAP</b>: globally consistent (same feature contribution always means the same thing), axiomatically grounded. Slow on big feature sets — TreeSHAP and KernelSHAP are the practical approximations. <b>LIME</b>: fast, local, approximate. Fits a simple model in a small bubble around the prediction. Explanations can shift run-to-run with the random sampling.</p>
+
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Why "fair share"?</div>
+        <p class="quiet">SHAP comes from cooperative game theory — the Shapley value (1953). Treat features as "players" cooperating to produce the prediction; the Shapley value is the unique payout rule that satisfies four reasonable fairness axioms. Skip the formula; the intuition is the substance.</p>
+
         <div class="ml-margin-rule thin"></div>
         <div class="ml-margin-h sm">Caveats</div>
-        <p class="quiet">Both methods explain the model, not the world. If the model is biased, the explanation will be too — sometimes laundering the bias into seemingly-objective numbers.</p>
+        <p class="quiet">Both methods explain the model, not the world. If the model is biased, the explanation will be too — sometimes laundering bias into seemingly-objective numbers.</p>
       </div>
     </aside>
   </section>

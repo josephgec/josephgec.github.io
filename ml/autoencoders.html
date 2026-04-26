@@ -52,9 +52,10 @@
     <div class="ml-try">
       <div class="ml-eyebrow accent">Try this</div>
       <ol>
-        <li>Drag the <em>latent dim</em> slider from 2 to 10. Watch the reconstruction quality climb. With 10 latent dims, the input is essentially recoverable; with 2, you see only the dominant structure.</li>
-        <li>Pick a <em>noisy</em> input. Watch the autoencoder's output remove noise — its latent only has room for the signal, not the noise. Denoising autoencoders are this principle, formalized.</li>
-        <li>Hit <em>Sweep latent</em> in 2D mode. Each slider sweeps one of the two latent dimensions; the decoder paints a continuous space of generated outputs. The network has learned a 2D <em>map</em> of plausible inputs.</li>
+        <li>Hit <em>Run forward</em>. Particles flow from input → encoder → bottleneck → decoder → output. The waist is exactly k numbers wide. <em>Bottleneck</em> isn't a metaphor — it's a literal squeeze in the network's shape.</li>
+        <li>Drag the <em>latent dim</em> slider from 2 to 10. The funnel waist gets fatter; the reconstruction sharpens. With k=2, the AE can only keep two numbers — so reconstruction collapses to the average.</li>
+        <li>Pick the <em>noisy</em> input and switch to <em>Denoising</em>. Three panels: clean / noisy input / reconstruction. The AE projects the noisy version back onto the manifold of real shapes — denoising for free.</li>
+        <li>Switch to <em>Latent scatter</em> with k=2. Each preset gets one dot. Classes separate in 2D <em>without ever being told the labels</em>. That clustering is the unsupervised structure the bottleneck found.</li>
       </ol>
     </div>
   </section>
@@ -64,35 +65,62 @@
       <div class="ml-rail-label">Input</div>
       <div class="ml-presets" id="inputs"></div>
 
-      <div class="ml-rail-label" style="margin-top: 24px">Latent dimension</div>
+      <div class="ml-rail-label" style="margin-top: 24px">Latent dimension <span style="font-family:var(--mono); font-size:11px; color:var(--ml-ink-fade)">— width of the bottleneck (waist)</span></div>
       <input id="k-slider" type="range" min="2" max="16" step="1" value="4" style="width:100%; accent-color:var(--accent)" />
       <div id="k-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">k = 4</div>
 
-      <div class="ml-rail-label" style="margin-top: 24px">Latent values</div>
-      <div id="latent-sliders"></div>
+      <div style="display:flex; gap:8px; margin-top:18px">
+        <button id="run-btn" class="ml-sbtn" style="flex:1; padding:10px 14px; font-family:var(--serif); font-style:italic; font-size:14px">▷ Run forward</button>
+      </div>
 
       <div class="ml-readout" id="readout" style="margin-top:18px"></div>
     </aside>
 
     <div class="ml-canvas-wrap">
+      <div class="ml-mode-tabs" id="view-tabs"></div>
       <div class="ml-canvas-frame" style="aspect-ratio: 2.4 / 1; padding: 24px">
         <canvas id="canvas"></canvas>
       </div>
-      <div class="ml-caption">
+      <div class="ml-caption" id="caption">
         <span class="ml-cap-num">·</span>
-        Left: the original input, an 8×8 grid. Middle: the latent vector — k learned numbers. Right: the network's reconstruction. With enough latent dimensions, the reconstruction is sharp; with too few, it blurs into the average.
+        <span id="caption-text">A funnel: input pixels condense through narrowing layers to a tight latent of k numbers, then expand back out into a reconstruction. Whatever survives the squeeze is the data's essence.</span>
       </div>
     </div>
 
     <aside class="right-rail">
       <div class="ml-margin">
         <div class="ml-margin-rule"></div>
-        <div class="ml-margin-h">Autoencoder loss</div>
-        <div class="ml-equation" style="font-size:14px">L = ‖x − decoder(encoder(x))‖²</div>
-        <p>Mean-squared reconstruction error. The encoder learns to <em>throw away</em> as little useful information as possible; the decoder learns to <em>recover</em> as much as possible from what's left.</p>
+        <div class="ml-margin-h">Before this</div>
+        <p class="quiet">Before autoencoders (Hinton 1986, refined 2006), unsupervised feature learning meant clustering or PCA — linear, hand-tuned. Autoencoders gave us a <em>neural</em> way to discover structure without labels, and seeded everything that followed: denoising, generative models, pretraining. Modern self-supervised learning is the autoencoder's grandchild.</p>
+
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h">The architecture</div>
+        <svg viewBox="0 0 200 130" style="width:100%; max-width:200px; display:block; margin:6px 0 10px">
+          <!-- Funnel schematic -->
+          <polygon points="10,15 90,55 90,75 10,115" fill="rgba(122,31,36,0.08)" stroke="#7a1f24" stroke-width="1"/>
+          <polygon points="190,15 110,55 110,75 190,115" fill="rgba(122,31,36,0.08)" stroke="#7a1f24" stroke-width="1"/>
+          <rect x="90" y="55" width="20" height="20" fill="#7a1f24"/>
+          <text x="50" y="68" text-anchor="middle" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="11" fill="#262320">encoder</text>
+          <text x="150" y="68" text-anchor="middle" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="11" fill="#262320">decoder</text>
+          <text x="100" y="92" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#7a1f24">z ∈ ℝᵏ</text>
+          <text x="14" y="128" font-family="JetBrains Mono, monospace" font-size="8" fill="rgba(38,35,32,0.55)">x</text>
+          <text x="180" y="128" font-family="JetBrains Mono, monospace" font-size="8" fill="rgba(38,35,32,0.55)">x̂</text>
+        </svg>
+        <p class="quiet" style="font-size:12px">Wide → narrow → wide. The waist is the <em>bottleneck</em>: a forced summary in k numbers. The decoder must reconstruct everything it can from those k numbers alone.</p>
+
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Reconstruction loss</div>
+        <div class="ml-equation" style="font-size:14px">L = ‖x − x̂‖²</div>
+        <p class="quiet"><em>x</em>: the original input. <em>x̂</em> ("x-hat"): the reconstruction the decoder produces. The double bars <em>‖·‖²</em> mean squared distance — sum of squared differences between corresponding pixels. Average that, and you have mean-squared error. <em>That's it</em> — no labels, no targets beyond the input itself. The narrowness of <em>k</em> forces the network to learn what's worth keeping.</p>
+
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Latent space</div>
+        <p class="quiet"><em>Latent</em> just means hidden. It's the k-dimensional vector at the waist — a learned, compressed code for the input. Two inputs that look alike land near each other.</p>
+
         <div class="ml-margin-rule thin"></div>
         <div class="ml-margin-h sm">Linear ≡ PCA</div>
-        <p class="quiet">A linear autoencoder with mean-squared loss converges to the principal-component subspace. The latent dimensions become PC₁, PC₂, …, PC<em>k</em> — proven equivalent to Vol IV's eigen-of-covariance recipe.</p>
+        <p class="quiet">A linear autoencoder with MSE loss converges to the principal-component subspace. PCA is just the linear special case.</p>
+
         <div class="ml-margin-rule thin"></div>
         <div class="ml-margin-h sm">Up next</div>
         <p class="quiet">A <em>variational</em> autoencoder constrains the latent to a Gaussian — letting you sample new examples from latent space.</p>

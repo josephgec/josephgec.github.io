@@ -39,9 +39,9 @@
     <div class="ml-intro-grid">
       <div class="ml-intro-block">
         <div class="ml-eyebrow">The concept</div>
-        <p class="lead"><span class="term">Federated learning</span> trains a shared model across many clients (phones, hospitals, banks) without centralizing the data.</p>
-        <p>The protocol: <em>(1)</em> server broadcasts current global weights to a sample of clients; <em>(2)</em> each client trains locally on its own data for a few epochs; <em>(3)</em> clients send the <em>weight updates</em> (not the data) back to the server; <em>(4)</em> server averages the updates into a new global model. Repeat for hundreds of rounds.</p>
-        <p>The famous algorithm is <em>FedAvg</em>: weighted average of client updates by data size. Variants add differential privacy (add noise so updates can't reveal individual rows) and secure aggregation (server can't even see individual updates, just the sum).</p>
+        <p class="lead">In one sentence: <span class="term">data stays local, gradients move</span>. Each device trains on its own data; only the model updates leave.</p>
+        <p>The protocol — <em>FedAvg</em>: <em>(1)</em> server broadcasts current global weights to a sample of clients; <em>(2)</em> each client trains locally on its own data for a few epochs; <em>(3)</em> clients send the <em>weight updates</em> (not the data) back to the server; <em>(4)</em> server averages the updates, weighted by data size, into new global weights. Repeat for hundreds of rounds.</p>
+        <p>Variants add <em>differential privacy</em> (noise injected into each update so individual rows can't be reverse-engineered) and <em>secure aggregation</em> (the server can decrypt only the sum, not the individual contributions).</p>
       </div>
       <div class="ml-intro-block">
         <div class="ml-eyebrow">Why ML cares</div>
@@ -52,10 +52,23 @@
     <div class="ml-try">
       <div class="ml-eyebrow accent">Try this</div>
       <ol>
-        <li>Hit <em>Run round</em>. Watch the global model (top) broadcast to clients (bottom). Each client trains locally; updates come back; the server averages. Loss drops one round at a time.</li>
-        <li>Toggle <em>non-IID data</em>. Each client now has skewed labels (one client sees mostly class A, another mostly class B). Convergence slows; the loss curve gets noisier — a real-world federated pain point.</li>
-        <li>Drop a few clients each round (simulate offline phones). FedAvg still converges, just more slowly. Robustness to dropout is one of the algorithm's quiet strengths.</li>
+        <li>Hit <em>Run rounds</em>. Watch the <em>broadcast</em> phase: white packets fan out from the server to each client (the global weights). Then the <em>upload</em> phase: orange gradient packets travel back. The server averages (a single white packet emerges) and the loss curve drops.</li>
+        <li>Toggle <em>non-IID data</em>. Each client's local data histogram now skews toward a different class (device 1 mostly class A, device 2 mostly class B). Convergence slows; the loss curve gets noisier — a real-world federated pain point.</li>
+        <li>Turn up <em>privacy noise</em> (DP-σ). Notice the small jitter added to gradient packets before they leave each client; the global loss curve becomes noisier as σ rises. The privacy-utility tradeoff, made visible.</li>
+        <li>Raise <em>client dropout</em>. Some clients gray out with an X each round — offline phones, dead laptops. FedAvg still converges; robustness is one of the algorithm's quiet strengths.</li>
       </ol>
+    </div>
+
+    <div class="ml-try" style="margin-top:14px; background: rgba(38,35,32,0.025); border-left: 2px solid rgba(38,35,32,0.18); padding-left: 14px">
+      <div class="ml-eyebrow">FedAvg, in plain English</div>
+      <div class="ml-equation" style="font-size:14px; margin: 8px 0 6px">w<sup>t+1</sup> = Σ<sub>k</sub> (n<sub>k</sub> / n) · w<sub>k</sub><sup>t+1</sup></div>
+      <ul style="font-family:var(--serif); font-style:italic; font-size:14px; line-height:1.65; color:var(--ink); margin:6px 0 0; padding-left:18px">
+        <li><b>w</b> · the global model weights — a long vector. Same architecture across all devices.</li>
+        <li><b>w<sub>k</sub><sup>t+1</sup></b> · client <em>k</em>'s local weights after this round of local training (starting from the broadcast w<sup>t</sup>).</li>
+        <li><b>n<sub>k</sub></b> · client <em>k</em>'s local data size (how many examples that device trained on).</li>
+        <li><b>n</b> · total data across all participating clients this round (= Σ n<sub>k</sub>).</li>
+        <li><b>The recipe</b>: the server averages the clients' new weights, but weights with more data get more say. A client with 10× the data has 10× the influence.</li>
+      </ul>
     </div>
   </section>
 
@@ -67,6 +80,10 @@
 
       <div class="ml-rail-label" style="margin-top: 18px">Data distribution</div>
       <div class="ml-presets" id="distribution"></div>
+
+      <div class="ml-rail-label" style="margin-top: 18px">Privacy noise (DP-σ)</div>
+      <input id="dp-slider" type="range" min="0" max="0.5" step="0.02" value="0" style="width:100%; accent-color:var(--accent)" />
+      <div id="dp-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">σ = 0.00 (off)</div>
 
       <div class="ml-rail-label" style="margin-top: 18px">Client dropout</div>
       <input id="dropout-slider" type="range" min="0" max="0.5" step="0.05" value="0" style="width:100%; accent-color:var(--accent)" />
@@ -86,19 +103,84 @@
       </div>
       <div class="ml-caption">
         <span class="ml-cap-num">·</span>
-        Top: the central server with the current global weights. Bottom: client devices, each with private local data. Lines flash <em style="color:var(--accent)">orange</em> when a client uploads its update; <em>ink</em> when the server broadcasts the new global. The chart at right plots global loss per round.
+        Top-center: the central server holding the global weights. Bottom: client devices, each surrounded by a <em>cloud of its own local data points</em> (the dots beside each client) and a class histogram. The data clouds <em>never move</em> — only the weight packets travel. White packets fan out from the server (broadcast w), clients train locally, orange gradient packets travel back, the server averages them weighted by data size. Right: global loss per round.
       </div>
     </div>
 
     <aside class="right-rail">
       <div class="ml-margin">
         <div class="ml-margin-rule"></div>
-        <div class="ml-margin-h">FedAvg</div>
-        <div class="ml-equation" style="font-size:13px">w<sup>t+1</sup> = Σ<sub>k</sub> (n<sub>k</sub> / n) · w<sub>k</sub><sup>t+1</sup></div>
-        <p>Weighted average of client weights, where each client's weight is proportional to its data size. The simplest possible aggregation; surprisingly effective.</p>
+        <div class="ml-margin-h">Before this</div>
+        <p class="quiet">Before federated learning (McMahan 2017), training on user data meant uploading it — privacy-incompatible for healthcare, finance, and mobile keyboards. Federated keeps data local: only weight updates travel. Combined with differential privacy and secure aggregation, it is how Google's Gboard learns from your typing without sending it anywhere. Critical for any regulated domain where the data legally cannot move.</p>
+
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h">FedAvg, one round</div>
+        <svg viewBox="0 0 220 240" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; margin:6px 0 4px">
+          <!-- Step 1: Broadcast -->
+          <circle cx="110" cy="22" r="10" fill="#7a1f24"/>
+          <text x="110" y="24" font-family="JetBrains Mono, monospace" font-size="6" fill="#fffdf6" text-anchor="middle">srv</text>
+          <text x="20" y="20" font-family="JetBrains Mono, monospace" font-size="7" fill="rgba(38,35,32,0.55)">step 1</text>
+          <text x="20" y="30" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="8" fill="#262320">broadcast w</text>
+          <!-- Three clients -->
+          <g>
+            <circle cx="60"  cy="60" r="7" fill="rgba(38,35,32,0.20)" stroke="rgba(38,35,32,0.50)" stroke-width="0.6"/>
+            <circle cx="110" cy="60" r="7" fill="rgba(38,35,32,0.20)" stroke="rgba(38,35,32,0.50)" stroke-width="0.6"/>
+            <circle cx="160" cy="60" r="7" fill="rgba(38,35,32,0.20)" stroke="rgba(38,35,32,0.50)" stroke-width="0.6"/>
+            <line x1="110" y1="32" x2="60"  y2="52" stroke="rgba(38,35,32,0.55)" stroke-width="0.6" stroke-dasharray="2,2"/>
+            <line x1="110" y1="32" x2="110" y2="52" stroke="rgba(38,35,32,0.55)" stroke-width="0.6" stroke-dasharray="2,2"/>
+            <line x1="110" y1="32" x2="160" y2="52" stroke="rgba(38,35,32,0.55)" stroke-width="0.6" stroke-dasharray="2,2"/>
+          </g>
+          <!-- Step 2: Local training -->
+          <text x="20" y="86"  font-family="JetBrains Mono, monospace" font-size="7" fill="rgba(38,35,32,0.55)">step 2</text>
+          <text x="20" y="96"  font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="8" fill="#262320">local SGD</text>
+          <text x="20" y="106" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="7" fill="rgba(38,35,32,0.65)">on private data</text>
+          <!-- Mini histograms below clients -->
+          <g>
+            <rect x="50"  y="100" width="3" height="8" fill="rgba(38,35,32,0.45)"/>
+            <rect x="55"  y="98"  width="3" height="10" fill="rgba(38,35,32,0.45)"/>
+            <rect x="60"  y="96"  width="3" height="12" fill="rgba(38,35,32,0.45)"/>
+            <rect x="65"  y="100" width="3" height="8" fill="rgba(38,35,32,0.45)"/>
+            <rect x="100" y="100" width="3" height="8" fill="rgba(38,35,32,0.45)"/>
+            <rect x="105" y="96"  width="3" height="12" fill="rgba(38,35,32,0.45)"/>
+            <rect x="110" y="98"  width="3" height="10" fill="rgba(38,35,32,0.45)"/>
+            <rect x="115" y="102" width="3" height="6" fill="rgba(38,35,32,0.45)"/>
+            <rect x="150" y="98"  width="3" height="10" fill="rgba(38,35,32,0.45)"/>
+            <rect x="155" y="102" width="3" height="6" fill="rgba(38,35,32,0.45)"/>
+            <rect x="160" y="96"  width="3" height="12" fill="rgba(38,35,32,0.45)"/>
+            <rect x="165" y="100" width="3" height="8" fill="rgba(38,35,32,0.45)"/>
+          </g>
+          <!-- Step 3: Upload Δw -->
+          <text x="20" y="138" font-family="JetBrains Mono, monospace" font-size="7" fill="rgba(38,35,32,0.55)">step 3</text>
+          <text x="20" y="148" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="8" fill="#262320">upload Δw</text>
+          <text x="20" y="158" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="7" fill="rgba(122,31,36,0.85)">(weight updates)</text>
+          <circle cx="160" cy="140" r="10" fill="#7a1f24"/>
+          <text x="160" y="142" font-family="JetBrains Mono, monospace" font-size="6" fill="#fffdf6" text-anchor="middle">srv</text>
+          <line x1="60"  y1="120" x2="155" y2="138" stroke="rgba(122,31,36,0.85)" stroke-width="0.8"/>
+          <line x1="110" y1="120" x2="155" y2="138" stroke="rgba(122,31,36,0.85)" stroke-width="0.8"/>
+          <line x1="160" y1="120" x2="160" y2="130" stroke="rgba(122,31,36,0.85)" stroke-width="0.8"/>
+          <!-- Small orange dots along upload lines -->
+          <circle cx="100" cy="129" r="1.6" fill="#7a1f24"/>
+          <circle cx="135" cy="132" r="1.6" fill="#7a1f24"/>
+          <circle cx="160" cy="125" r="1.6" fill="#7a1f24"/>
+          <!-- Step 4: Average -->
+          <text x="20" y="186" font-family="JetBrains Mono, monospace" font-size="7" fill="rgba(38,35,32,0.55)">step 4</text>
+          <text x="20" y="196" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="8" fill="#262320">weighted avg</text>
+          <text x="20" y="206" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="7" fill="rgba(38,35,32,0.65)">by data size n_k</text>
+          <rect x="120" y="178" width="50" height="14" fill="rgba(38,35,32,0.04)" stroke="rgba(38,35,32,0.30)" stroke-width="0.6"/>
+          <text x="145" y="188" font-family="JetBrains Mono, monospace" font-size="7" fill="#7a1f24" text-anchor="middle">w ← Σ (n_k/n) w_k</text>
+          <!-- Loop arrow -->
+          <path d="M 145 200 Q 200 220 110 226 Q 30 230 80 38 Q 100 22 110 22" fill="none" stroke="rgba(38,35,32,0.40)" stroke-width="0.6" stroke-dasharray="3,3"/>
+          <text x="190" y="234" font-family="JetBrains Mono, monospace" font-size="7" fill="rgba(38,35,32,0.55)" text-anchor="middle">repeat</text>
+        </svg>
+
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Why "data stays local" matters</div>
+        <p class="quiet">Three reasons: <em>regulation</em> (GDPR / HIPAA forbid pooling), <em>cost</em> (uploading every keystroke from a billion phones is expensive), and <em>privacy</em> (your data stays your data, unless you opt in). Federated solves all three with one trick.</p>
+
         <div class="ml-margin-rule thin"></div>
         <div class="ml-margin-h sm">Differential privacy</div>
-        <p class="quiet">Add Gaussian noise to each client update before sending. The server still gets a useful average; individual rows become provably hard to recover.</p>
+        <p class="quiet">Add a small Gaussian noise of standard deviation σ to each client update before sending. The server's average still converges; individual rows become provably hard to recover. Bigger σ ⇒ more privacy, slower learning.</p>
+
         <div class="ml-margin-rule thin"></div>
         <div class="ml-margin-h sm">Cross-silo vs cross-device</div>
         <p class="quiet"><em>Cross-silo</em>: a few hundred organizations (hospitals, banks). Reliable, large local datasets. <em>Cross-device</em>: millions of phones. Unreliable, small local datasets — Gboard's regime.</p>

@@ -53,8 +53,9 @@
       <div class="ml-eyebrow accent">Try this</div>
       <ol>
         <li>Hit <em>Train</em>. The generator's points (orange) start as a tight blob near origin and spread to match the real-data ring. Watch the discriminator's heatmap shift as it loses traction.</li>
-        <li>Try <em>spiral</em> or <em>two clusters</em>. Some shapes are harder — the generator may collapse to a single mode (a known GAN failure called <em>mode collapse</em>).</li>
-        <li>Increase the <em>discriminator strength</em>. Too strong, and the generator gets no useful signal; too weak, and it goes nowhere. Tuning this balance is the eternal GAN-training pain.</li>
+        <li>Watch the <em>loss strip</em> above the canvas. G-loss (orange) and D-loss (ink) push against each other and oscillate — they don't both fall like a normal training curve. That zig-zag <em>is</em> the adversarial game.</li>
+        <li>Try <em>spiral</em> or <em>two clusters</em>. Some shapes are harder — the generator may collapse to a single mode (a known GAN failure called <em>mode collapse</em>). Uncovered modes pulse on the canvas.</li>
+        <li>Slide the <em>discriminator strength</em> knob. Too strong, and the generator gets no useful signal; too weak, and it goes nowhere. Tuning this balance is the eternal GAN-training pain.</li>
       </ol>
     </div>
   </section>
@@ -66,7 +67,8 @@
 
       <div class="ml-rail-label" style="margin-top: 24px">Discriminator strength</div>
       <input id="d-strength" type="range" min="0.5" max="2.5" step="0.1" value="1" style="width:100%; accent-color:var(--accent)" />
-      <div id="d-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">D strength = 1.0</div>
+      <div id="d-label" style="font-family:var(--mono); font-size:11px; color:var(--accent); text-align:center; margin-top:2px">EQUILIBRIUM</div>
+      <div id="d-sublabel" style="font-family:var(--serif); font-style:italic; font-size:12px; color:var(--ml-ink-fade); text-align:center; margin-top:2px; line-height:1.4">D and G push back evenly — the only regime that learns.</div>
 
       <div style="display:flex; gap:8px; margin-top:18px">
         <button id="train-btn" class="ml-sbtn" style="flex:1; padding:10px 14px; font-family:var(--serif); font-style:italic; font-size:14px">▷ Train</button>
@@ -77,24 +79,75 @@
     </aside>
 
     <div class="ml-canvas-wrap">
+      <div class="ml-canvas-frame" style="aspect-ratio: 4 / 1; padding: 12px; margin-bottom:10px">
+        <canvas id="loss-canvas"></canvas>
+      </div>
       <div class="ml-canvas-frame">
         <canvas id="canvas"></canvas>
       </div>
       <div class="ml-caption">
         <span class="ml-cap-num">·</span>
-        Black points are real samples. <span class="ml-ink-orange">Accent points</span> are the generator's fakes. The shaded heatmap is the discriminator's "real probability" — orange means it thinks <em>real</em>, ink means <em>fake</em>. Watch the heatmap fight as both networks learn.
+        Black points are real samples. <span style="color:var(--accent)">Orange points</span> are the generator's fakes. The shaded heatmap is the discriminator's "real probability" — orange means it thinks <em>real</em>, ink means <em>fake</em>. The strip above plots G-loss and D-loss as training proceeds — watch them oscillate.
       </div>
     </div>
 
     <aside class="right-rail">
       <div class="ml-margin">
         <div class="ml-margin-rule"></div>
+        <div class="ml-margin-h">Before this</div>
+        <p class="quiet">Generating realistic images was hard. VAEs gave blurry samples (MSE averages); pixelCNNs were slow. Goodfellow (2014) reframed generation as a game: generator vs. discriminator. The discriminator's <em>learned</em> loss replaced hand-crafted ones — and that move powered photorealistic faces, deepfakes, and the adversarial fine-tuning behind today's diffusion models.</p>
+
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h">The architecture</div>
+        <svg viewBox="0 0 220 180" style="width:100%; max-width:220px; display:block; margin:6px 0 10px">
+          <!-- noise z -->
+          <text x="14" y="40" font-family="JetBrains Mono, monospace" font-size="9" fill="rgba(38,35,32,0.55)">z ~ N(0,I)</text>
+          <circle cx="22" cy="56" r="6" fill="rgba(38,35,32,0.18)" stroke="#262320" stroke-width="1"/>
+          <line x1="30" y1="56" x2="48" y2="56" stroke="#262320" stroke-width="1" marker-end="url(#a1)"/>
+          <!-- Generator -->
+          <rect x="48" y="42" width="48" height="28" fill="rgba(122,31,36,0.10)" stroke="#7a1f24"/>
+          <text x="72" y="60" text-anchor="middle" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="11" fill="#7a1f24">Generator</text>
+          <text x="72" y="80" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="rgba(38,35,32,0.6)">G(z)</text>
+          <!-- fake samples -->
+          <line x1="96" y1="56" x2="120" y2="56" stroke="#7a1f24" stroke-width="1" marker-end="url(#a1)"/>
+          <text x="108" y="50" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="#7a1f24">fake</text>
+          <!-- real data -->
+          <text x="36" y="120" text-anchor="middle" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="10" fill="#262320">real x</text>
+          <line x1="48" y1="120" x2="120" y2="100" stroke="#262320" stroke-width="1" marker-end="url(#a1)"/>
+          <!-- Discriminator -->
+          <rect x="120" y="80" width="60" height="32" fill="rgba(38,35,32,0.08)" stroke="#262320"/>
+          <text x="150" y="98" text-anchor="middle" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="11" fill="#262320">Discriminator</text>
+          <text x="150" y="110" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="rgba(38,35,32,0.6)">D(·)</text>
+          <!-- output real/fake -->
+          <line x1="180" y1="96" x2="208" y2="96" stroke="#262320" stroke-width="1" marker-end="url(#a1)"/>
+          <text x="194" y="86" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="rgba(38,35,32,0.6)">real?</text>
+          <!-- feedback arrow back to G -->
+          <path d="M 150 112 Q 130 165 72 165 L 72 70" fill="none" stroke="rgba(122,31,36,0.55)" stroke-width="1" stroke-dasharray="3,3" marker-end="url(#a2)"/>
+          <text x="110" y="158" text-anchor="middle" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="9" fill="rgba(122,31,36,0.7)">gradient: fool D harder</text>
+          <defs>
+            <marker id="a1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M0,0 L10,5 L0,10 z" fill="#262320"/>
+            </marker>
+            <marker id="a2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M0,0 L10,5 L0,10 z" fill="rgba(122,31,36,0.7)"/>
+            </marker>
+          </defs>
+        </svg>
+        <p class="quiet" style="font-size:12px">Two networks, one feedback loop. <em>G</em> turns noise into fake samples; <em>D</em> classifies real vs fake; <em>D</em>'s mistakes are gradient signal pushing <em>G</em> to forge better.</p>
+
+        <div class="ml-margin-rule thin"></div>
         <div class="ml-margin-h">The minimax game</div>
-        <div class="ml-equation" style="font-size:13px">min<sub>G</sub> max<sub>D</sub> 𝔼[log D(x)] + 𝔼[log(1 − D(G(z)))]</div>
-        <p>D wants to score reals high and fakes low. G wants to push D's fake-score up. At the global optimum, D outputs 0.5 everywhere — it can't distinguish.</p>
+        <div class="ml-equation" style="font-size:12px">min<sub>G</sub> max<sub>D</sub> 𝔼[log D(x)] + 𝔼[log(1 − D(G(z)))]</div>
+        <p class="quiet">The two networks play a game. <em>D</em> wants <em>log D(x)</em> high (recognize <em>real</em>) <em>and</em> <em>log(1 − D(G(z)))</em> high (recognize <em>fakes</em>). <em>G</em> wants the opposite — to push <em>log(1 − D(G(z)))</em> <em>down</em>, by making <em>D(G(z))</em> close to 1. They alternate; equilibrium = D guesses randomly because G's fakes are indistinguishable.</p>
+
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Symbol gloss</div>
+        <p class="quiet"><em>z</em>: random noise vector drawn from a fixed prior (usually <em>N(0, I)</em>). <em>G(z)</em>: the generator's fake sample. <em>D(·)</em>: discriminator's score in [0, 1] — closer to 1 means "real." 𝔼: expected value (average over many samples).</p>
+
         <div class="ml-margin-rule thin"></div>
         <div class="ml-margin-h sm">Mode collapse</div>
-        <p class="quiet">A common failure: G discovers <em>one</em> output that fools D, and produces only that. Real distribution has 10 modes; G covers 1.</p>
+        <p class="quiet">A common failure: G discovers <em>one</em> output that fools D and produces only that. Real distribution has many modes; G covers one. The flashing label on the canvas warns when this happens.</p>
+
         <div class="ml-margin-rule thin"></div>
         <div class="ml-margin-h sm">Beyond images</div>
         <p class="quiet">RLHF for language models is GAN-shaped: the language model is the generator; a learned preference model is the discriminator (reward model).</p>

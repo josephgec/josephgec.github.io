@@ -53,10 +53,21 @@
     <div class="ml-try">
       <div class="ml-eyebrow accent">Try this</div>
       <ol>
-        <li>Pick <em>grid search</em>. Watch the regular lattice spray probes across the space — it covers everything but wastes many evaluations on bad regions.</li>
-        <li>Switch to <em>random search</em>. Same number of trials, scattered randomly. Often finds the optimum faster despite being "unstructured."</li>
-        <li>Pick <em>Bayesian</em>. Initial points are scattered; later ones cluster around high-score regions. The "score history" plot below shows how quickly each strategy zeroes in.</li>
+        <li>Click <em>▷ Run search</em>. Three panels race side-by-side on the same hidden landscape: grid spreads probes on a lattice, random scatters them, Bayesian starts random then clusters near the best regions found so far.</li>
+        <li>Watch the <em>budget bar</em> under each panel fill as trials are spent. The bottom plot shows "best score so far" against GPU minutes — the curve that reaches a high score with the fewest minutes wins.</li>
+        <li>Switch the <em>Score landscape</em> to <em>Bumpy</em>. Multiple peaks penalize grid (it doesn't notice the bumps) and reward Bayesian (it tracks promising regions).</li>
       </ol>
+    </div>
+
+    <div class="ml-try" style="margin-top:14px; background: rgba(38,35,32,0.025); border-left: 2px solid rgba(38,35,32,0.18); padding-left: 14px">
+      <div class="ml-eyebrow">Symbol gloss</div>
+      <ul style="font-family:var(--serif); font-style:italic; font-size:14px; line-height:1.65; color:var(--ink); margin:6px 0 0; padding-left:18px">
+        <li><b>trial</b> · one full training run with one specific hyperparameter setting (e.g., learning rate = 3e-4, weight decay = 0.01).</li>
+        <li><b>budget</b> · total GPU-time you can afford. Each trial draws from this pool.</li>
+        <li><b>θ</b> (theta) · a vector of hyperparameters; each axis of the 2D landscape is one knob.</li>
+        <li><b>f(θ)</b> · the (unknown) score of training with hyperparameters θ — the heatmap above is what you're trying to climb.</li>
+        <li><b>EI</b> (expected improvement) · the heuristic Bayesian uses — for each candidate θ, estimate how much better than the current best it might be, then pick the θ that maximizes that estimate.</li>
+      </ul>
     </div>
   </section>
 
@@ -86,18 +97,76 @@
       </div>
       <div class="ml-caption">
         <span class="ml-cap-num">·</span>
-        Top: a 2D hyperparameter space (e.g., learning rate × weight decay) with a hidden score landscape (oxblood = high, ink = low). Probes appear as dots — the order is shown by the trail. Bottom: the running best score over trials.
+        Top: three panels race side-by-side on the same hidden score landscape (oxblood = high score, cream = low). Each panel's probes are dots; the encircled point is the best-so-far. The budget bar under each panel shows GPU-time consumed. Bottom: best score vs GPU minutes — the curve that climbs fastest wins.
       </div>
     </div>
 
     <aside class="right-rail">
       <div class="ml-margin">
         <div class="ml-margin-rule"></div>
-        <div class="ml-margin-h">Bayesian optimization</div>
-        <p>Maintain a model of <em>f(x)</em> (the unknown score function). At each step, pick the <em>x</em> that maximizes "expected improvement over current best." Repeat. The model gets sharper; the picks get smarter.</p>
+        <div class="ml-margin-h">Before this</div>
+        <p class="quiet">Before automated tuning, hyperparameters were guessed by hand — practitioners reused defaults from papers and prayed. Bergstra &amp; Bengio (2012) showed that random search beats grid search for the same budget; Bayesian methods (Spearmint, GPyOpt) added probabilistic models of the score landscape. Modern AutoML services (Vizier, Optuna) tune at scale, and SOTA results often hinge on careful tuning rather than fancier architectures.</p>
+
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h">Three strategies, side-by-side</div>
+        <svg viewBox="0 0 220 90" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; margin:6px 0 4px">
+          <!-- Three 3x3 mini grids showing each strategy's exploration pattern -->
+          <!-- Grid: regular lattice -->
+          <g>
+            <rect x="6" y="14" width="60" height="60" fill="rgba(38,35,32,0.04)" stroke="rgba(38,35,32,0.30)" stroke-width="0.6"/>
+            <circle cx="16" cy="24" r="2" fill="#262320"/>
+            <circle cx="36" cy="24" r="2" fill="#262320"/>
+            <circle cx="56" cy="24" r="2" fill="#262320"/>
+            <circle cx="16" cy="44" r="2" fill="#262320"/>
+            <circle cx="36" cy="44" r="2" fill="#262320"/>
+            <circle cx="56" cy="44" r="2" fill="#262320"/>
+            <circle cx="16" cy="64" r="2" fill="#262320"/>
+            <circle cx="36" cy="64" r="2" fill="#262320"/>
+            <circle cx="56" cy="64" r="2" fill="#262320"/>
+            <text x="36" y="86" font-family="JetBrains Mono, monospace" font-size="7" fill="#262320" text-anchor="middle">grid</text>
+          </g>
+          <!-- Random: scattered -->
+          <g>
+            <rect x="80" y="14" width="60" height="60" fill="rgba(38,35,32,0.04)" stroke="rgba(38,35,32,0.30)" stroke-width="0.6"/>
+            <circle cx="92"  cy="22" r="2" fill="#3a6b5e"/>
+            <circle cx="118" cy="20" r="2" fill="#3a6b5e"/>
+            <circle cx="100" cy="36" r="2" fill="#3a6b5e"/>
+            <circle cx="130" cy="38" r="2" fill="#3a6b5e"/>
+            <circle cx="86"  cy="50" r="2" fill="#3a6b5e"/>
+            <circle cx="116" cy="52" r="2" fill="#3a6b5e"/>
+            <circle cx="96"  cy="64" r="2" fill="#3a6b5e"/>
+            <circle cx="124" cy="66" r="2" fill="#3a6b5e"/>
+            <circle cx="134" cy="58" r="2" fill="#3a6b5e"/>
+            <text x="110" y="86" font-family="JetBrains Mono, monospace" font-size="7" fill="#262320" text-anchor="middle">random</text>
+          </g>
+          <!-- Bayesian: clustered around peak -->
+          <g>
+            <rect x="154" y="14" width="60" height="60" fill="rgba(38,35,32,0.04)" stroke="rgba(38,35,32,0.30)" stroke-width="0.6"/>
+            <!-- faint heat at center-right -->
+            <circle cx="194" cy="42" r="14" fill="rgba(122,31,36,0.15)"/>
+            <circle cx="194" cy="42" r="8"  fill="rgba(122,31,36,0.25)"/>
+            <!-- 3 initial scattered, rest clustered -->
+            <circle cx="162" cy="22" r="2" fill="rgba(122,31,36,0.55)"/>
+            <circle cx="180" cy="68" r="2" fill="rgba(122,31,36,0.55)"/>
+            <circle cx="206" cy="22" r="2" fill="rgba(122,31,36,0.55)"/>
+            <circle cx="194" cy="42" r="2.4" fill="#7a1f24"/>
+            <circle cx="190" cy="46" r="2"   fill="#7a1f24"/>
+            <circle cx="198" cy="38" r="2"   fill="#7a1f24"/>
+            <circle cx="200" cy="46" r="2"   fill="#7a1f24"/>
+            <circle cx="188" cy="38" r="2"   fill="#7a1f24"/>
+            <text x="184" y="86" font-family="JetBrains Mono, monospace" font-size="7" fill="#262320" text-anchor="middle">Bayesian</text>
+          </g>
+        </svg>
+        <p class="quiet" style="margin-top:6px">Grid covers everything uniformly; random scatters; Bayesian uses early scattered probes to <em>learn</em> the landscape, then clusters its remaining budget where the score model says payoff is highest.</p>
+
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Bayesian intuition</div>
+        <p class="quiet">After a few trials, fit a probabilistic model of the landscape — for each θ, the model gives a <em>guess</em> (mean) and an <em>uncertainty</em> (variance). Pick the next θ where <em>(expected score) + (uncertainty bonus)</em> is highest. So Bayesian rewards both promising and unexplored regions — that's the explore-vs-exploit tradeoff in one line.</p>
+
         <div class="ml-margin-rule thin"></div>
         <div class="ml-margin-h sm">Random &gt; grid</div>
-        <p class="quiet">Bergstra &amp; Bengio (2012) showed: in high-D spaces, only a few hyperparameters actually matter. Grid search wastes its budget probing every combination of irrelevant knobs; random search puts more diversity along each axis.</p>
+        <p class="quiet">Bergstra &amp; Bengio (2012): in high-D spaces, only a few hyperparameters actually matter. Grid search wastes its budget probing every combination of irrelevant knobs; random search puts more diversity along each axis.</p>
+
         <div class="ml-margin-rule thin"></div>
         <div class="ml-margin-h sm">Hyperband &amp; BOHB</div>
         <p class="quiet">Modern HPO combines Bayesian-style smart sampling with <em>early stopping</em> — kill bad trials early, give compute to promising ones. Hyperband, BOHB, and Google Vizier are standard.</p>

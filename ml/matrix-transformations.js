@@ -236,6 +236,41 @@
     ctx.textAlign = 'right';
     ctx.fillText(`det = ${formatNum(det)}${det < 0 ? '  (orientation flipped)' : ''}`,
       size.w - 18, size.h - 22);
+
+    // ── Top-right legend: what the colors mean ──
+    const legX = size.w - 168;
+    const legY = 14;
+    const legW = 154;
+    const legH = 78;
+    ctx.fillStyle = 'rgba(255,253,246,0.92)';
+    ctx.strokeStyle = 'rgba(38,35,32,0.30)';
+    ctx.lineWidth = 1;
+    ctx.fillRect(legX, legY, legW, legH);
+    ctx.strokeRect(legX, legY, legW, legH);
+    ctx.fillStyle = INK_FADE;
+    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText('LEGEND', legX + 8, legY + 14);
+    // î′ swatch
+    arrow(ctx, [legX + 14, legY + 30], [legX + 36, legY + 30], INK, 2, 7);
+    ctx.fillStyle = INK;
+    ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+    ctx.fillText('î′  = column 1 of A', legX + 44, legY + 33);
+    // ĵ′ swatch
+    arrow(ctx, [legX + 14, legY + 48], [legX + 36, legY + 48], ACCENT, 2, 7);
+    ctx.fillStyle = ACCENT;
+    ctx.fillText('ĵ′  = column 2 of A', legX + 44, legY + 51);
+    // dashed = original unit square
+    ctx.strokeStyle = 'rgba(38,35,32,0.55)';
+    ctx.setLineDash([3, 3]);
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(legX + 14, legY + 66); ctx.lineTo(legX + 36, legY + 66);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = INK_FADE;
+    ctx.fillText('start (unit square)', legX + 44, legY + 69);
   }
 
   // ───────── Render (DOM updates + canvas redraw) ─────────

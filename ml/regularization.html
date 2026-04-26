@@ -54,7 +54,7 @@
       <ol>
         <li>Drag the <em>dropout rate</em> from 0 to 0.7. Watch random units fade to zero on each forward pass — and the test-time outputs stay almost identical thanks to scaling.</li>
         <li>Toggle <em>BatchNorm off</em> on the comparison plot. Without it, deeper layers' activations drift to extreme values; with it, every layer's distribution stays roughly standard.</li>
-        <li>Try dropout = 1 — every unit silenced, output is zero. Then dropout = 0 — full network back. Anywhere in between is the regularization regime.</li>
+        <li>Push dropout near 0.9 — almost every unit silenced; the surviving ones get scaled up so much they look hot. Then drop to 0 — full network back. Anywhere in between is the regularization regime.</li>
       </ol>
     </div>
   </section>
@@ -62,8 +62,8 @@
   <section class="ml-stage">
     <aside class="left-rail">
       <div class="ml-rail-label">Dropout rate p</div>
-      <input id="p-slider" type="range" min="0" max="0.9" step="0.05" value="0.3" style="width:100%; accent-color:var(--accent)" />
-      <div id="p-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">p = 0.30</div>
+      <input id="p-slider" type="range" min="0" max="0.9" step="0.05" value="0.5" style="width:100%; accent-color:var(--accent)" />
+      <div id="p-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">p = 0.50</div>
 
       <div class="ml-rail-label" style="margin-top: 24px">BatchNorm</div>
       <div class="ml-presets" id="bn-toggle"></div>
@@ -76,26 +76,45 @@
     </aside>
 
     <div class="ml-canvas-wrap">
+      <div class="ml-mode-tabs" id="view-tabs"></div>
       <div class="ml-canvas-frame" style="aspect-ratio: 1.4 / 1; padding: 24px">
         <canvas id="canvas"></canvas>
       </div>
-      <div class="ml-caption">
+      <div class="ml-caption" id="caption">
         <span class="ml-cap-num">·</span>
-        Top: a 4-layer network's hidden activations on a single forward pass. Faded units are dropout-silenced. Bottom: activation distributions per layer, with and without BatchNorm. Without BN, distributions drift; with BN, they stay tight around zero with unit variance.
+        <span id="caption-text">Top: a 4-layer network's hidden activations on a single forward pass. Diagonal stripes mark dropout-silenced neurons. Bottom: activation distribution per layer.</span>
       </div>
+
+      <section style="margin-top: 32px; width: 100%">
+        <div style="font-family:var(--mono); font-size:11px; letter-spacing:0.22em; text-transform:uppercase; color:var(--ml-ink-fade); text-align:center; margin-bottom: 14px">
+          The two regularizer blocks · what's inside each
+        </div>
+        <canvas id="arch-canvas" style="width:100%; height:200px; display:block; background: var(--paper); border: 1px solid var(--rule)"></canvas>
+      </section>
     </div>
 
     <aside class="right-rail">
       <div class="ml-margin">
         <div class="ml-margin-rule"></div>
-        <div class="ml-margin-h">Dropout, intuitively</div>
-        <p>Each forward pass uses a different random sub-network — the average over passes is the full network. It's an ensemble of <em>2^N</em> sub-networks for free, and works because the units that <em>do</em> survive can't get lazy.</p>
+        <div class="ml-margin-h">Before this</div>
+        <p>Without regularization, deep nets overfit aggressively — memorizing the training set, failing on the test set. Dropout (Srivastava 2014) randomly silences neurons each batch, forcing redundancy. Batch norm (Ioffe &amp; Szegedy 2015) standardized activations layer by layer, making training faster and more stable. Both were vital for deep architectures.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h">Dropout, in symbols</div>
+        <div class="ml-equation" style="font-size:14px">a' = (m ⊙ a) / (1 − p)</div>
+        <p><b>p</b> is the dropout probability — e.g. 0.3 means each neuron is silenced with 30% chance during training. <b>m</b> is the random binary mask (1 = keep, 0 = drop). <b>⊙</b> is element-wise multiplication. We divide by (1 − p) so the average activation matches test time, when nothing is dropped.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Dropout, intuitively</div>
+        <p>Each forward pass uses a different random sub-network — the average over passes is the full network. It's an ensemble of <em>2^N</em> sub-networks for free.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">BatchNorm, in symbols</div>
+        <div class="ml-equation" style="font-size:13px">x̂ = (x − μ) / σ<br />y = γ · x̂ + β</div>
+        <p><b>μ (mu)</b> is the batch mean; <b>σ (sigma)</b> is the batch standard deviation. Subtracting μ and dividing by σ gives <em>x̂</em>, an activation centered at 0 with variance 1. Then <b>γ (gamma)</b> rescales and <b>β (beta)</b> shifts — both <em>learned</em>, so the network can undo the standardization if it helps.</p>
         <div class="ml-margin-rule thin"></div>
         <div class="ml-margin-h sm">BatchNorm, intuitively</div>
-        <p class="quiet">If layer 5's input distribution shifts every step, layer 5 can't learn anything stable. BN clamps the distribution to (μ=0, σ=1) per mini-batch, then learns an affine map back if needed. Effectively decouples each layer from the others.</p>
+        <p class="quiet">If layer 5's input distribution shifts every step, layer 5 can't learn anything stable. BN clamps the distribution to (μ=0, σ=1) per mini-batch, then learns γ, β to optionally re-shape it.</p>
         <div class="ml-margin-rule thin"></div>
         <div class="ml-margin-h sm">LayerNorm</div>
-        <p class="quiet">Same idea but normalizes across <em>features</em> within a single sample, not across the batch. Less batch-dependent. The default in transformers since 2017.</p>
+        <p class="quiet">Same idea but normalizes across <em>features</em> within a single sample, not across the batch. The default in transformers since 2017.</p>
       </div>
     </aside>
   </section>

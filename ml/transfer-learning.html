@@ -40,7 +40,7 @@
       <div class="ml-intro-block">
         <div class="ml-eyebrow">The concept</div>
         <p class="lead"><span class="term">Transfer learning</span> takes a model pre-trained on a large source task and adapts it to a smaller target task with much less data.</p>
-        <p>Three flavors, increasingly invasive: <em>(1) feature extraction</em> — freeze all the pretrained weights and train only a small head on top; <em>(2) fine-tuning</em> — unfreeze the last few layers and continue training at a low learning rate; <em>(3) full fine-tuning</em> — update everything, slowly.</p>
+        <p>Three flavors, increasingly invasive: <em>(1) feature extraction</em> — <em>freeze</em> all the pretrained weights (lock them so the optimizer doesn't touch them) and train only a small head on top; <em>(2) fine-tuning</em> — unfreeze the last few layers and continue training at a low learning rate, gently nudging them toward the new task; <em>(3) full fine-tuning</em> — unfreeze and update everything, very slowly.</p>
         <p>The earlier layers learn task-agnostic features (edges, color blobs, textures); later layers learn task-specific abstractions (cat-shaped, dog-shaped). Transfer works because the early features generalize across many vision tasks.</p>
       </div>
       <div class="ml-intro-block">
@@ -52,10 +52,23 @@
     <div class="ml-try">
       <div class="ml-eyebrow accent">Try this</div>
       <ol>
-        <li>Compare <em>train from scratch</em> vs <em>transfer + freeze</em> vs <em>transfer + fine-tune</em> on the small target dataset. Watch the accuracy curve: scratch is slowest; freeze is fastest start; fine-tune is highest final accuracy.</li>
-        <li>Drag the <em>frozen-layers</em> slider. Freezing more layers stabilizes training but caps potential. Freezing fewer gives more flexibility but risks "catastrophic forgetting" of the pretrained features.</li>
-        <li>Reduce <em>target data size</em>. Transfer's advantage grows as data shrinks — the gap between scratch and transfer widens dramatically.</li>
+        <li>Click <em>▷ Train all three</em>. The architecture strip up top shows which layers the optimizer is allowed to touch (oxblood = trainable, gray = locked). Below, three accuracy curves race: scratch is slowest; frozen jumps to a fast start but flat-lines low; fine-tune climbs steadily and finishes highest.</li>
+        <li>Drag the <em>frozen layers</em> slider. The trainable-parameter pill above the curves drops as you freeze more — fewer knobs to tune means a faster, cheaper run, but a lower achievable ceiling. Freeze 0 layers and fine-tune nearly matches scratch in cost; freeze 4 and it nearly matches frozen in cost.</li>
+        <li>Reduce <em>target data size</em>. The scratch curve falls fastest because random-init networks are data-hungry; transfer barely flinches. The gap is the entire point.</li>
+        <li>Watch the <em>wall-clock counters</em> at the bottom. Each strategy spends compute at a different rate per epoch — frozen is cheap (only the head trains), full fine-tune is expensive (every layer updates).</li>
       </ol>
+    </div>
+
+    <div class="ml-try" style="margin-top:14px; background: rgba(38,35,32,0.025); border-left: 2px solid rgba(38,35,32,0.18); padding-left: 14px">
+      <div class="ml-eyebrow">Symbol gloss</div>
+      <div class="ml-equation" style="font-size:14px; margin: 8px 0 6px">θ ← θ<sub>pre</sub> + Δθ</div>
+      <ul style="font-family:var(--serif); font-style:italic; font-size:14px; line-height:1.65; color:var(--ink); margin:6px 0 0; padding-left:18px">
+        <li><b>θ</b> (theta) · the full vector of model weights — millions of numbers, one per learnable parameter.</li>
+        <li><b>θ<sub>pre</sub></b> · the pretrained weights you start from (e.g., ResNet's ImageNet checkpoint). <em>Already good</em>; not random.</li>
+        <li><b>Δθ</b> (delta theta) · the small <em>change</em> the optimizer is allowed to make. In <em>frozen</em>, Δθ is zero everywhere except the head. In <em>fine-tuning</em>, Δθ is non-zero on the last few layers. In <em>full FT</em>, Δθ touches everything (gently).</li>
+        <li><b>Trainable parameters</b> · the count of weights with non-zero allowed Δθ — the figure in the pill above the loss curves. Fewer trainable parameters = less GPU memory, faster epochs, less risk of overfitting.</li>
+        <li><b>Wall-clock minutes</b> · GPU time elapsed. Frozen is cheap because most layers skip the gradient computation. Fine-tune is dearer because gradients flow through every layer.</li>
+      </ul>
     </div>
   </section>
 
@@ -93,11 +106,69 @@
     <aside class="right-rail">
       <div class="ml-margin">
         <div class="ml-margin-rule"></div>
-        <div class="ml-margin-h">Why it works</div>
-        <p>Early layers learn features that are generic across many tasks: edges, colors, textures. Late layers specialize. Pre-training on a large diverse dataset gets the early layers <em>nearly right</em>; the target task only needs to adjust the last few layers.</p>
+        <div class="ml-margin-h">Before this</div>
+        <p class="quiet">Before transfer learning, every new task started from scratch — random weights, weeks of training, mountains of labeled data. Then practitioners noticed that ImageNet-trained CNN features generalized stunningly well to almost any vision problem. Transfer learning (popularized around 2014) freezes those features and trains only a small head, cutting training time 10–100× and labels needed 100–1000×. Today every fine-tuned LLM is the same idea at scale.</p>
+
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h">Freeze the bottom, train the top</div>
+        <svg viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; margin:6px 0 4px">
+          <!-- Pre-trained backbone (lots of grayed-out layers) -->
+          <g>
+            <rect x="20" y="16"  width="160" height="14" fill="rgba(38,35,32,0.18)" stroke="rgba(38,35,32,0.35)" stroke-width="0.6"/>
+            <rect x="20" y="32"  width="160" height="14" fill="rgba(38,35,32,0.18)" stroke="rgba(38,35,32,0.35)" stroke-width="0.6"/>
+            <rect x="20" y="48"  width="160" height="14" fill="rgba(38,35,32,0.18)" stroke="rgba(38,35,32,0.35)" stroke-width="0.6"/>
+            <rect x="20" y="64"  width="160" height="14" fill="rgba(38,35,32,0.18)" stroke="rgba(38,35,32,0.35)" stroke-width="0.6"/>
+            <rect x="20" y="80"  width="160" height="14" fill="rgba(38,35,32,0.18)" stroke="rgba(38,35,32,0.35)" stroke-width="0.6"/>
+            <rect x="20" y="96"  width="160" height="14" fill="rgba(38,35,32,0.18)" stroke="rgba(38,35,32,0.35)" stroke-width="0.6"/>
+            <rect x="20" y="112" width="160" height="14" fill="rgba(38,35,32,0.28)" stroke="rgba(38,35,32,0.35)" stroke-width="0.6"/>
+            <rect x="20" y="128" width="160" height="14" fill="rgba(38,35,32,0.28)" stroke="rgba(38,35,32,0.35)" stroke-width="0.6"/>
+          </g>
+          <!-- Backbone label brace -->
+          <line x1="10" y1="16" x2="10" y2="142" stroke="rgba(38,35,32,0.45)" stroke-width="0.8"/>
+          <text x="6" y="84" font-family="JetBrains Mono, monospace" font-size="7" fill="rgba(38,35,32,0.55)" text-anchor="end" transform="rotate(-90 6 84)">FROZEN</text>
+          <!-- Head (oxblood) -->
+          <rect x="20" y="148" width="160" height="16" fill="rgba(122,31,36,0.85)" stroke="#7a1f24" stroke-width="0.8"/>
+          <rect x="20" y="166" width="160" height="16" fill="rgba(122,31,36,0.65)" stroke="#7a1f24" stroke-width="0.8"/>
+          <text x="100" y="159" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="9" fill="#fffdf6" text-anchor="middle">new head</text>
+          <text x="100" y="177" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="9" fill="#fffdf6" text-anchor="middle">trainable</text>
+          <!-- Caption -->
+          <text x="100" y="200" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="9" fill="#262320" text-anchor="middle">edges, textures, shapes</text>
+          <text x="100" y="212" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="9" fill="#262320" text-anchor="middle">already learned — re-use</text>
+        </svg>
+        <p class="quiet" style="margin-top:8px">A pretrained network is mostly already correct. Lock the bottom layers (generic features); replace and train just the top.</p>
+
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">The four-point spectrum</div>
+        <svg viewBox="0 0 220 110" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; margin-top:4px">
+          <line x1="14" y1="36" x2="206" y2="36" stroke="rgba(38,35,32,0.45)" stroke-width="0.8"/>
+          <!-- Tick marks -->
+          <line x1="14"  y1="32" x2="14"  y2="40" stroke="rgba(38,35,32,0.55)" stroke-width="0.8"/>
+          <line x1="78"  y1="32" x2="78"  y2="40" stroke="rgba(38,35,32,0.55)" stroke-width="0.8"/>
+          <line x1="142" y1="32" x2="142" y2="40" stroke="rgba(38,35,32,0.55)" stroke-width="0.8"/>
+          <line x1="206" y1="32" x2="206" y2="40" stroke="rgba(38,35,32,0.55)" stroke-width="0.8"/>
+          <!-- Markers -->
+          <circle cx="14"  cy="36" r="3" fill="#262320"/>
+          <circle cx="78"  cy="36" r="3" fill="#3a6b5e"/>
+          <circle cx="142" cy="36" r="3" fill="rgba(122,31,36,0.7)"/>
+          <circle cx="206" cy="36" r="3" fill="#7a1f24"/>
+          <!-- Labels above -->
+          <text x="14"  y="22" font-family="JetBrains Mono, monospace" font-size="7" fill="#262320" text-anchor="middle">scratch</text>
+          <text x="78"  y="22" font-family="JetBrains Mono, monospace" font-size="7" fill="#262320" text-anchor="middle">frozen</text>
+          <text x="142" y="22" font-family="JetBrains Mono, monospace" font-size="7" fill="#262320" text-anchor="middle">partial FT</text>
+          <text x="206" y="22" font-family="JetBrains Mono, monospace" font-size="7" fill="#262320" text-anchor="middle">full FT</text>
+          <!-- Labels below -->
+          <text x="14"  y="58" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="8" fill="rgba(38,35,32,0.55)" text-anchor="middle">slow / data-hungry</text>
+          <text x="78"  y="58" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="8" fill="rgba(38,35,32,0.55)" text-anchor="middle">fast / cheap</text>
+          <text x="142" y="58" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="8" fill="rgba(38,35,32,0.55)" text-anchor="middle">balanced</text>
+          <text x="206" y="58" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="8" fill="rgba(38,35,32,0.55)" text-anchor="middle">slow / accurate</text>
+          <!-- Axis label -->
+          <text x="110" y="78" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="8" fill="rgba(38,35,32,0.55)" text-anchor="middle">← cheaper · trainable params · pricier →</text>
+          <text x="110" y="92" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="8" fill="rgba(38,35,32,0.55)" text-anchor="middle">← faster · wall-clock · slower →</text>
+        </svg>
+
         <div class="ml-margin-rule thin"></div>
         <div class="ml-margin-h sm">Catastrophic forgetting</div>
-        <p class="quiet">If you fine-tune too aggressively (high LR, all layers unfrozen), the network "forgets" what made it good on the source task — and may overfit the small target data. Layer-wise LR decay (lower LR for earlier layers) is the standard fix.</p>
+        <p class="quiet">If you fine-tune too aggressively (high LR, all layers unfrozen), the network "forgets" what made it good on the source task. Layer-wise LR decay (lower LR for earlier layers) is the standard fix.</p>
         <div class="ml-margin-rule thin"></div>
         <div class="ml-margin-h sm">In LLMs: LoRA</div>
         <p class="quiet">Modern LLM fine-tuning rarely updates the full weight matrix. <em>LoRA</em> adds a tiny low-rank adapter and trains only that — drastically cheaper, comparable performance.</p>
