@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Forward Propagation · ML, Visualized · Joseph Thomas</title>
+  <meta name="description" content="Watch the signal travel: weighted sums, bent through nonlinearities, layer by layer into a prediction." />
+  <link rel="canonical" href="https://jthomas.site/ml/forward.html" />
+  <meta name="theme-color" content="#7a1f24" />
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Forward Propagation · ML, Visualized" />
+  <meta property="og:description" content="A neural network is a pipeline. Watch the signal travel." />
+  <meta property="og:url" content="https://jthomas.site/ml/forward.html" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;1,8..60,300;1,8..60,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body>
+
+<header class="nb-nav">
+  <div class="brand-block">
+    <a class="brand" href="../index.html">jthomas.site</a><span class="brand-meta">// notebook · v.4.2026</span>
+  </div>
+  <nav>
+    <a href="../blog/index.html">writing</a>
+    <a href="index.html" style="color:var(--ink)">tutorial</a>
+    <a href="../index.html#research">research</a>
+    <a href="../index.html#work">work</a>
+    <a href="../index.html#projects">projects</a>
+    <a href="../consulting.html">consulting</a>
+    <a href="../index.html#contact" class="contact">→ contact</a>
+  </nav>
+</header>
+
+<main class="ml-page-shell">
+
+  <header class="ml-mast">
+    <div class="kicker">Machine Learning, Visualized · Vol. X</div>
+    <h1>Forward<br /><em>Propagation</em></h1>
+    <p class="dek">A neural network is a pipeline. Each layer multiplies the previous activations by a weight matrix, adds a bias, and bends the result through a nonlinearity. Watch the signal travel.</p>
+  </header>
+
+  <section class="ml-intro">
+    <div class="ml-intro-grid">
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">The concept</div>
+        <p class="lead">A <span class="term">forward pass</span> is the act of running input through a neural network to produce an output, layer by layer.</p>
+        <p>Each layer does three things: <em>(1)</em> multiply the previous activations by a weight matrix, <em>(2)</em> add a bias vector, <em>(3)</em> bend the result through a nonlinearity. The output of layer ℓ becomes the input of layer ℓ+1.</p>
+        <p>The math is one line: <em>a⁽ˡ⁾ = ƒ(W⁽ˡ⁾ a⁽ˡ⁻¹⁾ + b⁽ˡ⁾)</em>. Stack three of these and you have the network on the right — input → hidden 1 → hidden 2 → output, with tanh between hidden layers and softmax at the top.</p>
+      </div>
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">Why ML cares</div>
+        <p>Forward propagation is what every deployed neural network does at inference time — every Gemini response, every Stable Diffusion image, every Tesla camera frame is the result of running a forward pass on a trained network. Training is forward propagation followed by backpropagation; inference is just forward.</p>
+        <p>The same forward pass also defines what the network can <em>express</em>: a stack of linear layers with bends in between can approximate any continuous function (universal approximation theorem). The depth and the bends are what make it powerful.</p>
+      </div>
+    </div>
+    <div class="ml-try">
+      <div class="ml-eyebrow accent">Try this</div>
+      <ol>
+        <li>Hit <em>Replay flow</em>. Watch the signal hop column by column — pre-activations (the weighted sums) lit up first, then post-activations (after the bend).</li>
+        <li>Drag <em>x₁</em> and <em>x₂</em>. The network is fixed; only the inputs change. Watch how a small shift in one number ripples differently through every neuron.</li>
+        <li>Try the four corner presets. Each one is a different region of the input space, and the softmax outputs change smoothly as you move between them — a learned 2D classifier in action.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="ml-stage">
+
+    <aside class="left-rail">
+      <div class="ml-rail-label">Input</div>
+      <div class="ml-params" id="inputs"></div>
+
+      <div class="ml-rail-label" style="margin-top: 24px">Animate</div>
+      <div style="display: flex; gap: 8px">
+        <button id="replay-btn" class="ml-sbtn" style="flex:1; padding:10px 14px; font-family:var(--serif); font-style:italic; font-size:14px">▷ Replay flow</button>
+      </div>
+      <div style="margin-top: 14px">
+        <div class="ml-param-head"><span class="label">step</span><b id="step-label">6/6</b></div>
+        <input id="step-slider" type="range" min="0" max="6" step="1" value="6" style="width:100%; accent-color:var(--accent)" />
+      </div>
+
+      <div class="ml-rail-label" style="margin-top: 24px">Architecture</div>
+      <div class="ml-readout" style="font-family:var(--mono); font-size:12px; line-height:1.7">
+        <div>2 → 4 (tanh)</div>
+        <div>4 → 4 (tanh)</div>
+        <div>4 → 2 (softmax)</div>
+      </div>
+
+      <div class="ml-rail-label" style="margin-top: 24px">Presets</div>
+      <div class="ml-presets" id="presets"></div>
+    </aside>
+
+    <div class="ml-canvas-wrap">
+      <div class="ml-canvas-frame" style="aspect-ratio: 1.3 / 1; background: var(--paper)">
+        <canvas id="canvas"></canvas>
+      </div>
+      <div class="ml-caption" id="caption"></div>
+    </div>
+
+    <aside class="right-rail">
+      <div class="ml-margin">
+        <div class="ml-margin-rule"></div>
+        <div class="ml-margin-h">The math</div>
+        <div class="ml-equation" style="font-size: 14px">a⁽ˡ⁾ = ƒ(W⁽ˡ⁾ a⁽ˡ⁻¹⁾ + b⁽ˡ⁾)</div>
+        <p>Each layer takes the previous activations, applies a linear map, shifts by a bias, and bends through a nonlinearity ƒ.</p>
+        <p class="quiet">Without the nonlinearity, stacking layers would be pointless: a chain of matrix multiplies is just one matrix multiply.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Output</div>
+        <p class="quiet">Softmax turns the final scores into a probability distribution — the network's vote for which class.</p>
+        <div class="ml-readout" id="prob-readout" style="margin-top: 14px"></div>
+      </div>
+    </aside>
+
+  </section>
+
+  <section class="ml-applications">
+    <div class="ml-section-rule">
+      <span class="kicker">Where you've seen this</span>
+      <span class="meta">04 examples</span>
+    </div>
+    <div class="ml-app-grid">
+      <div class="ml-app">
+        <div class="ml-app-h">Every model inference, ever</div>
+        <p>The "forward pass" is what every deployed neural network does at inference. Every prediction your iPhone makes, every Gemini response, every YouTube recommendation — a forward pass through trained weights.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Image classification</div>
+        <p>Convolutional networks process images by stacking these forward passes — but the matrices are organized as filters that slide over patches of the image. The basic recipe (multiply, bias, bend, repeat) is unchanged.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Transformer attention</div>
+        <p>Each transformer layer is a forward pass with a special structure: queries, keys, values are all computed by linear layers, then combined with attention weights. Stack 100 of these and you have GPT-4.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Tabular ML</div>
+        <p>Multi-layer perceptrons remain the workhorse for tabular data — credit risk, ad-CTR prediction, propensity models. Each prediction is a small forward pass through a few densely connected layers.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="ml-further">
+    <div class="ml-section-rule">
+      <span class="kicker">Further reading</span>
+    </div>
+    <ul class="ml-further-list">
+      <li>
+        <span class="title"><a href="https://www.youtube.com/watch?v=aircAruvnKk" target="_blank" rel="noopener">3Blue1Brown — But what is a neural network?</a></span>
+        <span class="kind">video</span>
+        <span class="by">Grant Sanderson · The series that uses the same column-of-neurons diagram you see on this page. Episodes 1 and 2 cover forward propagation in detail.</span>
+      </li>
+      <li>
+        <span class="title"><a href="http://neuralnetworksanddeeplearning.com/chap1.html" target="_blank" rel="noopener">Neural Networks and Deep Learning · Ch. 1</a></span>
+        <span class="kind">free book</span>
+        <span class="by">Michael Nielsen · A genuinely beautiful exposition that derives the forward pass equation from MNIST classification — and ends with working Python code.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://playground.tensorflow.org/" target="_blank" rel="noopener">TensorFlow Playground</a></span>
+        <span class="kind">interactive</span>
+        <span class="by">Smilkov et al. · A more elaborate version of the canvas above with multiple datasets, configurable depth, and live training. Excellent next step.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://en.wikipedia.org/wiki/Universal_approximation_theorem" target="_blank" rel="noopener">Universal Approximation Theorem</a></span>
+        <span class="kind">reference</span>
+        <span class="by">Wikipedia · The theorem that says the kind of network you see on this page can approximate any continuous function — given enough neurons. Why depth works.</span>
+      </li>
+    </ul>
+  </section>
+
+  <footer class="ml-foot">
+    <div class="line"><a href="index.html">← all entries</a> · <a href="activations.html">IX. Activations</a></div>
+    <div class="line eq">x → ŷ</div>
+    <div class="line"><a href="backprop.html">XI. Backpropagation →</a></div>
+  </footer>
+
+</main>
+
+<script src="shared.js"></script>
+<script src="forward.js"></script>
+
+</body>
+</html>

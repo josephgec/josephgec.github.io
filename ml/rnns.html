@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recurrent Networks · ML, Visualized · Joseph Thomas</title>
+  <meta name="description" content="A loop in the graph: the hidden state is the network's running thought as it reads a sequence." />
+  <link rel="canonical" href="https://jthomas.site/ml/rnns.html" />
+  <meta name="theme-color" content="#7a1f24" />
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;1,8..60,300;1,8..60,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body>
+<header class="nb-nav">
+  <div class="brand-block"><a class="brand" href="../index.html">jthomas.site</a><span class="brand-meta">// notebook · v.4.2026</span></div>
+  <nav>
+    <a href="../blog/index.html">writing</a>
+    <a href="index.html" style="color:var(--ink)">tutorial</a>
+    <a href="../index.html#research">research</a>
+    <a href="../index.html#work">work</a>
+    <a href="../index.html#projects">projects</a>
+    <a href="../consulting.html">consulting</a>
+    <a href="../index.html#contact" class="contact">→ contact</a>
+  </nav>
+</header>
+
+<main class="ml-page-shell">
+  <header class="ml-mast">
+    <div class="kicker">Machine Learning, Visualized · Vol. XVII</div>
+    <h1>Recurrent<br /><em>Networks</em></h1>
+    <p class="dek">A network with a memory. At each step it sees a new symbol and updates a hidden state — a running summary of everything it has seen so far. The same weights, applied over and over.</p>
+  </header>
+
+  <section class="ml-intro">
+    <div class="ml-intro-grid">
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">The concept</div>
+        <p class="lead">A <span class="term">recurrent neural network</span> (RNN) is a network with a loop: at each timestep, it takes a new input and the previous hidden state, and produces a new hidden state.</p>
+        <p>The defining equation is <em>h_t = tanh(W_xh · x_t + W_hh · h_{t−1} + b)</em>. The same weight matrices are reused at every step — that's why an RNN can read sequences of any length with a fixed parameter count.</p>
+        <p>Watch the hidden state evolve as the network reads a sequence. Different dimensions of the hidden vector specialize to track different patterns — vowels, recurring symbols, position in the sequence.</p>
+      </div>
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">Why ML cares</div>
+        <p>Before transformers ate the field in 2018, RNNs (and their LSTM/GRU variants) were the dominant architecture for everything sequential: language modeling, machine translation, speech recognition, time-series forecasting.</p>
+        <p>They're still the right tool when sequences are very long, irregular, or when memory is constrained — RNN inference is constant-memory per step, while attention is quadratic. Modern "linear attention" variants (Mamba, RWKV) revive the recurrent recipe with new tricks.</p>
+      </div>
+    </div>
+    <div class="ml-try">
+      <div class="ml-eyebrow accent">Try this</div>
+      <ol>
+        <li>Edit the sequence (only <em>a b r c d</em> and space). Hit <em>Replay</em> and watch the hidden state matrix fill in column by column.</li>
+        <li>Observe how a repeated pattern like <em>abracadabra</em> creates a recurring rhythm in the hidden state — certain dimensions oscillate as familiar chunks reappear.</li>
+        <li>Click <em>↻ weights</em> to randomize. The same input produces a wildly different state trajectory — but the structure of "memory of recent history" is preserved.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="ml-stage">
+    <aside class="left-rail">
+      <div class="ml-rail-label">Sequence</div>
+      <input id="seq-input" type="text" value="abracadabra" maxlength="14"
+             style="width:100%; padding:8px; font-family:var(--mono); font-size:14px; border:1px solid var(--rule); background:var(--paper)" />
+      <div style="font-family:var(--mono); font-size:10px; color:var(--ml-ink-fade); margin-top:6px">chars: a b r c d · space</div>
+
+      <div class="ml-rail-label" style="margin-top: 24px">Step</div>
+      <input id="step-slider" type="range" min="0" max="11" step="1" value="11" style="width:100%; accent-color:var(--accent)" />
+      <div id="step-label" style="font-family:var(--mono); font-size:11px; color:var(--ml-ink-fade); text-align:center">t = 11 / 11</div>
+
+      <div style="display:flex; gap:8px; margin-top:14px">
+        <button id="replay-btn" class="ml-sbtn" style="flex:1; padding:10px 14px; font-family:var(--serif); font-style:italic; font-size:14px">▷ Replay</button>
+        <button id="seed-btn" class="ml-sbtn ghost" style="padding:10px 14px; font-family:var(--serif); font-style:italic; font-size:13px">↻ weights</button>
+      </div>
+
+      <div class="ml-rail-label" style="margin-top: 24px">Hidden state</div>
+      <div style="font-family:var(--mono); font-size:11px; color:var(--ml-ink-fade)">8 dimensions, tanh-bounded</div>
+
+      <div class="ml-readout" id="readout" style="margin-top:18px"></div>
+    </aside>
+
+    <div class="ml-canvas-wrap">
+      <div class="ml-canvas-frame" style="aspect-ratio: 1.5 / 1; padding: 24px">
+        <canvas id="canvas"></canvas>
+      </div>
+      <div class="ml-caption">
+        <span class="ml-cap-num">·</span>
+        Top row: the input sequence. Bottom: hidden state at each timestep, one column per character. Rows are dimensions of <em>h</em> — orange means a positive activation, ink means negative. Watch how dimensions specialize as you scrub through the sequence.
+      </div>
+    </div>
+
+    <aside class="right-rail">
+      <div class="ml-margin">
+        <div class="ml-margin-rule"></div>
+        <div class="ml-margin-h">The recurrence</div>
+        <div class="ml-equation" style="font-size:14px">h_t = tanh(W<sub>xh</sub>x<sub>t</sub> + W<sub>hh</sub>h<sub>t−1</sub>)</div>
+        <p>One weight matrix per input direction, one for the recurrence, both reused across all timesteps.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">The vanishing gradient</div>
+        <p class="quiet">Backpropping through 100 timesteps is like multiplying 100 derivatives. Tanh's slope is at most 1, so gradients shrink fast — vanilla RNNs forget anything more than ~10 steps back. LSTMs are the fix.</p>
+      </div>
+    </aside>
+  </section>
+
+  <section class="ml-applications">
+    <div class="ml-section-rule"><span class="kicker">Where you've seen this</span><span class="meta">04 examples</span></div>
+    <div class="ml-app-grid">
+      <div class="ml-app">
+        <div class="ml-app-h">Pre-2018 machine translation</div>
+        <p>Google Translate's neural backend launched in 2016 with stacked LSTMs (encoder–decoder with attention). Held the field until transformers swept it away in 2018.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Speech recognition</div>
+        <p>Bidirectional LSTMs powered Siri, Alexa, and Google's voice search through the late 2010s — taking a stream of audio frames and producing a stream of phonemes.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Time series and weather</div>
+        <p>RNNs forecast electricity demand, financial volatility, and short-term weather. Newer state-space models (S4, Mamba) are direct descendants of the recurrent idea.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Karpathy's char-RNN</div>
+        <p>The famous 2015 blog post that generated Shakespeare, Wikipedia, and source code letter-by-letter. The first time many people saw a neural net produce structured prose.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="ml-further">
+    <div class="ml-section-rule"><span class="kicker">Further reading</span></div>
+    <ul class="ml-further-list">
+      <li>
+        <span class="title"><a href="https://karpathy.github.io/2015/05/21/rnn-effectiveness/" target="_blank" rel="noopener">The Unreasonable Effectiveness of Recurrent Neural Networks</a></span>
+        <span class="kind">essay</span>
+        <span class="by">Andrej Karpathy (2015) · The blog post that launched a thousand char-RNN demos. Still the clearest "look what these things can do" introduction.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://colah.github.io/posts/2015-08-Understanding-LSTMs/" target="_blank" rel="noopener">Understanding LSTM Networks</a></span>
+        <span class="kind">essay</span>
+        <span class="by">Christopher Olah · The diagrams everyone has seen. Bridges from vanilla RNNs to LSTMs and is the natural next read after this page.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://arxiv.org/abs/1211.5063" target="_blank" rel="noopener">On the difficulty of training recurrent networks</a></span>
+        <span class="kind">paper</span>
+        <span class="by">Pascanu et al. (2013) · The vanishing/exploding gradient analysis that motivated all subsequent gating mechanisms.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://arxiv.org/abs/2312.00752" target="_blank" rel="noopener">Mamba: Linear-Time Sequence Modeling</a></span>
+        <span class="kind">paper</span>
+        <span class="by">Gu &amp; Dao (2023) · The state-space model that revived the recurrent idea — competitive with transformers, with linear scaling and constant memory.</span>
+      </li>
+    </ul>
+  </section>
+
+  <footer class="ml-foot">
+    <div class="line"><a href="index.html">← all entries</a> · <a href="image-classifier.html">XVI. Classifier</a></div>
+    <div class="line eq">h<sub>t</sub> = f(x<sub>t</sub>, h<sub>t−1</sub>)</div>
+    <div class="line"><a href="lstms.html">XVIII. LSTMs →</a></div>
+  </footer>
+</main>
+
+<script src="shared.js"></script>
+<script src="rnns.js"></script>
+</body>
+</html>

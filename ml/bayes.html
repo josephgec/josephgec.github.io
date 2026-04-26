@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Bayes' Theorem · ML, Visualized · Joseph Thomas</title>
+  <meta name="description" content="A prior, some evidence, a posterior — interactive probability trees and area squares for Bayes' rule." />
+  <link rel="canonical" href="https://jthomas.site/ml/bayes.html" />
+  <meta name="theme-color" content="#7a1f24" />
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Bayes' Theorem · ML, Visualized" />
+  <meta property="og:description" content="The single equation behind probabilistic reasoning." />
+  <meta property="og:url" content="https://jthomas.site/ml/bayes.html" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;1,8..60,300;1,8..60,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body>
+
+<header class="nb-nav">
+  <div class="brand-block">
+    <a class="brand" href="../index.html">jthomas.site</a><span class="brand-meta">// notebook · v.4.2026</span>
+  </div>
+  <nav>
+    <a href="../blog/index.html">writing</a>
+    <a href="index.html" style="color:var(--ink)">tutorial</a>
+    <a href="../index.html#research">research</a>
+    <a href="../index.html#work">work</a>
+    <a href="../index.html#projects">projects</a>
+    <a href="../consulting.html">consulting</a>
+    <a href="../index.html#contact" class="contact">→ contact</a>
+  </nav>
+</header>
+
+<main class="ml-page-shell">
+
+  <header class="ml-mast">
+    <div class="kicker">Machine Learning, Visualized · Vol. VII</div>
+    <h1>Bayes'<br /><em>Theorem</em></h1>
+    <p class="dek">You start with a guess about the world (the prior). Then you see evidence. Bayes' rule tells you exactly how much to update — no more, no less. The whole of probabilistic reasoning rests on this one equation.</p>
+  </header>
+
+  <section class="ml-intro">
+    <div class="ml-intro-grid">
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">The concept</div>
+        <p class="lead"><span class="term">Bayes' theorem</span> tells you how to update your belief about an event A after observing evidence B: <em>P(A | B) = P(B | A) · P(A) / P(B)</em>.</p>
+        <p>Read left to right: the chance of <em>A given B</em> equals the chance of <em>B given A</em>, re-weighted by how plausible A was to begin with (the <em>prior</em>), and normalized by how often B occurs at all (the <em>evidence</em>).</p>
+        <p>The most counter-intuitive consequence is the <em>base rate fallacy</em>: even a 95%-accurate test for a 1% disease produces only ~16% probability of disease given a positive result. Most positives are false positives — simply because healthy people vastly outnumber sick ones.</p>
+      </div>
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">Why ML cares</div>
+        <p>Every probabilistic classifier, from the spam filter that built Gmail to the variational autoencoder behind image generation, is doing some form of Bayesian update. <em>Naive Bayes</em> classifiers compute exactly the equation above for every word in an email; modern Bayesian deep learning generalizes the same idea to billions of parameters.</p>
+        <p>Bayes' rule is also the engine of scientific reasoning under uncertainty: experiments are evidence, and how much your beliefs change after seeing them is exactly the posterior. It is the math behind A/B test analysis, particle-physics discoveries, and clinical drug approvals.</p>
+      </div>
+    </div>
+    <div class="ml-try">
+      <div class="ml-eyebrow accent">Try this</div>
+      <ol>
+        <li>Open <em>Medical test</em>. Note the posterior is ~16% — a positive test on a 1% disease is mostly a false positive. Now drag the prior up to <em>0.5</em>. The posterior leaps to ~95%.</li>
+        <li>In <em>Spam filter</em>, slide the false-positive rate to <em>0</em>. The posterior pins to 100% — perfect detector when there are zero false positives.</li>
+        <li>Switch to the <em>Area square</em> view. The orange area divided by the total orange equals the posterior. The whole equation becomes one ratio of areas.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="ml-stage">
+
+    <aside class="left-rail">
+      <div class="ml-rail-label">Scenario</div>
+      <div class="ml-presets" id="scenarios"></div>
+
+      <div class="ml-rail-label" style="margin-top: 24px">Knobs</div>
+      <div class="ml-params" id="knobs"></div>
+
+      <div class="ml-readout" id="readout"></div>
+
+      <div class="ml-preset-blurb" id="scenario-blurb" style="margin-top: 18px"></div>
+    </aside>
+
+    <div class="ml-canvas-wrap">
+      <div class="ml-mode-tabs" id="mode-tabs">
+        <button data-mode="tree">I. Probability tree</button>
+        <button data-mode="square">II. Area square</button>
+      </div>
+      <div class="ml-canvas-frame" id="canvas-frame">
+        <canvas id="canvas"></canvas>
+      </div>
+      <div class="ml-caption" id="caption"></div>
+    </div>
+
+    <aside class="right-rail">
+      <div class="ml-margin">
+        <div class="ml-margin-rule"></div>
+        <div class="ml-margin-h">In the margin</div>
+        <div class="ml-equation">P(A | B) = P(B | A) P(A) / P(B)</div>
+        <p>In words: the chance of <em>A given B</em> is the chance of <em>B given A</em>, re-weighted by how plausible A was to begin with, and normalized by how often B happens at all.</p>
+        <p class="quiet">Reverend Thomas Bayes proved this in the 1740s. It now powers spam filters, medical diagnosis, particle physics, and every probabilistic neural network.</p>
+
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Try the medical case</div>
+        <p class="quiet">The <em>base rate fallacy</em>: even with a 95%-accurate test for a 1% disease, a positive result means only ~16% chance you're sick. Most positives are false positives, because healthy people vastly outnumber sick ones.</p>
+
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">The four ingredients</div>
+        <p class="quiet"><em>Prior</em> P(A) · <em>Likelihood</em> P(B|A) · <em>Evidence</em> P(B) · <em>Posterior</em> P(A|B). Three are inputs; the fourth comes out.</p>
+      </div>
+    </aside>
+
+  </section>
+
+  <section class="ml-applications">
+    <div class="ml-section-rule">
+      <span class="kicker">Where you've seen this</span>
+      <span class="meta">04 examples</span>
+    </div>
+    <div class="ml-app-grid">
+      <div class="ml-app">
+        <div class="ml-app-h">Gmail's first spam filter</div>
+        <p>Paul Graham's 2002 essay <em>"A Plan for Spam"</em> — the proof-of-concept for Bayesian spam filtering — kicked off an industry. The math is exactly what's on this page: each word's <em>P(spam | word)</em> combined into a single posterior.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Medical screening interpretation</div>
+        <p>Doctors and statisticians teach the base-rate fallacy specifically because intuition gets it so wrong. A 95%-accurate test for a 1% disease produces a 16% posterior — exactly what the medical scenario shows above. This single fact reshapes how screening programs are designed.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Particle physics discovery</div>
+        <p>The Higgs boson announcement in 2012 was a Bayesian-style reasoning chain: observe an excess; compute the likelihood under "Higgs" vs "background only"; the ratio is the discovery significance. Five-sigma is a posterior threshold.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">A/B testing</div>
+        <p>Modern experimentation platforms (Google Optimize, Eppo, Statsig) increasingly report posteriors instead of p-values. Bayesian A/B testing answers "what is the probability B is better than A?" — exactly the kind of conditional that the posterior on this page computes.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="ml-further">
+    <div class="ml-section-rule">
+      <span class="kicker">Further reading</span>
+    </div>
+    <ul class="ml-further-list">
+      <li>
+        <span class="title"><a href="https://www.youtube.com/watch?v=HZGCoVF3YvM" target="_blank" rel="noopener">3Blue1Brown — Bayes' theorem, the geometry of changing beliefs</a></span>
+        <span class="kind">video</span>
+        <span class="by">Grant Sanderson · The same area-of-the-square argument used here, animated and narrated. The companion piece on the medical-test base rate is also worth the click.</span>
+      </li>
+      <li>
+        <span class="title"><a href="http://www.paulgraham.com/spam.html" target="_blank" rel="noopener">A Plan for Spam</a></span>
+        <span class="kind">essay</span>
+        <span class="by">Paul Graham (2002) · The blog post that started Bayesian spam filtering. Short, opinionated, and a snapshot of pre-deep-learning anti-spam.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://yudkowsky.net/rational/bayes/" target="_blank" rel="noopener">An Intuitive Explanation of Bayes' Theorem</a></span>
+        <span class="kind">essay</span>
+        <span class="by">Eliezer Yudkowsky · A long, patient walkthrough of the medical-test example with manipulable numbers — written for someone who wants the rule to <em>click</em>, not just be true.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://xcelab.net/rm/" target="_blank" rel="noopener">Statistical Rethinking</a></span>
+        <span class="kind">textbook</span>
+        <span class="by">Richard McElreath · The modern introduction to Bayesian inference for working data scientists. Code + worked examples + the conceptual framing that lets you reach for Bayes on real problems.</span>
+      </li>
+    </ul>
+  </section>
+
+  <footer class="ml-foot">
+    <div class="line"><a href="index.html">← all entries</a> · <a href="distributions.html">VI. Distributions</a></div>
+    <div class="line eq">P(A|B) ∝ P(B|A) P(A)</div>
+    <div class="line"></div>
+  </footer>
+
+</main>
+
+<script src="shared.js"></script>
+<script src="bayes.js"></script>
+
+</body>
+</html>

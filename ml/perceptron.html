@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>The Perceptron · ML, Visualized · Joseph Thomas</title>
+  <meta name="description" content="One neuron. Two weights and a bias. It draws a single straight line — and learns where to put it." />
+  <link rel="canonical" href="https://jthomas.site/ml/perceptron.html" />
+  <meta name="theme-color" content="#7a1f24" />
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="The Perceptron · ML, Visualized" />
+  <meta property="og:description" content="The simplest neural network: a weighted sum and a threshold. Watch it learn." />
+  <meta property="og:url" content="https://jthomas.site/ml/perceptron.html" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;1,8..60,300;1,8..60,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body>
+
+<header class="nb-nav">
+  <div class="brand-block">
+    <a class="brand" href="../index.html">jthomas.site</a><span class="brand-meta">// notebook · v.4.2026</span>
+  </div>
+  <nav>
+    <a href="../blog/index.html">writing</a>
+    <a href="index.html" style="color:var(--ink)">tutorial</a>
+    <a href="../index.html#research">research</a>
+    <a href="../index.html#work">work</a>
+    <a href="../index.html#projects">projects</a>
+    <a href="../consulting.html">consulting</a>
+    <a href="../index.html#contact" class="contact">→ contact</a>
+  </nav>
+</header>
+
+<main class="ml-page-shell">
+
+  <header class="ml-mast">
+    <div class="kicker">Machine Learning, Visualized · Vol. VIII</div>
+    <h1>The<br /><em>Perceptron</em></h1>
+    <p class="dek">One neuron. Two weights and a bias. It draws a single straight line through the plane and calls one side "yes," the other "no." Crude — but it learns.</p>
+  </header>
+
+  <section class="ml-intro">
+    <div class="ml-intro-grid">
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">The concept</div>
+        <p class="lead">A <span class="term">perceptron</span> is the simplest neural network: it computes <em>w·x + b</em>, then outputs 1 if that's positive, 0 otherwise.</p>
+        <p>Geometrically, the equation <em>w·x + b = 0</em> defines a <em>line</em> (or hyperplane in higher dimensions). Everything on one side gets classified as 1, everything on the other as 0. The two weights <em>w₁, w₂</em> set the line's slope; the bias <em>b</em> shifts it.</p>
+        <p>The learning rule is brutally simple: when the perceptron is wrong on a point, nudge the weights toward correctness. Repeat until everything is classified — provably converges, <em>if</em> the data is linearly separable.</p>
+      </div>
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">Why ML cares</div>
+        <p>Every neuron in a modern neural network is, at its core, a perceptron with a smoother activation. Stack them in layers, train with backpropagation instead of the perceptron rule, and you get GPT and Gemini and image classifiers.</p>
+        <p>The perceptron's failure on XOR — <em>the</em> historical failure that froze AI for a decade — is also why deep networks were invented. Stack two layers and the wall falls.</p>
+      </div>
+    </div>
+    <div class="ml-try">
+      <div class="ml-eyebrow accent">Try this</div>
+      <ol>
+        <li>Pick the <em>diagonal</em> dataset and hit <em>Train</em>. Watch the line rotate as the perceptron rule fixes one mistake at a time. After a few seconds it lands on a separator.</li>
+        <li>Switch to <em>xor</em>. Try training. Accuracy never gets above ~75% — XOR isn't linearly separable, so a single line can't do it. This is the wall that broke 1960s AI.</li>
+        <li>Drag <em>w₁</em> and <em>w₂</em> manually. Watch the dark arrow (the weight vector) rotate; the decision line is always perpendicular to it.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="ml-stage">
+
+    <aside class="left-rail">
+      <div class="ml-rail-label">Weights</div>
+      <div class="ml-params" id="weights"></div>
+
+      <div class="ml-readout" id="readout"></div>
+
+      <div class="ml-rail-label" style="margin-top: 24px">Dataset</div>
+      <div class="ml-presets" id="datasets"></div>
+      <button id="resample" class="ml-resample-btn">↻ Resample</button>
+
+      <div style="display: flex; gap: 8px; margin-top: 18px">
+        <button id="train-btn" class="ml-sbtn" style="flex:1; padding:8px 18px; font-family:var(--serif); font-style:italic; font-size:14px">Train</button>
+        <button id="random-init" class="ml-sbtn ghost" style="padding:8px 14px; font-family:var(--serif); font-style:italic; font-size:13px">Random init</button>
+      </div>
+      <div class="ml-preset-blurb" id="warning" style="margin-top: 14px; min-height: 1em"></div>
+    </aside>
+
+    <div class="ml-canvas-wrap">
+      <div class="ml-canvas-frame">
+        <canvas id="canvas"></canvas>
+      </div>
+      <div class="ml-caption">
+        <span class="ml-cap-num">·</span>
+        The <span class="ml-ink-orange">accent line</span> is where <em>w·x + b = 0</em>. One side says "1," the other "0." Training nudges the line until it splits the classes — if it can. Misclassified points are circled.
+      </div>
+    </div>
+
+    <aside class="right-rail">
+      <div class="ml-margin">
+        <div class="ml-margin-rule"></div>
+        <div class="ml-margin-h">In the margin</div>
+        <div class="ml-equation">ŷ = step(w·x + b)</div>
+        <p>The simplest neural network: a weighted sum, then a threshold.</p>
+        <p class="quiet">Rosenblatt's 1958 learning rule: when wrong, nudge weights in the direction of the input, by the amount of the error.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">The wall</div>
+        <p class="quiet">Minsky &amp; Papert (1969) proved one perceptron can't learn XOR. Stack them in layers and the wall falls — but you need backpropagation to train them.</p>
+      </div>
+    </aside>
+
+  </section>
+
+  <section class="ml-applications">
+    <div class="ml-section-rule">
+      <span class="kicker">Where you've seen this</span>
+      <span class="meta">04 examples</span>
+    </div>
+    <div class="ml-app-grid">
+      <div class="ml-app">
+        <div class="ml-app-h">Logistic regression</div>
+        <p>Replace the hard step with a smooth sigmoid and you have logistic regression — still the workhorse classifier in fraud detection, click-through prediction, and medical risk scores. Same geometry: a hyperplane separating two classes.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Single-neuron output layers</div>
+        <p>The last layer of a binary classifier — "is this email spam?" "does this CT scan show a tumor?" — is essentially a perceptron operating on features extracted by deeper layers. Modern networks compose many of these.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Spam filters and ad ranking</div>
+        <p>Linear classifiers powered web-scale filtering through the 2000s. Their interpretability — every weight is "how much does this feature pull toward spam?" — is still why they appear in audit-sensitive ML pipelines.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Geometric ML</div>
+        <p>The perceptron's view of classification — find the right hyperplane — is the foundation of support-vector machines, max-margin classifiers, and even modern contrastive-learning objectives.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="ml-further">
+    <div class="ml-section-rule">
+      <span class="kicker">Further reading</span>
+    </div>
+    <ul class="ml-further-list">
+      <li>
+        <span class="title"><a href="https://psycnet.apa.org/record/1959-09865-001" target="_blank" rel="noopener">The Perceptron: A Probabilistic Model</a></span>
+        <span class="kind">paper</span>
+        <span class="by">Frank Rosenblatt (1958) · The original. Surprisingly readable, and an interesting historical document — written a decade before the AI winter that the perceptron's limitations triggered.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://en.wikipedia.org/wiki/Perceptrons_(book)" target="_blank" rel="noopener">Perceptrons</a></span>
+        <span class="kind">book (1969)</span>
+        <span class="by">Minsky &amp; Papert · The book that proved single-layer perceptrons can't learn XOR — and was widely (mis)read as proof that neural networks were a dead end. Backpropagation revived the field 17 years later.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://www.deeplearningbook.org/contents/mlp.html" target="_blank" rel="noopener">Deep Learning · Chapter 6: Deep Feedforward Networks</a></span>
+        <span class="kind">textbook</span>
+        <span class="by">Goodfellow, Bengio, Courville · The bridge from one perceptron to many. The XOR example appears explicitly as the motivation for hidden layers.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://playground.tensorflow.org/" target="_blank" rel="noopener">TensorFlow Playground</a></span>
+        <span class="kind">interactive</span>
+        <span class="by">Daniel Smilkov · A more elaborate sibling of the toy above, with multiple layers, multiple datasets, and live training animations. The natural next step after this page.</span>
+      </li>
+    </ul>
+  </section>
+
+  <footer class="ml-foot">
+    <div class="line"><a href="index.html">← all entries</a> · <a href="bayes.html">VII. Bayes</a></div>
+    <div class="line eq">w · x + b</div>
+    <div class="line"><a href="activations.html">IX. Activations →</a></div>
+  </footer>
+
+</main>
+
+<script src="shared.js"></script>
+<script src="perceptron.js"></script>
+
+</body>
+</html>

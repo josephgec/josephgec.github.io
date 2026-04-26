@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hyperparameter Tuning · ML, Visualized · Joseph Thomas</title>
+  <meta name="description" content="Grid search, random search, Bayesian optimization — three ways to comb a high-dimensional knob space." />
+  <link rel="canonical" href="https://jthomas.site/ml/hyperparameter-tuning.html" />
+  <meta name="theme-color" content="#7a1f24" />
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;1,8..60,300;1,8..60,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body>
+<header class="nb-nav">
+  <div class="brand-block"><a class="brand" href="../index.html">jthomas.site</a><span class="brand-meta">// notebook · v.4.2026</span></div>
+  <nav>
+    <a href="../blog/index.html">writing</a>
+    <a href="index.html" style="color:var(--ink)">tutorial</a>
+    <a href="../index.html#research">research</a>
+    <a href="../index.html#work">work</a>
+    <a href="../index.html#projects">projects</a>
+    <a href="../consulting.html">consulting</a>
+    <a href="../index.html#contact" class="contact">→ contact</a>
+  </nav>
+</header>
+
+<main class="ml-page-shell">
+  <header class="ml-mast">
+    <div class="kicker">Machine Learning, Visualized · Vol. XXXI</div>
+    <h1>Hyperparameter<br /><em>Tuning</em></h1>
+    <p class="dek">Every model has knobs — learning rate, weight decay, layer count, dropout. Grid search probes them on a regular lattice; random search throws darts; Bayesian optimization learns where to throw next. Three different theories of how to comb a knob space.</p>
+  </header>
+
+  <section class="ml-intro">
+    <div class="ml-intro-grid">
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">The concept</div>
+        <p class="lead"><span class="term">Hyperparameter tuning</span> is the search for the knob settings that maximize validation accuracy — a black-box optimization in a few-to-many dimensions.</p>
+        <p><em>Grid search</em>: try every combination of a regular lattice. Simple; wasteful; embarrassingly parallel.</p>
+        <p><em>Random search</em>: sample knob settings at random. Counter-intuitively often beats grid search — Bergstra &amp; Bengio (2012) showed that for any "important dimension" random search has a much better chance of finding good values along it.</p>
+        <p><em>Bayesian optimization</em>: build a model of the score landscape (typically a Gaussian process) and pick the next point that maximizes "expected improvement" given the model.</p>
+      </div>
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">Why ML cares</div>
+        <p>The difference between a 90%-accuracy model and a 96% one is often hyperparameter tuning. Tuning is what separates published-paper results from production-quality ones.</p>
+        <p>For deep learning specifically, training a model is expensive — each evaluation in this search costs hours of GPU time. Bayesian optimization (Hyperband, BOHB, Vizier) lets you find good settings with far fewer trials than grid or random — making it the default in modern AutoML systems.</p>
+      </div>
+    </div>
+    <div class="ml-try">
+      <div class="ml-eyebrow accent">Try this</div>
+      <ol>
+        <li>Pick <em>grid search</em>. Watch the regular lattice spray probes across the space — it covers everything but wastes many evaluations on bad regions.</li>
+        <li>Switch to <em>random search</em>. Same number of trials, scattered randomly. Often finds the optimum faster despite being "unstructured."</li>
+        <li>Pick <em>Bayesian</em>. Initial points are scattered; later ones cluster around high-score regions. The "score history" plot below shows how quickly each strategy zeroes in.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="ml-stage">
+    <aside class="left-rail">
+      <div class="ml-rail-label">Strategy</div>
+      <div class="ml-presets" id="strategies"></div>
+
+      <div class="ml-rail-label" style="margin-top: 24px">Number of trials</div>
+      <input id="trials-slider" type="range" min="4" max="64" step="2" value="20" style="width:100%; accent-color:var(--accent)" />
+      <div id="trials-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">20 trials</div>
+
+      <div class="ml-rail-label" style="margin-top: 24px">Score landscape</div>
+      <div class="ml-presets" id="landscapes"></div>
+
+      <div style="display:flex; gap:8px; margin-top: 18px">
+        <button id="run-btn" class="ml-sbtn" style="flex:1; padding:10px 14px; font-family:var(--serif); font-style:italic; font-size:14px">▷ Run search</button>
+        <button id="reset-btn" class="ml-sbtn ghost" style="padding:10px 14px; font-family:var(--serif); font-style:italic; font-size:13px">↻</button>
+      </div>
+
+      <div class="ml-readout" id="readout" style="margin-top: 18px"></div>
+    </aside>
+
+    <div class="ml-canvas-wrap">
+      <div class="ml-canvas-frame" style="aspect-ratio: 1.4 / 1; padding: 24px">
+        <canvas id="canvas"></canvas>
+      </div>
+      <div class="ml-caption">
+        <span class="ml-cap-num">·</span>
+        Top: a 2D hyperparameter space (e.g., learning rate × weight decay) with a hidden score landscape (oxblood = high, ink = low). Probes appear as dots — the order is shown by the trail. Bottom: the running best score over trials.
+      </div>
+    </div>
+
+    <aside class="right-rail">
+      <div class="ml-margin">
+        <div class="ml-margin-rule"></div>
+        <div class="ml-margin-h">Bayesian optimization</div>
+        <p>Maintain a model of <em>f(x)</em> (the unknown score function). At each step, pick the <em>x</em> that maximizes "expected improvement over current best." Repeat. The model gets sharper; the picks get smarter.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Random &gt; grid</div>
+        <p class="quiet">Bergstra &amp; Bengio (2012) showed: in high-D spaces, only a few hyperparameters actually matter. Grid search wastes its budget probing every combination of irrelevant knobs; random search puts more diversity along each axis.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Hyperband &amp; BOHB</div>
+        <p class="quiet">Modern HPO combines Bayesian-style smart sampling with <em>early stopping</em> — kill bad trials early, give compute to promising ones. Hyperband, BOHB, and Google Vizier are standard.</p>
+      </div>
+    </aside>
+  </section>
+
+  <section class="ml-applications">
+    <div class="ml-section-rule"><span class="kicker">Where you've seen this</span><span class="meta">04 examples</span></div>
+    <div class="ml-app-grid">
+      <div class="ml-app">
+        <div class="ml-app-h">Google Vizier</div>
+        <p>Google's internal HPO service tunes thousands of production models — search ranking, ad bidding, YouTube recommendations. Bayesian optimization at fleet scale.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">AutoML systems</div>
+        <p>Cloud AutoML (Google, Azure, AWS) wraps HPO behind a "give me a good model" API. The orchestration is mostly hyperparameter tuning + architecture search.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Drug discovery and materials</div>
+        <p>Bayesian optimization is widely used to choose which experiments to run next in chemistry and materials science — each "trial" is a wet-lab synthesis costing thousands of dollars.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Compiler autotuning</div>
+        <p>Optimizing kernels for GPU performance (TVM, Triton, XLA) involves searching huge spaces of compilation flags. Modern compilers use Bayesian-style HPO to find good flag combinations.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="ml-further">
+    <div class="ml-section-rule"><span class="kicker">Further reading</span></div>
+    <ul class="ml-further-list">
+      <li>
+        <span class="title"><a href="https://jmlr.org/papers/v13/bergstra12a.html" target="_blank" rel="noopener">Random Search for Hyper-Parameter Optimization</a></span>
+        <span class="kind">paper</span>
+        <span class="by">Bergstra &amp; Bengio (2012) · The paper that argued (with empirical evidence) that random search beats grid search in high dimensions. A small-but-foundational result.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://distill.pub/2020/bayesian-optimization/" target="_blank" rel="noopener">Exploring Bayesian Optimization</a></span>
+        <span class="kind">interactive essay</span>
+        <span class="by">Agnihotri &amp; Batra (Distill) · The clearest visual explanation of how Gaussian processes drive Bayesian optimization, with sliders.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://arxiv.org/abs/1603.06560" target="_blank" rel="noopener">Hyperband</a></span>
+        <span class="kind">paper</span>
+        <span class="by">Li et al. (2018) · The "smart early stopping" method that became the default in deep-learning HPO. Combines well with Bayesian search; standard now.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://optuna.org/" target="_blank" rel="noopener">Optuna</a></span>
+        <span class="kind">library</span>
+        <span class="by">The most popular Python HPO library. Tree-structured Parzen Estimator + Hyperband + visualization, all in a few lines of code.</span>
+      </li>
+    </ul>
+  </section>
+
+  <footer class="ml-foot">
+    <div class="line"><a href="index.html">← all entries</a> · <a href="transfer-learning.html">XXX. Transfer Learning</a></div>
+    <div class="line eq">argmax<sub>θ</sub> f(θ)</div>
+    <div class="line"><a href="bias-variance.html">XXXII. Bias-Variance →</a></div>
+  </footer>
+</main>
+
+<script src="shared.js"></script>
+<script src="hyperparameter-tuning.js"></script>
+</body>
+</html>

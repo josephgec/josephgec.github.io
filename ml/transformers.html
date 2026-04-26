@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Transformer · ML, Visualized · Joseph Thomas</title>
+  <meta name="description" content="Stack attention blocks. Skip connections, layer norm, multi-head — the architecture behind almost everything in 2024." />
+  <link rel="canonical" href="https://jthomas.site/ml/transformers.html" />
+  <meta name="theme-color" content="#7a1f24" />
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;1,8..60,300;1,8..60,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body>
+<header class="nb-nav">
+  <div class="brand-block"><a class="brand" href="../index.html">jthomas.site</a><span class="brand-meta">// notebook · v.4.2026</span></div>
+  <nav>
+    <a href="../blog/index.html">writing</a>
+    <a href="index.html" style="color:var(--ink)">tutorial</a>
+    <a href="../index.html#research">research</a>
+    <a href="../index.html#work">work</a>
+    <a href="../index.html#projects">projects</a>
+    <a href="../consulting.html">consulting</a>
+    <a href="../index.html#contact" class="contact">→ contact</a>
+  </nav>
+</header>
+
+<main class="ml-page-shell">
+  <header class="ml-mast">
+    <div class="kicker">Machine Learning, Visualized · Vol. XXIV</div>
+    <h1>The<br /><em>Transformer</em></h1>
+    <p class="dek">Stack attention blocks. Add skip connections, layer norm, multi-head, and an MLP. The 2017 architecture that ate everything — language, code, images, audio, proteins.</p>
+  </header>
+
+  <section class="ml-intro">
+    <div class="ml-intro-grid">
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">The concept</div>
+        <p class="lead">A <span class="term">transformer</span> is a stack of identical blocks. Each block does two things: <em>attention</em> (let tokens look at each other) and a <em>feed-forward</em> MLP (transform features per token).</p>
+        <p>Around each sub-block: a residual connection (add the input back) and a LayerNorm. The residual stream carries information forward; each block writes its update into it. Multi-head attention runs several attention operations in parallel, each with its own learned Q/K/V projections.</p>
+        <p>That's the whole architecture. Stack 12 (BERT), 96 (GPT-3), or 200+ (GPT-4) of these blocks, train on a lot of text, and you get a language model.</p>
+      </div>
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">Why ML cares</div>
+        <p>Transformers are the architecture behind GPT-4, Claude, Gemini, Llama, AlphaFold 2, DALL·E, Whisper, ViT — essentially every state-of-the-art model since 2018. The 2017 paper <em>Attention Is All You Need</em> is one of the most consequential machine-learning publications ever written.</p>
+        <p>The reason for the dominance: transformers parallelize cleanly across sequence positions (unlike RNNs), scale predictably (loss decreases as a power law in compute), and transfer well across tasks. Three properties that nothing else in the architecture zoo has all three of.</p>
+      </div>
+    </div>
+    <div class="ml-try">
+      <div class="ml-eyebrow accent">Try this</div>
+      <ol>
+        <li>Hit <em>Step through</em>. Watch the residual stream pass through each block — attention writes its update, then the FFN writes its update, then we move to the next layer.</li>
+        <li>Toggle <em>multi-head</em>. With one head, attention has a single pattern; with four heads, you can see each head specialize in a different relationship (syntax, position, etc.).</li>
+        <li>Switch the input prompt. Watch how a different prompt activates a different attention pattern at each layer — the network's "thought process" varies with content.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="ml-stage">
+    <aside class="left-rail">
+      <div class="ml-rail-label">Prompt</div>
+      <div class="ml-presets" id="prompts"></div>
+
+      <div class="ml-rail-label" style="margin-top: 24px">Heads</div>
+      <input id="heads-slider" type="range" min="1" max="4" step="1" value="4" style="width:100%; accent-color:var(--accent)" />
+      <div id="heads-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">heads = 4</div>
+
+      <div class="ml-rail-label" style="margin-top: 24px">Layer</div>
+      <input id="layer-slider" type="range" min="0" max="5" step="1" value="0" style="width:100%; accent-color:var(--accent)" />
+      <div id="layer-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">layer 0 / 5</div>
+
+      <div class="ml-readout" style="margin-top: 18px; font-family:var(--mono); font-size:11px; line-height:1.7">
+        <div>Block components</div>
+        <div style="color:var(--ml-ink-fade); font-style:italic; margin-top:6px">→ LayerNorm</div>
+        <div style="color:var(--ml-ink-fade); font-style:italic">→ Multi-head attention</div>
+        <div style="color:var(--ml-ink-fade); font-style:italic">→ Residual add</div>
+        <div style="color:var(--ml-ink-fade); font-style:italic">→ LayerNorm</div>
+        <div style="color:var(--ml-ink-fade); font-style:italic">→ FFN (2-layer MLP)</div>
+        <div style="color:var(--ml-ink-fade); font-style:italic">→ Residual add</div>
+      </div>
+    </aside>
+
+    <div class="ml-canvas-wrap">
+      <div class="ml-canvas-frame" style="aspect-ratio: 1.4 / 1; padding: 24px">
+        <canvas id="canvas"></canvas>
+      </div>
+      <div class="ml-caption" id="caption"></div>
+    </div>
+
+    <aside class="right-rail">
+      <div class="ml-margin">
+        <div class="ml-margin-rule"></div>
+        <div class="ml-margin-h">The block</div>
+        <p>Two sub-blocks per layer: <em>attention</em> mixes information across token positions; the <em>FFN</em> processes each token independently. The residual stream is the highway — every block reads it and writes back into it.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Multi-head</div>
+        <p class="quiet">Run several attention operations in parallel with different learned Q/K/V projections. Heads tend to specialize: one tracks subject-verb agreement, another tracks coreference, another just attends to the previous token.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Positional encoding</div>
+        <p class="quiet">Attention is permutation-invariant by default. Positional encodings (sinusoidal in the original, RoPE in modern transformers) inject "this is token #3" information.</p>
+      </div>
+    </aside>
+  </section>
+
+  <section class="ml-applications">
+    <div class="ml-section-rule"><span class="kicker">Where you've seen this</span><span class="meta">04 examples</span></div>
+    <div class="ml-app-grid">
+      <div class="ml-app">
+        <div class="ml-app-h">Every language model</div>
+        <p>GPT-2/3/4, Gemini, Claude, Llama, Mistral, Qwen — every modern LLM is a stack of transformer blocks (often 100+). The differences are size, training data, and minor architectural tweaks.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Vision Transformers (ViT)</div>
+        <p>Cut an image into 16×16 patches, embed each patch as a token, run a transformer. Won ImageNet around 2021. Now standard for image models, often outperforming CNNs at scale.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">AlphaFold 2 &amp; ESMFold</div>
+        <p>Protein structure prediction. The Evoformer and structure modules are transformer-based. The 2020 DeepMind result that solved a 50-year-old problem.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Whisper, Gemini Live, voice agents</div>
+        <p>Speech recognition and synthesis transitioned from RNN/LSTM to encoder–decoder transformers around 2020. Whisper is the open-source reference; Gemini Live is the productized version.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="ml-further">
+    <div class="ml-section-rule"><span class="kicker">Further reading</span></div>
+    <ul class="ml-further-list">
+      <li>
+        <span class="title"><a href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noopener">Attention Is All You Need</a></span>
+        <span class="kind">paper</span>
+        <span class="by">Vaswani et al. (2017) · The transformer paper. The single most consequential ML paper of the 2010s.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://nlp.seas.harvard.edu/annotated-transformer/" target="_blank" rel="noopener">The Annotated Transformer</a></span>
+        <span class="kind">walkthrough</span>
+        <span class="by">Sasha Rush · Line-by-line PyTorch implementation of the original transformer paper, with prose explaining each block.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://www.youtube.com/watch?v=kCc8FmEb1nY" target="_blank" rel="noopener">Let's build GPT: from scratch, in code</a></span>
+        <span class="kind">video</span>
+        <span class="by">Andrej Karpathy · A two-hour live coding of nanoGPT. Best end-to-end "build a transformer from scratch" lesson available.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://transformer-circuits.pub/" target="_blank" rel="noopener">Transformer Circuits Thread</a></span>
+        <span class="kind">research</span>
+        <span class="by">Anthropic · Mechanistic interpretability — deciphering what each attention head and each MLP neuron actually computes inside a trained transformer.</span>
+      </li>
+    </ul>
+  </section>
+
+  <footer class="ml-foot">
+    <div class="line"><a href="index.html">← all entries</a> · <a href="attention.html">XXIII. Attention</a></div>
+    <div class="line eq">attn → FFN → repeat</div>
+    <div class="line"><a href="embeddings.html">XXV. Embeddings →</a></div>
+  </footer>
+</main>
+
+<script src="shared.js"></script>
+<script src="transformers.js"></script>
+</body>
+</html>

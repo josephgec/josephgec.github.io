@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A Continent of Latent Space · ML, Visualized · Joseph Thomas</title>
+  <meta name="description" content="Make every region of latent space decode to something plausible — then sample it for free." />
+  <link rel="canonical" href="https://jthomas.site/ml/vaes.html" />
+  <meta name="theme-color" content="#7a1f24" />
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;1,8..60,300;1,8..60,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body>
+<header class="nb-nav">
+  <div class="brand-block"><a class="brand" href="../index.html">jthomas.site</a><span class="brand-meta">// notebook · v.4.2026</span></div>
+  <nav>
+    <a href="../blog/index.html">writing</a>
+    <a href="index.html" style="color:var(--ink)">tutorial</a>
+    <a href="../index.html#research">research</a>
+    <a href="../index.html#work">work</a>
+    <a href="../index.html#projects">projects</a>
+    <a href="../consulting.html">consulting</a>
+    <a href="../index.html#contact" class="contact">→ contact</a>
+  </nav>
+</header>
+
+<main class="ml-page-shell">
+  <header class="ml-mast">
+    <div class="kicker">Machine Learning, Visualized · Vol. XXI</div>
+    <h1>A Continent of<br /><em>Latent Space</em></h1>
+    <p class="dek">A plain autoencoder learns one point per training example. A variational autoencoder learns a whole <em>region</em> per example — and because the regions overlap and fill the space, you can sample anywhere and decode to a plausible new output.</p>
+  </header>
+
+  <section class="ml-intro">
+    <div class="ml-intro-grid">
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">The concept</div>
+        <p class="lead">A <span class="term">variational autoencoder</span> (VAE) maps each input to a <em>distribution</em> over latent space — typically a Gaussian with a learned mean and variance — instead of a single point.</p>
+        <p>The encoder outputs (μ, σ) for each input. We sample <em>z ~ N(μ, σ²)</em> from that distribution, decode it, and add a regularization term that pulls every encoder output toward the standard normal <em>N(0, I)</em>. The result: latent space fills smoothly, with no holes.</p>
+        <p>Once trained, you can ignore the encoder entirely and just sample <em>z ~ N(0, I)</em>, decode, and get plausible new examples. Generation comes for free.</p>
+      </div>
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">Why ML cares</div>
+        <p>Stable Diffusion's "VAE" is literally this — a 2014-vintage VAE that compresses 512×512 RGB images to 64×64×4 latents before the diffusion process runs. Without it, the diffusion model would have to learn to denoise raw pixels (a much harder optimization).</p>
+        <p>VAEs also pioneered the <em>reparameterization trick</em>: sample <em>ε ~ N(0,I)</em> first, then compute <em>z = μ + σ · ε</em>. This lets gradients flow through the random sampling — a technique now everywhere in modern probabilistic ML.</p>
+      </div>
+    </div>
+    <div class="ml-try">
+      <div class="ml-eyebrow accent">Try this</div>
+      <ol>
+        <li>Drag the <em>z₁</em> and <em>z₂</em> sliders. The decoder paints a continuous map of generated outputs across latent space — a <em>continent</em> of plausible inputs.</li>
+        <li>Hit <em>Sample N(0, I)</em>. Each click draws a fresh random latent and decodes it. With a well-trained VAE, every sample is a valid-looking output, not noise.</li>
+        <li>Compare to a plain autoencoder (Vol XX). A regular AE leaves "holes" in latent space — places that decode to nothing meaningful. A VAE's KL term forces the holes to fill in.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="ml-stage">
+    <aside class="left-rail">
+      <div class="ml-rail-label">Latent z₁</div>
+      <input id="z1-slider" type="range" min="-3" max="3" step="0.05" value="0" style="width:100%; accent-color:var(--accent)" />
+      <div id="z1-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">z₁ = 0.00</div>
+
+      <div class="ml-rail-label" style="margin-top: 18px">Latent z₂</div>
+      <input id="z2-slider" type="range" min="-3" max="3" step="0.05" value="0" style="width:100%; accent-color:var(--accent)" />
+      <div id="z2-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">z₂ = 0.00</div>
+
+      <div style="display:flex; gap:8px; margin-top:18px">
+        <button id="sample-btn" class="ml-sbtn" style="flex:1; padding:10px 14px; font-family:var(--serif); font-style:italic; font-size:14px">↻ Sample N(0, I)</button>
+      </div>
+
+      <div class="ml-rail-label" style="margin-top: 24px">View</div>
+      <div class="ml-presets" id="view-toggle"></div>
+
+      <div class="ml-readout" id="readout" style="margin-top: 18px"></div>
+    </aside>
+
+    <div class="ml-canvas-wrap">
+      <div class="ml-canvas-frame">
+        <canvas id="canvas"></canvas>
+      </div>
+      <div class="ml-caption" id="caption"></div>
+    </div>
+
+    <aside class="right-rail">
+      <div class="ml-margin">
+        <div class="ml-margin-rule"></div>
+        <div class="ml-margin-h">VAE loss</div>
+        <div class="ml-equation" style="font-size:13px">L = ‖x − x̂‖² + KL(q(z|x) ‖ N(0, I))</div>
+        <p>Reconstruction loss + regularizer. The KL term pulls each input's encoded distribution toward the standard normal — making latent space a single cohesive blob you can sample from.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Reparameterization trick</div>
+        <p class="quiet">To make the random sampling differentiable: sample <em>ε</em> from a fixed N(0,I), then compute <em>z = μ + σ · ε</em>. The randomness is now an "input," and gradients flow cleanly through μ and σ.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">VAE vs GAN</div>
+        <p class="quiet">VAEs produce blurry samples (MSE loss likes the average). GANs produce sharper samples (adversarial loss penalizes implausibility). Modern systems often combine both.</p>
+      </div>
+    </aside>
+  </section>
+
+  <section class="ml-applications">
+    <div class="ml-section-rule"><span class="kicker">Where you've seen this</span><span class="meta">04 examples</span></div>
+    <div class="ml-app-grid">
+      <div class="ml-app">
+        <div class="ml-app-h">Stable Diffusion's image VAE</div>
+        <p>Stable Diffusion's first stage compresses 512×512 RGB → 64×64×4 latents using a VAE; the diffusion process operates entirely in this latent space. Speeds up training and inference by ~10×.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Drug molecule generation</div>
+        <p>VAEs trained on SMILES strings learn a continuous latent space of valid molecules. Optimize a property (binding affinity, solubility) directly in latent space, then decode — generating novel candidate drugs.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Voice and speech synthesis</div>
+        <p>Variational TTS systems (VITS, NaturalSpeech) use VAE-style encoders to capture speaker identity, then condition decoding on text. The smooth latent space allows voice morphing between speakers.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Anomaly detection (probabilistic)</div>
+        <p>Compute the <em>likelihood</em> a sample's encoding came from N(0,I). Far-from-typical examples have low likelihood and high reconstruction error — a more principled anomaly score than a plain AE provides.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="ml-further">
+    <div class="ml-section-rule"><span class="kicker">Further reading</span></div>
+    <ul class="ml-further-list">
+      <li>
+        <span class="title"><a href="https://arxiv.org/abs/1312.6114" target="_blank" rel="noopener">Auto-Encoding Variational Bayes</a></span>
+        <span class="kind">paper</span>
+        <span class="by">Kingma &amp; Welling (2014) · The original VAE paper. Establishes the variational lower bound, the reparameterization trick, and the framework that VAEs run on.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://lilianweng.github.io/posts/2018-08-12-vae/" target="_blank" rel="noopener">From Autoencoder to Beta-VAE</a></span>
+        <span class="kind">essay</span>
+        <span class="by">Lilian Weng · A patient walkthrough of the math, the variants (β-VAE, VQ-VAE, IWAE), and why each one was introduced.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://arxiv.org/abs/1906.02691" target="_blank" rel="noopener">An Introduction to Variational Autoencoders</a></span>
+        <span class="kind">survey</span>
+        <span class="by">Kingma &amp; Welling (2019) · A book-length treatment from the inventors. The canonical reference if you're going deep.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://arxiv.org/abs/1711.00937" target="_blank" rel="noopener">Neural Discrete Representation Learning (VQ-VAE)</a></span>
+        <span class="kind">paper</span>
+        <span class="by">van den Oord et al. (2017) · The discrete-latent variant. Underlies most modern image-token systems (DALL·E, Parti, MaskGIT).</span>
+      </li>
+    </ul>
+  </section>
+
+  <footer class="ml-foot">
+    <div class="line"><a href="index.html">← all entries</a> · <a href="autoencoders.html">XX. Autoencoders</a></div>
+    <div class="line eq">z ~ N(μ, σ²)</div>
+    <div class="line"><a href="gans.html">XXII. GANs →</a></div>
+  </footer>
+</main>
+
+<script src="shared.js"></script>
+<script src="vaes.js"></script>
+</body>
+</html>

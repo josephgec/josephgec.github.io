@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A Geometry of Meaning · ML, Visualized · Joseph Thomas</title>
+  <meta name="description" content="Words become vectors. Similar meanings cluster; analogies become arithmetic." />
+  <link rel="canonical" href="https://jthomas.site/ml/embeddings.html" />
+  <meta name="theme-color" content="#7a1f24" />
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;1,8..60,300;1,8..60,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body>
+<header class="nb-nav">
+  <div class="brand-block"><a class="brand" href="../index.html">jthomas.site</a><span class="brand-meta">// notebook · v.4.2026</span></div>
+  <nav>
+    <a href="../blog/index.html">writing</a>
+    <a href="index.html" style="color:var(--ink)">tutorial</a>
+    <a href="../index.html#research">research</a>
+    <a href="../index.html#work">work</a>
+    <a href="../index.html#projects">projects</a>
+    <a href="../consulting.html">consulting</a>
+    <a href="../index.html#contact" class="contact">→ contact</a>
+  </nav>
+</header>
+
+<main class="ml-page-shell">
+  <header class="ml-mast">
+    <div class="kicker">Machine Learning, Visualized · Vol. XXV</div>
+    <h1>A Geometry of<br /><em>Meaning</em></h1>
+    <p class="dek">Words become vectors. Similar meanings cluster; analogies become arithmetic. The single trick that turns text into something a neural network can multiply.</p>
+  </header>
+
+  <section class="ml-intro">
+    <div class="ml-intro-grid">
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">The concept</div>
+        <p class="lead">An <span class="term">embedding</span> assigns each word (or token, or item) a vector in some high-dimensional space. The geometry encodes meaning.</p>
+        <p>The famous result from Word2Vec (2013): vector arithmetic captures semantics. <em>king − man + woman ≈ queen</em>. <em>Paris − France + Italy ≈ Rome</em>. The directions in embedding space correspond to abstract relationships — gender, tense, country/capital — that nobody explicitly programmed.</p>
+        <p>Modern embeddings (BERT, OpenAI embeddings, Cohere embeddings) live in 768- to 4096-dimensional spaces. The toy below shows a hand-tuned 2D version where you can see analogies as actual arrows.</p>
+      </div>
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">Why ML cares</div>
+        <p>Embeddings are how text — discrete, symbolic — becomes geometric, continuous, and differentiable. Every transformer's first layer is an embedding lookup. Every retrieval system (RAG, semantic search) compares query and document embeddings by cosine similarity.</p>
+        <p>Beyond text, the same idea generalizes: face embeddings (FaceNet), product embeddings (Amazon's recommender), molecule embeddings (drug discovery), node embeddings (graph ML). Wherever you have items + a notion of "similar," embeddings are the common currency.</p>
+      </div>
+    </div>
+    <div class="ml-try">
+      <div class="ml-eyebrow accent">Try this</div>
+      <ol>
+        <li>Try the <em>king/queen/man/woman</em> analogy. The arrow from <em>man</em> to <em>woman</em> is parallel to the arrow from <em>king</em> to <em>queen</em>. That parallelism is the gender direction in embedding space.</li>
+        <li>Try the <em>Paris/France/Italy</em> analogy. Same shape, different content — the country→capital vector is its own direction.</li>
+        <li>Click any word to see its 5 nearest neighbors (by cosine similarity). Words with related meanings cluster; the geometric closeness <em>is</em> the semantic similarity.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="ml-stage">
+    <aside class="left-rail">
+      <div class="ml-rail-label">Analogy</div>
+      <div class="ml-presets" id="analogies"></div>
+
+      <div class="ml-rail-label" style="margin-top: 24px">Highlighted word</div>
+      <div id="hover-info" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade)">Hover or click a word</div>
+
+      <div class="ml-rail-label" style="margin-top: 24px">Nearest neighbors</div>
+      <div class="ml-readout" id="readout"></div>
+    </aside>
+
+    <div class="ml-canvas-wrap">
+      <div class="ml-canvas-frame">
+        <canvas id="canvas"></canvas>
+      </div>
+      <div class="ml-caption" id="caption"></div>
+    </div>
+
+    <aside class="right-rail">
+      <div class="ml-margin">
+        <div class="ml-margin-rule"></div>
+        <div class="ml-margin-h">Word2Vec</div>
+        <p>Train a network to predict a word from its surrounding context (or vice versa). The hidden layer's weights become the word vectors. Mikolov's 2013 paper showed that this simple objective gives semantic geometry for free.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Cosine similarity</div>
+        <p class="quiet">Similarity = cos(angle between vectors) = u·v / (‖u‖‖v‖). Length is mostly noise; direction encodes meaning. This is the metric every retrieval system uses.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Modern embeddings</div>
+        <p class="quiet">Today's text embeddings come from large pre-trained transformers — OpenAI's text-embedding-3, Cohere, Voyage, etc. Same geometry idea, just trained on much more data with much bigger models.</p>
+      </div>
+    </aside>
+  </section>
+
+  <section class="ml-applications">
+    <div class="ml-section-rule"><span class="kicker">Where you've seen this</span><span class="meta">04 examples</span></div>
+    <div class="ml-app-grid">
+      <div class="ml-app">
+        <div class="ml-app-h">Retrieval-augmented generation (RAG)</div>
+        <p>Every "chat with your PDF" tool embeds chunks of the document, embeds the query, and retrieves the chunks closest to the query in embedding space. The LLM then answers using the retrieved chunks as context.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Semantic search</div>
+        <p>Google, Bing, and most modern search engines now use embedding-based retrieval alongside keyword matching. A query for "fix my car" matches docs about "auto repair" because the vectors are close.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Face recognition</div>
+        <p>FaceNet embeds each face into a 128-d vector such that vectors of the same person are close, different people far. Phone unlock, photo album grouping, and surveillance all use this geometry.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Amazon &amp; Spotify recommendations</div>
+        <p>Product embeddings (item2vec) and song embeddings (sequence-based) live in spaces where "things bought together" are close. Recommendation = nearest-neighbor lookup in embedding space.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="ml-further">
+    <div class="ml-section-rule"><span class="kicker">Further reading</span></div>
+    <ul class="ml-further-list">
+      <li>
+        <span class="title"><a href="https://arxiv.org/abs/1301.3781" target="_blank" rel="noopener">Efficient Estimation of Word Representations</a></span>
+        <span class="kind">paper</span>
+        <span class="by">Mikolov et al. (2013) · The Word2Vec paper. Showed for the first time that the king/queen analogy fell out of an unsupervised objective. Genuinely surprising at the time.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://jalammar.github.io/illustrated-word2vec/" target="_blank" rel="noopener">The Illustrated Word2Vec</a></span>
+        <span class="kind">essay</span>
+        <span class="by">Jay Alammar · The clearest visual explanation of how Word2Vec actually works. Pairs naturally with the canvas above.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://nlp.stanford.edu/projects/glove/" target="_blank" rel="noopener">GloVe: Global Vectors</a></span>
+        <span class="kind">project page</span>
+        <span class="by">Pennington, Socher, Manning (2014) · The other classic word-embedding method. Different objective, similar results — and the dataset most NLP courses use as a teaching example.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://platform.openai.com/docs/guides/embeddings" target="_blank" rel="noopener">OpenAI Embeddings Guide</a></span>
+        <span class="kind">docs</span>
+        <span class="by">The practical guide to using modern transformer-based embeddings for retrieval, classification, and clustering. The reference for production embedding work today.</span>
+      </li>
+    </ul>
+  </section>
+
+  <footer class="ml-foot">
+    <div class="line"><a href="index.html">← all entries</a> · <a href="transformers.html">XXIV. Transformers</a></div>
+    <div class="line eq">w → ℝ<sup>d</sup></div>
+    <div class="line"></div>
+  </footer>
+</main>
+
+<script src="shared.js"></script>
+<script src="embeddings.js"></script>
+</body>
+</html>

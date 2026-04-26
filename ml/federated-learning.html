@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Federated Learning · ML, Visualized · Joseph Thomas</title>
+  <meta name="description" content="A model trained across many devices, each keeping its data local. The server only sees the gradients." />
+  <link rel="canonical" href="https://jthomas.site/ml/federated-learning.html" />
+  <meta name="theme-color" content="#7a1f24" />
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;1,8..60,300;1,8..60,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body>
+<header class="nb-nav">
+  <div class="brand-block"><a class="brand" href="../index.html">jthomas.site</a><span class="brand-meta">// notebook · v.4.2026</span></div>
+  <nav>
+    <a href="../blog/index.html">writing</a>
+    <a href="index.html" style="color:var(--ink)">tutorial</a>
+    <a href="../index.html#research">research</a>
+    <a href="../index.html#work">work</a>
+    <a href="../index.html#projects">projects</a>
+    <a href="../consulting.html">consulting</a>
+    <a href="../index.html#contact" class="contact">→ contact</a>
+  </nav>
+</header>
+
+<main class="ml-page-shell">
+  <header class="ml-mast">
+    <div class="kicker">Machine Learning, Visualized · Vol. XXXIV</div>
+    <h1>Federated<br /><em>Learning</em></h1>
+    <p class="dek">A model trained across many devices, each keeping its data local. The server only sees the gradients — never the raw data. The fix when "send everything to the cloud" is illegal, expensive, or just impolite.</p>
+  </header>
+
+  <section class="ml-intro">
+    <div class="ml-intro-grid">
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">The concept</div>
+        <p class="lead"><span class="term">Federated learning</span> trains a shared model across many clients (phones, hospitals, banks) without centralizing the data.</p>
+        <p>The protocol: <em>(1)</em> server broadcasts current global weights to a sample of clients; <em>(2)</em> each client trains locally on its own data for a few epochs; <em>(3)</em> clients send the <em>weight updates</em> (not the data) back to the server; <em>(4)</em> server averages the updates into a new global model. Repeat for hundreds of rounds.</p>
+        <p>The famous algorithm is <em>FedAvg</em>: weighted average of client updates by data size. Variants add differential privacy (add noise so updates can't reveal individual rows) and secure aggregation (server can't even see individual updates, just the sum).</p>
+      </div>
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">Why ML cares</div>
+        <p>Federated learning made on-device personalization viable. Gboard's next-word prediction, Apple's QuickType, and Siri voice models are all federated — your typing data never leaves your phone, but your phone contributes to the global model.</p>
+        <p>It's also the regulatory escape hatch for healthcare, finance, and HR ML: GDPR, HIPAA, and similar laws often forbid pooling raw data across jurisdictions. Federated training keeps each hospital's patient records on its servers while still building a shared model.</p>
+      </div>
+    </div>
+    <div class="ml-try">
+      <div class="ml-eyebrow accent">Try this</div>
+      <ol>
+        <li>Hit <em>Run round</em>. Watch the global model (top) broadcast to clients (bottom). Each client trains locally; updates come back; the server averages. Loss drops one round at a time.</li>
+        <li>Toggle <em>non-IID data</em>. Each client now has skewed labels (one client sees mostly class A, another mostly class B). Convergence slows; the loss curve gets noisier — a real-world federated pain point.</li>
+        <li>Drop a few clients each round (simulate offline phones). FedAvg still converges, just more slowly. Robustness to dropout is one of the algorithm's quiet strengths.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="ml-stage">
+    <aside class="left-rail">
+      <div class="ml-rail-label">Number of clients</div>
+      <input id="clients-slider" type="range" min="3" max="12" step="1" value="6" style="width:100%; accent-color:var(--accent)" />
+      <div id="clients-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">6 clients</div>
+
+      <div class="ml-rail-label" style="margin-top: 18px">Data distribution</div>
+      <div class="ml-presets" id="distribution"></div>
+
+      <div class="ml-rail-label" style="margin-top: 18px">Client dropout</div>
+      <input id="dropout-slider" type="range" min="0" max="0.5" step="0.05" value="0" style="width:100%; accent-color:var(--accent)" />
+      <div id="dropout-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">0% drop per round</div>
+
+      <div style="display:flex; gap:8px; margin-top: 18px">
+        <button id="run-btn" class="ml-sbtn" style="flex:1; padding:10px 14px; font-family:var(--serif); font-style:italic; font-size:14px">▷ Run rounds</button>
+        <button id="reset-btn" class="ml-sbtn ghost" style="padding:10px 14px; font-family:var(--serif); font-style:italic; font-size:13px">↻</button>
+      </div>
+
+      <div class="ml-readout" id="readout" style="margin-top: 18px"></div>
+    </aside>
+
+    <div class="ml-canvas-wrap">
+      <div class="ml-canvas-frame" style="aspect-ratio: 1.4 / 1; padding: 24px">
+        <canvas id="canvas"></canvas>
+      </div>
+      <div class="ml-caption">
+        <span class="ml-cap-num">·</span>
+        Top: the central server with the current global weights. Bottom: client devices, each with private local data. Lines flash <em style="color:var(--accent)">orange</em> when a client uploads its update; <em>ink</em> when the server broadcasts the new global. The chart at right plots global loss per round.
+      </div>
+    </div>
+
+    <aside class="right-rail">
+      <div class="ml-margin">
+        <div class="ml-margin-rule"></div>
+        <div class="ml-margin-h">FedAvg</div>
+        <div class="ml-equation" style="font-size:13px">w<sup>t+1</sup> = Σ<sub>k</sub> (n<sub>k</sub> / n) · w<sub>k</sub><sup>t+1</sup></div>
+        <p>Weighted average of client weights, where each client's weight is proportional to its data size. The simplest possible aggregation; surprisingly effective.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Differential privacy</div>
+        <p class="quiet">Add Gaussian noise to each client update before sending. The server still gets a useful average; individual rows become provably hard to recover.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Cross-silo vs cross-device</div>
+        <p class="quiet"><em>Cross-silo</em>: a few hundred organizations (hospitals, banks). Reliable, large local datasets. <em>Cross-device</em>: millions of phones. Unreliable, small local datasets — Gboard's regime.</p>
+      </div>
+    </aside>
+  </section>
+
+  <section class="ml-applications">
+    <div class="ml-section-rule"><span class="kicker">Where you've seen this</span><span class="meta">04 examples</span></div>
+    <div class="ml-app-grid">
+      <div class="ml-app">
+        <div class="ml-app-h">Gboard's next-word prediction</div>
+        <p>Google's keyboard learns from billions of phones without ever uploading your text. Each phone trains locally; encrypted gradient summaries are aggregated server-side. Federated learning at industrial scale.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Apple's QuickType and Siri</div>
+        <p>iPhone's predictive text and Siri's wake-word personalization use a federated mix with differential privacy. Apple's marketing leans on the fact that the data never leaves your device.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Medical imaging consortia</div>
+        <p>Multi-hospital tumor classification models — each hospital keeps patient scans local; federated rounds aggregate the model. Used by NVIDIA Clara, the Brain Tumor Federated Learning challenge, and several FDA-cleared products.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Financial fraud detection</div>
+        <p>Banks have patterns of fraud they can't share with competitors. Federated learning lets them collaboratively train fraud models without exposing customer transactions. Used by SWIFT and several large banking consortia.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="ml-further">
+    <div class="ml-section-rule"><span class="kicker">Further reading</span></div>
+    <ul class="ml-further-list">
+      <li>
+        <span class="title"><a href="https://arxiv.org/abs/1602.05629" target="_blank" rel="noopener">Communication-Efficient Learning of Deep Networks from Decentralized Data</a></span>
+        <span class="kind">paper</span>
+        <span class="by">McMahan et al. (2017) · The FedAvg paper. Introduced federated learning to mainstream ML and remains the foundational reference.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://arxiv.org/abs/1912.04977" target="_blank" rel="noopener">Advances and Open Problems in Federated Learning</a></span>
+        <span class="kind">survey</span>
+        <span class="by">Kairouz et al. (2021) · A 100+ page survey from a Google + academia consortium. The reference for both practical and research aspects.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://www.tensorflow.org/federated" target="_blank" rel="noopener">TensorFlow Federated</a></span>
+        <span class="kind">library</span>
+        <span class="by">Google's open-source framework for federated learning experiments. Includes simulation tools and DP integration.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://flower.dev/" target="_blank" rel="noopener">Flower</a></span>
+        <span class="kind">library</span>
+        <span class="by">Framework-agnostic federated learning. PyTorch + JAX + scikit-learn support; the modern alternative to TFF for research and production.</span>
+      </li>
+    </ul>
+  </section>
+
+  <footer class="ml-foot">
+    <div class="line"><a href="index.html">← all entries</a> · <a href="interpretability.html">XXXIII. Interpretability</a></div>
+    <div class="line eq">w ← Σ (n<sub>k</sub>/n) w<sub>k</sub></div>
+    <div class="line"></div>
+  </footer>
+</main>
+
+<script src="shared.js"></script>
+<script src="federated-learning.js"></script>
+</body>
+</html>

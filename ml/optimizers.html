@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>A Race of Optimizers · ML, Visualized · Joseph Thomas</title>
+  <meta name="description" content="SGD, Momentum, RMSprop, Adam — same hill, four different rules for descending it." />
+  <link rel="canonical" href="https://jthomas.site/ml/optimizers.html" />
+  <meta name="theme-color" content="#7a1f24" />
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="A Race of Optimizers · ML, Visualized" />
+  <meta property="og:description" content="Four different rules, same hill." />
+  <meta property="og:url" content="https://jthomas.site/ml/optimizers.html" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;1,8..60,300;1,8..60,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body>
+
+<header class="nb-nav">
+  <div class="brand-block">
+    <a class="brand" href="../index.html">jthomas.site</a><span class="brand-meta">// notebook · v.4.2026</span>
+  </div>
+  <nav>
+    <a href="../blog/index.html">writing</a>
+    <a href="index.html" style="color:var(--ink)">tutorial</a>
+    <a href="../index.html#research">research</a>
+    <a href="../index.html#work">work</a>
+    <a href="../index.html#projects">projects</a>
+    <a href="../consulting.html">consulting</a>
+    <a href="../index.html#contact" class="contact">→ contact</a>
+  </nav>
+</header>
+
+<main class="ml-page-shell">
+
+  <header class="ml-mast">
+    <div class="kicker">Machine Learning, Visualized · Vol. XIII</div>
+    <h1>A Race of<br /><em>Optimizers</em></h1>
+    <p class="dek">Same hill. Same start. Four different rules for descending it. Each carries a different memory of where it has been — and pays for it differently.</p>
+  </header>
+
+  <section class="ml-intro">
+    <div class="ml-intro-grid">
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">The concept</div>
+        <p class="lead">An <span class="term">optimizer</span> is a rule for converting gradients into weight updates. They differ in how much memory they keep of past gradients.</p>
+        <p><em>SGD</em> has none — each step uses only the current gradient. <em>Momentum</em> remembers a running velocity, accumulating consistent directions. <em>RMSprop</em> remembers per-coordinate gradient magnitudes, scaling steps where signals are loud or quiet. <em>Adam</em> combines momentum and RMSprop with bias correction.</p>
+        <p>None is universally best. The right choice depends on the loss-landscape geometry — and watching them race on the same surface is the fastest way to develop intuition for which one breaks where.</p>
+      </div>
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">Why ML cares</div>
+        <p>Adam and its variants (AdamW, Lion, Lamb, Adafactor) are the workhorses of every transformer training run today. SGD with momentum still wins on convolutional networks (and is what trained ResNet, the backbone of computer vision through 2020).</p>
+        <p>The choice often shows up as a percentage point of accuracy or a 2× speedup in convergence. On a billion-dollar pre-training run, that's the difference between two weeks and a month — and between top-of-leaderboard and second place.</p>
+      </div>
+    </div>
+    <div class="ml-try">
+      <div class="ml-eyebrow accent">Try this</div>
+      <ol>
+        <li>Pick <em>Narrow ravine</em> and hit <em>Race</em>. Vanilla SGD bounces across the ravine walls; Momentum slides down the long axis; Adam barely notices the ravine at all.</li>
+        <li>Switch to <em>Saddle</em>. Plain SGD sits on the saddle for ages — gradient is nearly zero. Momentum eventually rolls off; Adam breaks free almost instantly.</li>
+        <li>On <em>Bowl</em>, momentum methods overshoot the minimum and orbit before settling. Plain SGD walks straight in. The simplest case is the one where memory hurts.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="ml-stage">
+
+    <aside class="left-rail">
+      <div class="ml-rail-label">Racers</div>
+      <div id="racers" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 18px"></div>
+
+      <div class="ml-rail-label">Terrain</div>
+      <div class="ml-presets" id="terrains"></div>
+
+      <div class="ml-rail-label" style="margin-top: 20px">Learning rate η</div>
+      <input id="lr-slider" type="range" min="0.005" max="0.3" step="0.005" value="0.08" style="width:100%; accent-color:var(--accent)" />
+      <div style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center" id="lr-label">η = 0.080</div>
+
+      <div style="display:flex; gap:8px; margin-top: 18px">
+        <button id="run-btn" class="ml-sbtn" style="flex:1; padding:10px 14px; font-family:var(--serif); font-style:italic; font-size:14px">▷ Race</button>
+        <button id="reset-btn" class="ml-sbtn ghost" style="padding:10px 14px; font-family:var(--serif); font-style:italic; font-size:13px">↻</button>
+      </div>
+
+      <div class="ml-rail-label" style="margin-top: 24px">Standings</div>
+      <div class="ml-readout" id="standings"></div>
+      <div style="text-align:center; font-family:var(--mono); font-size:11px; color:var(--ml-ink-fade); margin-top:8px">step <span id="step-label">0</span></div>
+    </aside>
+
+    <div class="ml-canvas-wrap">
+      <div class="ml-canvas-frame">
+        <canvas id="canvas"></canvas>
+      </div>
+      <div class="ml-caption" id="caption"></div>
+
+      <section style="margin-top: 32px; width: 100%; max-width: 580px">
+        <div style="font-family:var(--mono); font-size:11px; letter-spacing:0.22em; text-transform:uppercase; color:var(--ml-ink-fade); text-align:center; margin-bottom: 14px">
+          Loss over time
+        </div>
+        <canvas id="loss-canvas" style="width:100%; height:160px; display:block; background: var(--paper); border: 1px solid var(--rule)"></canvas>
+      </section>
+    </div>
+
+    <aside class="right-rail">
+      <div class="ml-margin" id="margin"></div>
+    </aside>
+
+  </section>
+
+  <section class="ml-applications">
+    <div class="ml-section-rule">
+      <span class="kicker">Where you've seen this</span>
+      <span class="meta">04 examples</span>
+    </div>
+    <div class="ml-app-grid">
+      <div class="ml-app">
+        <div class="ml-app-h">Adam in every LLM</div>
+        <p>GPT-3, GPT-4, Gemini, Claude — all trained with AdamW, the weight-decay variant of Adam. The 2014 Adam paper is one of the most-cited results in modern ML, with a reach few methodological papers ever achieve.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">SGD with momentum for vision</div>
+        <p>ResNet, EfficientNet, and the entire ImageNet leaderboard for years was won by SGD with Nesterov momentum. The intuition: a well-tuned SGD finds flatter minima that generalize better than the sharp ones Adam tends to land in.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">RMSprop in reinforcement learning</div>
+        <p>Atari-playing agents (DQN), policy gradient methods, and many of DeepMind's classic RL systems used RMSprop. Reward signals in RL are noisy and unevenly scaled — exactly the regime RMSprop's per-coordinate scaling helps with.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Lion and Adafactor — Adam's heirs</div>
+        <p>2023's Lion (Google) uses the <em>sign</em> of an Adam-like estimator to halve memory; Adafactor reduces memory by factorizing the second moment. Both are built on Adam's structure but adapt it for billion-parameter training where every byte counts.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="ml-further">
+    <div class="ml-section-rule">
+      <span class="kicker">Further reading</span>
+    </div>
+    <ul class="ml-further-list">
+      <li>
+        <span class="title"><a href="https://arxiv.org/abs/1412.6980" target="_blank" rel="noopener">Adam: A Method for Stochastic Optimization</a></span>
+        <span class="kind">paper</span>
+        <span class="by">Kingma &amp; Ba (2014) · The original Adam paper. Compact, derives the update rule from a clear motivation, and includes the convergence analysis. Required reading.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://distill.pub/2017/momentum/" target="_blank" rel="noopener">Why Momentum Really Works</a></span>
+        <span class="kind">interactive essay</span>
+        <span class="by">Gabriel Goh (Distill) · The clearest visual explanation of momentum on the internet. Pairs with the ravine race above to make the "memory of velocity" concept concrete.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://www.ruder.io/optimizing-gradient-descent/" target="_blank" rel="noopener">An overview of gradient descent optimization algorithms</a></span>
+        <span class="kind">survey</span>
+        <span class="by">Sebastian Ruder · A patient, math-heavy comparison of all the optimizers above plus several niche ones. Best single page if you want to actually <em>understand</em> the differences.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://arxiv.org/abs/2302.06675" target="_blank" rel="noopener">Symbolic Discovery of Optimization Algorithms (Lion)</a></span>
+        <span class="kind">paper</span>
+        <span class="by">Chen et al. (2023) · The story of how Google researchers used program search to <em>discover</em> a better optimizer than Adam — and what they found. A glimpse of where the field is going.</span>
+      </li>
+    </ul>
+  </section>
+
+  <footer class="ml-foot">
+    <div class="line"><a href="index.html">← all entries</a> · <a href="loss-landscapes.html">XII. Loss Landscapes</a></div>
+    <div class="line eq">SGD · Momentum · RMSprop · Adam</div>
+    <div class="line"></div>
+  </footer>
+
+</main>
+
+<script src="shared.js"></script>
+<script src="optimizers.js"></script>
+
+</body>
+</html>

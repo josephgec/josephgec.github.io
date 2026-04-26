@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Markov Decision Processes · ML, Visualized · Joseph Thomas</title>
+  <meta name="description" content="A grid world, a few states, a reward. The minimal stage on which every RL algorithm performs." />
+  <link rel="canonical" href="https://jthomas.site/ml/mdp.html" />
+  <meta name="theme-color" content="#7a1f24" />
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;1,8..60,300;1,8..60,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body>
+<header class="nb-nav">
+  <div class="brand-block"><a class="brand" href="../index.html">jthomas.site</a><span class="brand-meta">// notebook · v.4.2026</span></div>
+  <nav>
+    <a href="../blog/index.html">writing</a>
+    <a href="index.html" style="color:var(--ink)">tutorial</a>
+    <a href="../index.html#research">research</a>
+    <a href="../index.html#work">work</a>
+    <a href="../index.html#projects">projects</a>
+    <a href="../consulting.html">consulting</a>
+    <a href="../index.html#contact" class="contact">→ contact</a>
+  </nav>
+</header>
+
+<main class="ml-page-shell">
+  <header class="ml-mast">
+    <div class="kicker">Machine Learning, Visualized · Vol. XXVI</div>
+    <h1>Markov Decision<br /><em>Processes</em></h1>
+    <p class="dek">An agent in a grid. A handful of states. Actions, transitions, and a reward at the end. The minimal stage on which every reinforcement-learning algorithm performs — and the one you have to draw on a whiteboard before any of them make sense.</p>
+  </header>
+
+  <section class="ml-intro">
+    <div class="ml-intro-grid">
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">The concept</div>
+        <p class="lead">A <span class="term">Markov Decision Process</span> (MDP) is a tuple <em>(S, A, P, R, γ)</em>: states, actions, a transition function, a reward function, and a discount.</p>
+        <p>The agent observes a state, picks an action, transitions to a new state with some probability, and receives a reward. The "Markov" property means the next state depends only on the current state and action — not the full history.</p>
+        <p>Solve the MDP by computing the <em>value</em> of each state — the expected total reward you'll collect starting from there. Once you know the values, picking the best action at each state ("the policy") is trivial: pick whichever action leads to the highest-valued next state.</p>
+      </div>
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">Why ML cares</div>
+        <p>Every reinforcement-learning algorithm — Q-learning, policy gradients, AlphaGo, ChatGPT-style RLHF — solves some MDP. The grid below is a toy, but the structure is identical: states, actions, rewards, transitions. Understanding the MDP makes everything that follows make sense.</p>
+        <p>MDPs also appear far outside RL. Inventory control, dialog systems, click-through optimization, healthcare treatment planning, robot navigation — anywhere a sequence of decisions affects future states is, mathematically, an MDP.</p>
+      </div>
+    </div>
+    <div class="ml-try">
+      <div class="ml-eyebrow accent">Try this</div>
+      <ol>
+        <li>Hit <em>Run value iteration</em>. Watch the value of each cell update as information from the goal "ripples" outward — high-value states are the ones close to the reward.</li>
+        <li>Drag the <em>discount γ</em> slider toward 0. Faraway rewards stop mattering — the agent becomes myopic. Drag it to 1; distant goals propagate fully.</li>
+        <li>Click any cell to make it a <em>wall</em> (or remove one). The values rearrange around the obstacle as a new optimal path emerges.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="ml-stage">
+    <aside class="left-rail">
+      <div class="ml-rail-label">Discount γ</div>
+      <input id="gamma-slider" type="range" min="0" max="1" step="0.05" value="0.9" style="width:100%; accent-color:var(--accent)" />
+      <div id="gamma-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">γ = 0.90</div>
+
+      <div class="ml-rail-label" style="margin-top: 24px">Step reward</div>
+      <input id="step-reward" type="range" min="-0.2" max="0.05" step="0.01" value="-0.04" style="width:100%; accent-color:var(--accent)" />
+      <div id="step-reward-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">step = −0.04</div>
+
+      <div class="ml-rail-label" style="margin-top: 24px">View</div>
+      <div class="ml-presets" id="view-toggle"></div>
+
+      <div style="display:flex; gap:8px; margin-top: 18px">
+        <button id="run-btn" class="ml-sbtn" style="flex:1; padding:10px 14px; font-family:var(--serif); font-style:italic; font-size:14px">▷ Run value iteration</button>
+        <button id="reset-btn" class="ml-sbtn ghost" style="padding:10px 14px; font-family:var(--serif); font-style:italic; font-size:13px">↻</button>
+      </div>
+
+      <div class="ml-readout" id="readout" style="margin-top: 18px"></div>
+      <div style="font-style:italic; font-family:var(--serif); font-size:13px; color:var(--ml-ink-fade); margin-top:14px; line-height:1.5">
+        Click a cell to toggle a wall.
+      </div>
+    </aside>
+
+    <div class="ml-canvas-wrap">
+      <div class="ml-canvas-frame">
+        <canvas id="canvas"></canvas>
+      </div>
+      <div class="ml-caption">
+        <span class="ml-cap-num">·</span>
+        Each cell shows its value <em>V(s)</em> — the expected discounted reward from that state. The arrows show the optimal action (greedy with respect to V). The <span class="ml-ink-orange">accent</span> goal is +1; the dark cell is a hazard at −1; gray cells are walls.
+      </div>
+    </div>
+
+    <aside class="right-rail">
+      <div class="ml-margin">
+        <div class="ml-margin-rule"></div>
+        <div class="ml-margin-h">Bellman equation</div>
+        <div class="ml-equation" style="font-size:13px">V(s) = max<sub>a</sub> [R(s, a) + γ Σ P(s′|s, a) V(s′)]</div>
+        <p>The value of being in state <em>s</em> equals the best action's immediate reward plus the discounted expected value of where it lands.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Value iteration</div>
+        <p class="quiet">Initialize V randomly. Sweep the grid, applying the Bellman update at each cell. Repeat until V stops changing — that's the optimal value function.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Up next</div>
+        <p class="quiet">Q-learning is the same idea, but the agent learns by <em>experience</em> instead of being told the transitions and rewards in advance.</p>
+      </div>
+    </aside>
+  </section>
+
+  <section class="ml-applications">
+    <div class="ml-section-rule"><span class="kicker">Where you've seen this</span><span class="meta">04 examples</span></div>
+    <div class="ml-app-grid">
+      <div class="ml-app">
+        <div class="ml-app-h">Robot navigation</div>
+        <p>Roomba-style robots, warehouse pickers, and AMRs all model their environment as a grid (or a continuous variant) and solve it as an MDP. Walls become forbidden states; charging docks become high-value goals.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Dialog systems</div>
+        <p>Customer-service bots cast each conversation turn as a state. Actions are responses; rewards are completed transactions or positive surveys. Modern RLHF training is, formally, an MDP — turns are states, the LLM is the agent.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Inventory and supply chain</div>
+        <p>How much to reorder at each warehouse, when, given uncertain demand? An MDP. Walmart and Amazon's order-management systems are full of MDP-shaped decision rules.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Healthcare treatment policies</div>
+        <p>Sequencing chemotherapy regimens, ICU ventilator settings, sepsis interventions — all MDP problems. The policy is "what to do next given the patient's current state." A growing area of medical ML research.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="ml-further">
+    <div class="ml-section-rule"><span class="kicker">Further reading</span></div>
+    <ul class="ml-further-list">
+      <li>
+        <span class="title"><a href="http://incompleteideas.net/book/the-book.html" target="_blank" rel="noopener">Reinforcement Learning: An Introduction</a></span>
+        <span class="kind">textbook</span>
+        <span class="by">Sutton &amp; Barto · The canonical RL textbook. Free online. Chapter 3 is the MDP chapter; everything else builds on it.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://www.davidsilver.uk/teaching/" target="_blank" rel="noopener">UCL Course on RL</a></span>
+        <span class="kind">lectures</span>
+        <span class="by">David Silver (DeepMind) · The lecture series that introduced a generation of AI researchers to MDPs. The Markov property and Bellman equation are the first lecture.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://gymnasium.farama.org/" target="_blank" rel="noopener">Gymnasium</a></span>
+        <span class="kind">library</span>
+        <span class="by">Farama Foundation · The standard Python interface for RL environments. Every environment exposes the MDP structure: <em>step()</em>, <em>reset()</em>, observations, rewards.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://www.cs.ubc.ca/~poole/aibook/html/ArtInt2e_App-A.S2.html" target="_blank" rel="noopener">Artificial Intelligence: Foundations of Computational Agents</a></span>
+        <span class="kind">free book</span>
+        <span class="by">Poole &amp; Mackworth · The MDP / value-iteration treatment for the broader AI audience. Excellent worked examples on grid worlds.</span>
+      </li>
+    </ul>
+  </section>
+
+  <footer class="ml-foot">
+    <div class="line"><a href="index.html">← all entries</a> · <a href="embeddings.html">XXV. Embeddings</a></div>
+    <div class="line eq">V(s) = max<sub>a</sub> Q(s, a)</div>
+    <div class="line"><a href="q-learning.html">XXVII. Q-Learning →</a></div>
+  </footer>
+</main>
+
+<script src="shared.js"></script>
+<script src="mdp.js"></script>
+</body>
+</html>

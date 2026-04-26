@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Policy Gradients · ML, Visualized · Joseph Thomas</title>
+  <meta name="description" content="Learn the policy directly. The probability of each action drifts up or down with the reward it brings." />
+  <link rel="canonical" href="https://jthomas.site/ml/policy-gradients.html" />
+  <meta name="theme-color" content="#7a1f24" />
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;1,8..60,300;1,8..60,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body>
+<header class="nb-nav">
+  <div class="brand-block"><a class="brand" href="../index.html">jthomas.site</a><span class="brand-meta">// notebook · v.4.2026</span></div>
+  <nav>
+    <a href="../blog/index.html">writing</a>
+    <a href="index.html" style="color:var(--ink)">tutorial</a>
+    <a href="../index.html#research">research</a>
+    <a href="../index.html#work">work</a>
+    <a href="../index.html#projects">projects</a>
+    <a href="../consulting.html">consulting</a>
+    <a href="../index.html#contact" class="contact">→ contact</a>
+  </nav>
+</header>
+
+<main class="ml-page-shell">
+  <header class="ml-mast">
+    <div class="kicker">Machine Learning, Visualized · Vol. XXVIII</div>
+    <h1>Policy<br /><em>Gradients</em></h1>
+    <p class="dek">Q-learning learns values, then derives a policy. Policy gradient methods skip the middleman and learn the policy <em>directly</em> — adjusting the probability of each action up or down by exactly the reward it brings.</p>
+  </header>
+
+  <section class="ml-intro">
+    <div class="ml-intro-grid">
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">The concept</div>
+        <p class="lead">A <span class="term">policy gradient</span> method represents the policy as a probability distribution over actions and trains it by gradient ascent on expected reward.</p>
+        <p>The key result: <em>∇ J(θ) = 𝔼[∇ log π(a|s) · R]</em>. Translated: take the gradient of "log probability of the action you took," weight it by the reward you got, and step. Good actions become more likely; bad actions become less likely. That's the whole rule.</p>
+        <p>Watch a 2D policy distribution shift toward a target as the agent samples actions and gets rewarded. The probability mass drifts toward where the reward lives.</p>
+      </div>
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">Why ML cares</div>
+        <p>Policy gradients are the engine of every modern deep RL system that doesn't fit into Q-learning's box. PPO, the workhorse of RLHF for ChatGPT and Claude. A3C, that powered DeepMind's Atari and StarCraft work. REINFORCE, the original.</p>
+        <p>They're also the natural method when actions are continuous (robot joint torques, financial portfolio weights) or when the policy is parameterized by a neural network — both cases where Q-learning's "argmax over actions" becomes intractable.</p>
+      </div>
+    </div>
+    <div class="ml-try">
+      <div class="ml-eyebrow accent">Try this</div>
+      <ol>
+        <li>Pick a <em>target</em> point. Hit <em>Train</em>. Watch the policy distribution (the contour) drift from origin toward the target as samples are rewarded.</li>
+        <li>Try a high <em>learning rate</em>. The policy lurches around — sometimes overshoots and oscillates. Real RL training pain in miniature.</li>
+        <li>Move the target mid-training. The policy slowly migrates. Adapting to a non-stationary reward is a known weakness — and a research subfield in itself.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="ml-stage">
+    <aside class="left-rail">
+      <div class="ml-rail-label">Target reward</div>
+      <div class="ml-presets" id="targets"></div>
+
+      <div class="ml-rail-label" style="margin-top: 24px">Learning rate</div>
+      <input id="lr-slider" type="range" min="0.005" max="0.3" step="0.005" value="0.05" style="width:100%; accent-color:var(--accent)" />
+      <div id="lr-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">η = 0.050</div>
+
+      <div class="ml-rail-label" style="margin-top: 24px">Policy std σ</div>
+      <input id="sigma-slider" type="range" min="0.1" max="1" step="0.05" value="0.5" style="width:100%; accent-color:var(--accent)" />
+      <div id="sigma-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">σ = 0.50</div>
+
+      <div style="display:flex; gap:8px; margin-top: 18px">
+        <button id="train-btn" class="ml-sbtn" style="flex:1; padding:10px 14px; font-family:var(--serif); font-style:italic; font-size:14px">▷ Train</button>
+        <button id="reset-btn" class="ml-sbtn ghost" style="padding:10px 14px; font-family:var(--serif); font-style:italic; font-size:13px">↻</button>
+      </div>
+
+      <div class="ml-readout" id="readout" style="margin-top: 18px"></div>
+      <div style="font-style:italic; font-family:var(--serif); font-size:13px; color:var(--ml-ink-fade); margin-top:14px; line-height:1.5">
+        Click anywhere on the canvas to set a custom target.
+      </div>
+    </aside>
+
+    <div class="ml-canvas-wrap">
+      <div class="ml-canvas-frame">
+        <canvas id="canvas"></canvas>
+      </div>
+      <div class="ml-caption">
+        <span class="ml-cap-num">·</span>
+        The policy is a Gaussian centered at <em>μ</em>, with covariance <em>σ²I</em>. The <span class="ml-ink-orange">accent star</span> is the target reward; the contours show the policy's current shape; gray dots are recent samples. Each step shifts μ toward whatever sampled action got the highest reward.
+      </div>
+    </div>
+
+    <aside class="right-rail">
+      <div class="ml-margin">
+        <div class="ml-margin-rule"></div>
+        <div class="ml-margin-h">REINFORCE</div>
+        <div class="ml-equation" style="font-size:13px">∇ J(θ) = 𝔼[∇ log π<sub>θ</sub>(a|s) · R]</div>
+        <p>Sample an action from the policy. Compute the reward. Push the log-probability up by an amount proportional to the reward. Repeat.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">High variance</div>
+        <p class="quiet">REINFORCE is correct but noisy — single rewards have huge variance. <em>Baselines</em> and <em>actor-critic</em> methods subtract a learned value estimate to reduce noise. PPO adds a clipped surrogate to prevent overshoot.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">In RLHF</div>
+        <p class="quiet">PPO is the algorithm fine-tuning every chat-aligned LLM. The "policy" is the language model; "actions" are tokens; the "reward" is a human-preference model's score.</p>
+      </div>
+    </aside>
+  </section>
+
+  <section class="ml-applications">
+    <div class="ml-section-rule"><span class="kicker">Where you've seen this</span><span class="meta">04 examples</span></div>
+    <div class="ml-app-grid">
+      <div class="ml-app">
+        <div class="ml-app-h">RLHF for LLMs</div>
+        <p>ChatGPT, Claude, and Gemini all use PPO (a policy-gradient variant) in their alignment pipelines. The LM is the policy; preferences from human raters define the reward. The same equation as on this page, just at billions of parameters.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Robot locomotion</div>
+        <p>Boston Dynamics-style locomotion controllers, Atlas's parkour, Cassie's running — all policy-gradient policies trained in simulation, deployed on hardware. Continuous action spaces (joint torques) are policy-gradient territory.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">AlphaGo, AlphaStar, AlphaFold-RL</div>
+        <p>DeepMind's flagship RL systems all use policy-gradient methods (often combined with value learning). AlphaStar beat top StarCraft II players in 2019; the policy was a deep network trained with a policy-gradient objective.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Trading and portfolio optimization</div>
+        <p>Quantitative funds use policy gradients to learn position-sizing rules from market data. The action space is continuous (how much of each asset to hold); the reward is risk-adjusted return.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="ml-further">
+    <div class="ml-section-rule"><span class="kicker">Further reading</span></div>
+    <ul class="ml-further-list">
+      <li>
+        <span class="title"><a href="https://arxiv.org/abs/1707.06347" target="_blank" rel="noopener">Proximal Policy Optimization</a></span>
+        <span class="kind">paper</span>
+        <span class="by">Schulman et al. (2017) · The PPO paper. The default policy-gradient algorithm in modern practice — used in RLHF, robotics, game-playing.</span>
+      </li>
+      <li>
+        <span class="title"><a href="http://www.scholarpedia.org/article/Policy_gradient_methods" target="_blank" rel="noopener">Policy Gradient Methods (Scholarpedia)</a></span>
+        <span class="kind">reference</span>
+        <span class="by">Sutton, McAllester, Singh, Mansour · Compact reference covering the policy-gradient theorem and its variants.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://karpathy.github.io/2016/05/31/rl/" target="_blank" rel="noopener">Deep RL: Pong from Pixels</a></span>
+        <span class="kind">essay</span>
+        <span class="by">Andrej Karpathy · 130-line policy-gradient agent that learns Pong. The clearest "implement REINFORCE in Python" walkthrough on the internet.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://huggingface.co/blog/rlhf" target="_blank" rel="noopener">Illustrating RLHF</a></span>
+        <span class="kind">essay</span>
+        <span class="by">Lambert, Castricato et al. (Hugging Face) · Walks through how PPO is plugged into LLM alignment, with diagrams. Bridges this page to modern LLM training.</span>
+      </li>
+    </ul>
+  </section>
+
+  <footer class="ml-foot">
+    <div class="line"><a href="index.html">← all entries</a> · <a href="q-learning.html">XXVII. Q-Learning</a></div>
+    <div class="line eq">∇J = 𝔼[∇log π · R]</div>
+    <div class="line"><a href="bandits.html">XXIX. Bandits →</a></div>
+  </footer>
+</main>
+
+<script src="shared.js"></script>
+<script src="policy-gradients.js"></script>
+</body>
+</html>

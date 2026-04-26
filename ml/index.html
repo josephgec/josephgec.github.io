@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Machine Learning, Visualized · Joseph Thomas</title>
+  <meta name="description" content="A visual encyclopedia of the ideas behind modern machine learning — one interactive entry at a time, from the math at the bottom to the models on top." />
+  <meta name="author" content="Joseph Thomas" />
+  <link rel="canonical" href="https://jthomas.site/ml/" />
+  <meta name="theme-color" content="#7a1f24" />
+
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+  <link rel="apple-touch-icon" href="../photo.jpg" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Joseph Thomas" />
+  <meta property="og:title" content="Machine Learning, Visualized" />
+  <meta property="og:description" content="An interactive encyclopedia of the ideas behind modern machine learning." />
+  <meta property="og:image" content="https://jthomas.site/photo.jpg" />
+  <meta property="og:url" content="https://jthomas.site/ml/" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Machine Learning, Visualized" />
+  <meta name="twitter:description" content="An interactive encyclopedia of the ideas behind modern machine learning." />
+  <meta name="twitter:image" content="https://jthomas.site/photo.jpg" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,300;1,8..60,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="../styles.css" />
+
+  <style>
+    /* ───────── ML encyclopedia — index page ─────────
+       Layered on top of the Notebook design system in styles.css.
+       Same tokens (--bg, --ink, --accent, --rule, --serif, --mono).
+       Wider measure than the rest of the site so the card grid breathes. */
+
+    .ml-page {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 72px 32px 96px;
+    }
+
+    .ml-mast {
+      text-align: center;
+      padding-bottom: 36px;
+      margin-bottom: 56px;
+      border-bottom: 1px solid var(--rule);
+    }
+    .ml-mast .kicker {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 22px;
+    }
+    .ml-mast h1 {
+      font-family: var(--serif);
+      font-weight: 400;
+      font-size: clamp(48px, 8vw, 92px);
+      line-height: 0.98;
+      letter-spacing: -0.02em;
+      margin: 0 0 24px;
+      text-wrap: balance;
+    }
+    .ml-mast h1 em {
+      font-style: italic;
+      font-weight: 300;
+      color: var(--accent);
+    }
+    .ml-mast .dek {
+      font-family: var(--serif);
+      font-size: 19px;
+      line-height: 1.55;
+      font-style: italic;
+      font-weight: 300;
+      color: var(--muted);
+      max-width: 560px;
+      margin: 0 auto;
+      text-wrap: pretty;
+    }
+
+    .ml-section-h {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 56px 0 18px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--rule);
+    }
+    .ml-section-h .quiet {
+      color: var(--muted);
+      opacity: 0.6;
+      font-style: italic;
+      letter-spacing: 0.04em;
+      text-transform: none;
+      margin-left: 6px;
+    }
+
+    .ml-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1px;
+      background: var(--rule);
+      border: 1px solid var(--rule);
+    }
+    .ml-card {
+      background: var(--paper);
+      padding: 36px 32px;
+      text-decoration: none;
+      color: var(--ink);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      min-height: 240px;
+      transition: background 0.15s, transform 0.15s;
+    }
+    .ml-card:hover {
+      background: var(--bg);
+    }
+    .ml-card .num {
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+    }
+    .ml-card .name {
+      font-family: var(--serif);
+      font-size: 32px;
+      line-height: 1.05;
+      font-weight: 400;
+      letter-spacing: -0.01em;
+    }
+    .ml-card .name em {
+      color: var(--accent);
+      font-style: italic;
+      font-weight: 300;
+    }
+    .ml-card .blurb {
+      font-family: var(--serif);
+      font-style: italic;
+      font-weight: 300;
+      font-size: 15px;
+      line-height: 1.55;
+      color: var(--muted);
+      margin-top: auto;
+    }
+    /* Lonely last card in an odd-count grid spans both columns
+       so a row with one card doesn't show an empty rule-coloured slot. */
+    .ml-grid > .ml-card:last-child:nth-child(odd) {
+      grid-column: 1 / -1;
+    }
+
+    .ml-coming {
+      background: var(--paper);
+      border: 1px dashed var(--rule);
+      padding: 24px 32px;
+      font-family: var(--serif);
+      font-style: italic;
+      font-weight: 300;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .ml-foot {
+      margin-top: 96px;
+      padding-top: 24px;
+      border-top: 1px solid var(--rule);
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .ml-foot .line {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .ml-foot .line.eq {
+      font-family: var(--mono);
+      font-style: normal;
+    }
+    .ml-foot a {
+      color: var(--muted);
+      text-decoration: none;
+      border-bottom: 1px solid var(--rule);
+    }
+    .ml-foot a:hover {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    @media (max-width: 760px) {
+      .ml-page { padding: 48px 24px 72px; }
+      .ml-grid { grid-template-columns: 1fr; }
+      .ml-mast { margin-bottom: 40px; }
+      .ml-mast .dek { font-size: 17px; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="nb-nav">
+  <div class="brand-block">
+    <a class="brand" href="../index.html">jthomas.site</a><span class="brand-meta">// notebook · v.4.2026</span>
+  </div>
+  <nav>
+    <a href="../blog/index.html">writing</a>
+    <a href="index.html" style="color:var(--ink)">tutorial</a>
+    <a href="../index.html#research">research</a>
+    <a href="../index.html#work">work</a>
+    <a href="../index.html#projects">projects</a>
+    <a href="../consulting.html">consulting</a>
+    <a href="../index.html#contact" class="contact">→ contact</a>
+  </nav>
+</header>
+
+<main class="ml-page">
+
+  <header class="ml-mast">
+    <div class="kicker">An interactive encyclopedia</div>
+    <h1>Machine Learning,<br /><em>Visualized</em></h1>
+    <p class="dek">A visual encyclopedia of the ideas behind modern machine learning — one entry at a time, from the math at the bottom to the models on top.</p>
+  </header>
+
+  <div class="ml-section-h">Linear Algebra <span class="quiet">· the foundations</span></div>
+
+  <div class="ml-grid">
+    <a class="ml-card" href="matrix-transformations.html">
+      <div class="num">VOL. I</div>
+      <div class="name">Matrix <em>Transformations</em></div>
+      <div class="blurb">A 2×2 matrix is a recipe for reshaping the plane. Two arrows tell you everything.</div>
+    </a>
+    <a class="ml-card" href="eigenvectors.html">
+      <div class="num">VOL. II</div>
+      <div class="name">Eigenvalues <em>&amp;</em> Eigenvectors</div>
+      <div class="blurb">The directions a transform leaves alone. Iterate them and you've built PageRank.</div>
+    </a>
+    <a class="ml-card" href="gradients.html">
+      <div class="num">VOL. III</div>
+      <div class="name">Gradients <em>&amp;</em> Derivatives</div>
+      <div class="blurb">Tangent lines on curves, gradient arrows on surfaces. The slope every learning algorithm walks down.</div>
+    </a>
+    <a class="ml-card" href="pca.html">
+      <div class="num">VOL. IV</div>
+      <div class="name">Principal <em>Components</em></div>
+      <div class="blurb">Find the grain of a data cloud. The first eigenvector of covariance is the line of best fit.</div>
+    </a>
+    <a class="ml-card" href="svd.html">
+      <div class="num">VOL. V</div>
+      <div class="name">Singular Value <em>Decomposition</em></div>
+      <div class="blurb">Every linear map is a rotation, a stretch, and another rotation. SVD finds the choreography.</div>
+    </a>
+  </div>
+
+  <div class="ml-section-h">Probability <span class="quiet">· the language of uncertainty</span></div>
+
+  <div class="ml-grid">
+    <a class="ml-card" href="distributions.html">
+      <div class="num">VOL. VI</div>
+      <div class="name">Probability <em>Distributions</em></div>
+      <div class="blurb">Gaussian, Bernoulli, Poisson and more. Tweak parameters; sample; watch the histogram converge.</div>
+    </a>
+    <a class="ml-card" href="bayes.html">
+      <div class="num">VOL. VII</div>
+      <div class="name">Bayes' <em>Theorem</em></div>
+      <div class="blurb">A prior, some evidence, a posterior. The single equation behind probabilistic reasoning.</div>
+    </a>
+  </div>
+
+  <div class="ml-section-h">Neural networks <span class="quiet">· the bend in the line</span></div>
+
+  <div class="ml-grid">
+    <a class="ml-card" href="perceptron.html">
+      <div class="num">VOL. VIII</div>
+      <div class="name">The <em>Perceptron</em></div>
+      <div class="blurb">One neuron. Two weights and a bias. It draws a single straight line — and learns where to put it.</div>
+    </a>
+    <a class="ml-card" href="activations.html">
+      <div class="num">VOL. IX</div>
+      <div class="name">A Field Guide to <em>Activations</em></div>
+      <div class="blurb">Sigmoid, tanh, ReLU, leaky, GELU. The bend that makes a stack of layers more than one matrix.</div>
+    </a>
+    <a class="ml-card" href="forward.html">
+      <div class="num">VOL. X</div>
+      <div class="name">Forward <em>Propagation</em></div>
+      <div class="blurb">Watch the signal travel: weighted sums, bent through nonlinearities, layer by layer into a prediction.</div>
+    </a>
+    <a class="ml-card" href="backprop.html">
+      <div class="num">VOL. XI</div>
+      <div class="name"><em>Back</em>propagation</div>
+      <div class="blurb">The signal flows forward; the error flows back. Chain rule, applied recursively — the engine that learns.</div>
+    </a>
+    <a class="ml-card" href="loss-landscapes.html">
+      <div class="num">VOL. XII</div>
+      <div class="name">Loss <em>Landscapes</em></div>
+      <div class="blurb">Training is descent through high-dimensional terrain. Bowls, ravines, saddles — and what they teach.</div>
+    </a>
+    <a class="ml-card" href="optimizers.html">
+      <div class="num">VOL. XIII</div>
+      <div class="name">A Race of <em>Optimizers</em></div>
+      <div class="blurb">SGD, Momentum, RMSprop, Adam — same hill, four different rules for descending it.</div>
+    </a>
+  </div>
+
+  <div class="ml-section-h">Architectures <span class="quiet">· stacking the blocks</span></div>
+
+  <div class="ml-grid">
+    <a class="ml-card" href="mlp.html">
+      <div class="num">VOL. XIV</div>
+      <div class="name">The <em>MLP</em> Builder</div>
+      <div class="blurb">Stack layers, pick activations, watch a multi-layer perceptron carve up the plane in real time.</div>
+    </a>
+    <a class="ml-card" href="cnns.html">
+      <div class="num">VOL. XV</div>
+      <div class="name">Convolutional <em>Networks</em></div>
+      <div class="blurb">Slide a small kernel over an image. Edges, textures, parts — features compose themselves.</div>
+    </a>
+    <a class="ml-card" href="image-classifier.html">
+      <div class="num">VOL. XVI</div>
+      <div class="name">An Image <em>Classifier</em>, end to end</div>
+      <div class="blurb">Pixels in, label out. Follow the signal through conv blocks, pooling, the final softmax.</div>
+    </a>
+    <a class="ml-card" href="rnns.html">
+      <div class="num">VOL. XVII</div>
+      <div class="name">Recurrent <em>Networks</em></div>
+      <div class="blurb">A loop in the graph: the hidden state is the network's running thought as it reads a sequence.</div>
+    </a>
+    <a class="ml-card" href="lstms.html">
+      <div class="num">VOL. XVIII</div>
+      <div class="name">Gates <em>&amp;</em> Long Memory</div>
+      <div class="blurb">A vanilla RNN forgets quickly. Gates — small learned controllers — decide what to keep.</div>
+    </a>
+    <a class="ml-card" href="regularization.html">
+      <div class="num">VOL. XIX</div>
+      <div class="name">Holding it <em>Together</em></div>
+      <div class="blurb">Two simple tricks that make deep nets trainable: random silencing, and standardized activations.</div>
+    </a>
+  </div>
+
+  <div class="ml-section-h">Modern deep learning <span class="quiet">· the present tense</span></div>
+
+  <div class="ml-grid">
+    <a class="ml-card" href="autoencoders.html">
+      <div class="num">VOL. XX</div>
+      <div class="name">The <em>Bottleneck</em></div>
+      <div class="blurb">Squeeze input through a narrow channel and decode it back. The channel learns the essence.</div>
+    </a>
+    <a class="ml-card" href="vaes.html">
+      <div class="num">VOL. XXI</div>
+      <div class="name">A Continent of <em>Latent Space</em></div>
+      <div class="blurb">Make every region of latent space decode to something plausible — then sample it for free.</div>
+    </a>
+    <a class="ml-card" href="gans.html">
+      <div class="num">VOL. XXII</div>
+      <div class="name">The <em>Adversaries</em></div>
+      <div class="blurb">Two networks lock horns: a forger and a critic. They drag each other to perfection.</div>
+    </a>
+    <a class="ml-card" href="attention.html">
+      <div class="num">VOL. XXIII</div>
+      <div class="name">What the model <em>looks at</em></div>
+      <div class="blurb">A learned, soft, content-addressed lookup. The mechanism that ate machine learning.</div>
+    </a>
+    <a class="ml-card" href="transformers.html">
+      <div class="num">VOL. XXIV</div>
+      <div class="name">The <em>Transformer</em></div>
+      <div class="blurb">Stack attention blocks. Skip connections, layer norm, multi-head — the architecture behind almost everything in 2024.</div>
+    </a>
+    <a class="ml-card" href="embeddings.html">
+      <div class="num">VOL. XXV</div>
+      <div class="name">A Geometry of <em>Meaning</em></div>
+      <div class="blurb">Words become vectors. Similar meanings cluster; analogies become arithmetic.</div>
+    </a>
+  </div>
+
+  <div class="ml-section-h">Reinforcement learning <span class="quiet">· trial and reward</span></div>
+
+  <div class="ml-grid">
+    <a class="ml-card" href="mdp.html">
+      <div class="num">VOL. XXVI</div>
+      <div class="name">Markov Decision <em>Processes</em></div>
+      <div class="blurb">A grid world, a few states, a reward. The minimal stage on which every RL algorithm performs.</div>
+    </a>
+    <a class="ml-card" href="q-learning.html">
+      <div class="num">VOL. XXVII</div>
+      <div class="name"><em>Q</em>-Learning</div>
+      <div class="blurb">An agent stumbles around a grid; the values of each move slowly fill in. No model, no plan — just trial, error, and bookkeeping.</div>
+    </a>
+    <a class="ml-card" href="policy-gradients.html">
+      <div class="num">VOL. XXVIII</div>
+      <div class="name">Policy <em>Gradients</em></div>
+      <div class="blurb">Learn the policy directly. The probability of each action drifts up or down with the reward it brings.</div>
+    </a>
+    <a class="ml-card" href="bandits.html">
+      <div class="num">VOL. XXIX</div>
+      <div class="name">Multi-Armed <em>Bandits</em></div>
+      <div class="blurb">Many slot machines, one budget. Explore the unknown lever or exploit the best one so far?</div>
+    </a>
+  </div>
+
+  <div class="ml-section-h">Advanced <span class="quiet">&amp; practical · the rest of the iceberg</span></div>
+
+  <div class="ml-grid">
+    <a class="ml-card" href="transfer-learning.html">
+      <div class="num">VOL. XXX</div>
+      <div class="name">Transfer <em>Learning</em></div>
+      <div class="blurb">A network trained for one task is usually halfway to the next. Freeze, fine-tune, ship.</div>
+    </a>
+    <a class="ml-card" href="hyperparameter-tuning.html">
+      <div class="num">VOL. XXXI</div>
+      <div class="name">Hyperparameter <em>Tuning</em></div>
+      <div class="blurb">Grid search, random search, Bayesian optimization — three ways to comb a high-dimensional knob space.</div>
+    </a>
+    <a class="ml-card" href="bias-variance.html">
+      <div class="num">VOL. XXXII</div>
+      <div class="name">Bias-Variance <em>Tradeoff</em></div>
+      <div class="blurb">Too simple a model misses the signal; too complex, it memorizes the noise. The dial every model has.</div>
+    </a>
+    <a class="ml-card" href="interpretability.html">
+      <div class="num">VOL. XXXIII</div>
+      <div class="name">Model <em>Interpretability</em></div>
+      <div class="blurb">SHAP and LIME open the black box just enough to ask "which feature pushed the prediction which way?"</div>
+    </a>
+    <a class="ml-card" href="federated-learning.html">
+      <div class="num">VOL. XXXIV</div>
+      <div class="name">Federated <em>Learning</em></div>
+      <div class="blurb">A model trained across many devices, each keeping its data local. The server only sees the gradients.</div>
+    </a>
+  </div>
+
+  <footer class="ml-foot">
+    <div class="line">An entry from the visual encyclopedia of machine learning · <a href="../index.html">back to jthomas.site</a></div>
+    <div class="line eq">v ↦ Av</div>
+  </footer>
+
+</main>
+
+</body>
+</html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Singular Value Decomposition · ML, Visualized · Joseph Thomas</title>
+  <meta name="description" content="Every linear map is a rotation, a stretch, and another rotation. SVD finds the choreography." />
+  <link rel="canonical" href="https://jthomas.site/ml/svd.html" />
+  <meta name="theme-color" content="#7a1f24" />
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Singular Value Decomposition · ML, Visualized" />
+  <meta property="og:description" content="Every linear map is a rotation, a stretch, and another rotation. SVD finds the choreography." />
+  <meta property="og:url" content="https://jthomas.site/ml/svd.html" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;1,8..60,300;1,8..60,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body>
+
+<header class="nb-nav">
+  <div class="brand-block">
+    <a class="brand" href="../index.html">jthomas.site</a><span class="brand-meta">// notebook · v.4.2026</span>
+  </div>
+  <nav>
+    <a href="../blog/index.html">writing</a>
+    <a href="index.html" style="color:var(--ink)">tutorial</a>
+    <a href="../index.html#research">research</a>
+    <a href="../index.html#work">work</a>
+    <a href="../index.html#projects">projects</a>
+    <a href="../consulting.html">consulting</a>
+    <a href="../index.html#contact" class="contact">→ contact</a>
+  </nav>
+</header>
+
+<main class="ml-page-shell">
+
+  <header class="ml-mast">
+    <div class="kicker">Machine Learning, Visualized · Vol. V</div>
+    <h1>Singular Value<br /><em>Decomposition</em></h1>
+    <p class="dek">Every linear transformation, no matter how strange-looking, is secretly the same three-step move: rotate, stretch along axes, rotate again. SVD is the recipe that reveals it.</p>
+  </header>
+
+  <section class="ml-intro">
+    <div class="ml-intro-grid">
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">The concept</div>
+        <p class="lead">SVD says every linear map factors into three steps: rotate, stretch along axes, rotate again — written <em>A = U Σ Vᵀ</em>.</p>
+        <p>Send the unit circle through any matrix and you always get an ellipse. The <span class="term">singular values</span> σ₁ ≥ σ₂ ≥ 0 are the lengths of that ellipse's semi-axes. <span class="term">V</span> names the input directions (in the original circle) that line up with those axes; <span class="term">U</span> names where they end up in the output.</p>
+        <p>It's the deepest "structure theorem" in elementary linear algebra: arbitrary matrix multiplication is secretly always the same shape — and unlike eigen-decomposition, SVD works for any matrix, even non-square or singular ones.</p>
+      </div>
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">Why ML cares</div>
+        <p>Truncating the small singular values gives the best low-rank approximation of any matrix (the <em>Eckart–Young theorem</em>). This single fact powers image compression, latent semantic indexing, recommender systems, and every modern matrix-factorization method.</p>
+        <p>It's also the connecting tissue of the curriculum: PCA is just the SVD of mean-centered data; the pseudoinverse used in least squares is built from SVD; and the spectral norm — how much a matrix can stretch a unit vector — is exactly σ₁.</p>
+      </div>
+    </div>
+    <div class="ml-try">
+      <div class="ml-eyebrow accent">Try this</div>
+      <ol>
+        <li>Click <em>Slanted</em>, then <em>Replay</em>. Watch the four stages: identity → Vᵀ rotates → Σ stretches → U rotates again.</li>
+        <li>Click <em>Singular</em> — σ₂ = 0, so the ellipse collapses to a line segment. The matrix has rank 1.</li>
+        <li>Click <em>Symmetric</em> — U and V come out the same (up to sign). Symmetric SVD <em>is</em> eigendecomposition.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="ml-stage">
+
+    <aside class="left-rail">
+      <div class="ml-rail-label">The matrix A</div>
+      <div id="matrix"></div>
+      <div class="ml-hint">drag a number to scrub · click to type</div>
+
+      <div class="ml-readout" id="readout">
+        <div class="row"><span>σ₁</span><b data-k="s1">—</b></div>
+        <div class="row"><span>σ₂</span><b data-k="s2">—</b></div>
+        <div class="row"><span>condition</span><b data-k="cond">—</b></div>
+        <div class="row"><span>rank</span><b data-k="rank">—</b></div>
+        <div class="row"><span>det</span><b data-k="det">—</b></div>
+      </div>
+
+      <div class="ml-rail-label" style="margin-top: 28px">Presets</div>
+      <div class="ml-presets" id="presets"></div>
+      <div class="ml-preset-blurb" id="preset-blurb"></div>
+    </aside>
+
+    <div class="ml-canvas-wrap">
+      <div class="ml-mode-tabs" id="stage-tabs"></div>
+      <div class="ml-canvas-frame">
+        <canvas id="canvas"></canvas>
+      </div>
+      <div class="ml-caption">
+        <span class="ml-cap-num">·</span>
+        The <span class="ml-ink-orange">accent ellipse</span> is the unit circle, transformed. Watch the dark <span class="ml-ink">v₁</span> arrow travel through three moves: <em>Vᵀ</em> rotates it onto the x-axis (becomes <em>e₁</em>); <em>Σ</em> stretches it to length <em>σ₁</em>; <em>U</em> rotates it to its final destination <em>σ₁ u₁</em> — the long semi-axis of the ellipse. The <em>σ</em> values are the lengths of the dashed semi-axes at the final stage.
+      </div>
+      <div class="ml-iter">
+        <button id="replay">Replay</button>
+        <input id="stage-slider" type="range" min="0" max="3" step="1" value="0" />
+        <span class="step" id="stage-label">step 0/3</span>
+      </div>
+    </div>
+
+    <aside class="right-rail">
+      <div class="ml-margin">
+        <div class="ml-margin-rule"></div>
+        <div class="ml-margin-h">In the margin</div>
+        <div class="ml-equation">A = U Σ Vᵀ</div>
+        <p><em>V</em> finds the input directions where A acts most simply. <em>Σ</em> stretches them by the singular values σ₁ ≥ σ₂. <em>U</em> says where those stretched directions land in the output.</p>
+        <p class="quiet">Unlike eigen-decomposition, SVD works for <em>any</em> matrix — non-square, non-symmetric, even singular. It is the most general structure theorem in linear algebra.</p>
+
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Why ML cares</div>
+        <p class="quiet">Throwing away the smallest σ's gives the best low-rank approximation of A — the Eckart–Young theorem. This is how image compression, latent semantic analysis, recommender systems and PCA all secretly work.</p>
+
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Connections</div>
+        <p class="quiet">When A is symmetric, U = V and the σ's are the absolute values of the eigenvalues. The covariance matrix you saw in PCA is symmetric, so its SVD <em>is</em> its eigendecomposition.</p>
+      </div>
+    </aside>
+
+  </section>
+
+  <section class="ml-applications">
+    <div class="ml-section-rule">
+      <span class="kicker">Where you've seen this</span>
+      <span class="meta">04 examples</span>
+    </div>
+    <div class="ml-app-grid">
+      <div class="ml-app">
+        <div class="ml-app-h">The Netflix Prize and modern recommenders</div>
+        <p>The 2006 Netflix challenge was won by SVD-based methods. Simon Funk's <em>FunkSVD</em> decomposed the (users × movies) rating matrix into low-rank factors. Today every major recommender — TikTok, YouTube, Spotify, Amazon — uses some descendant of this idea.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">LoRA — how Gemini and GPT get fine-tuned</div>
+        <p>Modern LLM fine-tuning rarely updates the full weight matrix of a model with billions of parameters. Instead, <em>Low-Rank Adaptation</em> approximates the <em>update</em> as a low-rank product UV — the same low-rank truncation idea SVD pioneered. A 7B-parameter model can be adapted with millions, not billions, of trainable weights.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Latent Semantic Analysis in search</div>
+        <p>Compute SVD on a (documents × words) matrix and the leading singular components capture <em>topics</em>. A search for "auto" can match documents containing "car" because they share a latent topic dimension. This was the first scalable semantic search method, predating embeddings by a decade.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Image and signal compression</div>
+        <p>An image is a matrix of pixels; keep only the components with the largest singular values and throw the rest away. Astronomers use SVD to denoise telescope images; medical imaging reconstructs MRIs from undersampled data. The Eckart–Young theorem says this truncation is provably the best low-rank approximation that exists.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="ml-further">
+    <div class="ml-section-rule">
+      <span class="kicker">Further reading</span>
+    </div>
+    <ul class="ml-further-list">
+      <li>
+        <span class="title"><a href="https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/lecture-29-singular-value-decomposition/" target="_blank" rel="noopener">MIT 18.06 — Singular Value Decomposition</a></span>
+        <span class="kind">lecture</span>
+        <span class="by">Gilbert Strang · A 50-minute lecture from the man who probably taught your professor's professor SVD.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://sifter.org/~simon/journal/20061211.html" target="_blank" rel="noopener">Try This at Home (Netflix Prize)</a></span>
+        <span class="kind">blog post</span>
+        <span class="by">Simon Funk (2006) · The single blog post that won most of the Netflix Prize. A working model in &lt;100 lines, with the geometric intuition spelled out plainly.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://arxiv.org/abs/2106.09685" target="_blank" rel="noopener">LoRA: Low-Rank Adaptation of Large Language Models</a></span>
+        <span class="kind">paper</span>
+        <span class="by">Hu et al. (2021) · The paper that made fine-tuning trillion-parameter models practical. The math is the same low-rank truncation you watched on this page.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://gregorygundersen.com/blog/2018/12/10/svd/" target="_blank" rel="noopener">Singular Value Decomposition as Simply as Possible</a></span>
+        <span class="kind">essay</span>
+        <span class="by">Gregory Gundersen · A clean derivation that connects all four views of SVD — geometric, eigen-, low-rank, and Eckart–Young — in one essay.</span>
+      </li>
+    </ul>
+  </section>
+
+  <footer class="ml-foot">
+    <div class="line"><a href="index.html">← all entries</a> · <a href="pca.html">← IV. PCA</a></div>
+    <div class="line eq">A = U Σ Vᵀ</div>
+    <div class="line"></div>
+  </footer>
+
+</main>
+
+<script src="shared.js"></script>
+<script src="svd.js"></script>
+
+</body>
+</html>

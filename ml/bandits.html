@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multi-Armed Bandits · ML, Visualized · Joseph Thomas</title>
+  <meta name="description" content="Many slot machines, one budget. Explore the unknown lever or exploit the best one so far?" />
+  <link rel="canonical" href="https://jthomas.site/ml/bandits.html" />
+  <meta name="theme-color" content="#7a1f24" />
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;1,8..60,300;1,8..60,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body>
+<header class="nb-nav">
+  <div class="brand-block"><a class="brand" href="../index.html">jthomas.site</a><span class="brand-meta">// notebook · v.4.2026</span></div>
+  <nav>
+    <a href="../blog/index.html">writing</a>
+    <a href="index.html" style="color:var(--ink)">tutorial</a>
+    <a href="../index.html#research">research</a>
+    <a href="../index.html#work">work</a>
+    <a href="../index.html#projects">projects</a>
+    <a href="../consulting.html">consulting</a>
+    <a href="../index.html#contact" class="contact">→ contact</a>
+  </nav>
+</header>
+
+<main class="ml-page-shell">
+  <header class="ml-mast">
+    <div class="kicker">Machine Learning, Visualized · Vol. XXIX</div>
+    <h1>Multi-Armed<br /><em>Bandits</em></h1>
+    <p class="dek">Ten slot machines. Each pays out at a different unknown rate. You have a thousand pulls. Explore the unknown lever, or exploit the best one so far? The simplest setting where exploration vs exploitation actually matters — and the testbed for nearly every algorithm that handles it.</p>
+  </header>
+
+  <section class="ml-intro">
+    <div class="ml-intro-grid">
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">The concept</div>
+        <p class="lead">A <span class="term">multi-armed bandit</span> is an MDP without states — only actions ("arms"), each with an unknown reward distribution.</p>
+        <p>The challenge is the <em>exploration-exploitation tradeoff</em>: pulling the apparent-best arm collects reward but might miss a better one; trying random arms gathers info but wastes pulls. Three classic strategies:</p>
+        <p class="quiet">→ <em>ε-greedy</em>: with probability ε pull a random arm, else the apparent-best. Simple, surprisingly effective.<br />→ <em>UCB</em>: pull the arm with the highest "upper confidence bound" — its mean plus a bonus that shrinks as you sample it. Provably optimal regret bounds.<br />→ <em>Thompson sampling</em>: maintain a Beta posterior per arm, sample from each, pull the highest. Bayesian and elegant.</p>
+      </div>
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">Why ML cares</div>
+        <p>Bandits are everywhere in production ML. A/B testing — choosing which design to show users — is a 2-armed bandit. News feeds, ad placement, recommendation rankings, drug-trial allocation — all bandit problems. Every "should we show this user version A or version B?" decision is, formally, a bandit.</p>
+        <p>The bandit is also the gentlest entry into RL. No state, no transitions, no Bellman equation — just "which arm should I pull?" Master it and the broader RL machinery makes more sense.</p>
+      </div>
+    </div>
+    <div class="ml-try">
+      <div class="ml-eyebrow accent">Try this</div>
+      <ol>
+        <li>Run the simulation. Watch each arm's estimated mean (the <em>tick</em>) approach the true mean (the <em>line</em>) as it gets sampled. The optimal arm dominates eventually.</li>
+        <li>Compare strategies — flip <em>ε-greedy</em>, <em>UCB</em>, and <em>Thompson sampling</em>. The cumulative-regret chart at the bottom tells the story: UCB and Thompson typically beat ε-greedy by a wide margin.</li>
+        <li>Crank ε to 1 — pure random pulls. Regret grows linearly. Drop ε to 0 — pure greed. Sometimes you get lucky; usually you lock onto a sub-optimal arm.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="ml-stage">
+    <aside class="left-rail">
+      <div class="ml-rail-label">Strategy</div>
+      <div class="ml-presets" id="strategies"></div>
+
+      <div class="ml-rail-label" style="margin-top: 24px">ε (for ε-greedy)</div>
+      <input id="eps-slider" type="range" min="0" max="1" step="0.02" value="0.1" style="width:100%; accent-color:var(--accent)" />
+      <div id="eps-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">ε = 0.10</div>
+
+      <div class="ml-rail-label" style="margin-top: 18px">Speed</div>
+      <input id="speed-slider" type="range" min="1" max="200" step="1" value="50" style="width:100%; accent-color:var(--accent)" />
+      <div id="speed-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">50 pulls / s</div>
+
+      <div style="display:flex; gap:8px; margin-top: 18px">
+        <button id="run-btn" class="ml-sbtn" style="flex:1; padding:10px 14px; font-family:var(--serif); font-style:italic; font-size:14px">▷ Run</button>
+        <button id="reset-btn" class="ml-sbtn ghost" style="padding:10px 14px; font-family:var(--serif); font-style:italic; font-size:13px">↻</button>
+      </div>
+
+      <div class="ml-readout" id="readout" style="margin-top: 18px"></div>
+    </aside>
+
+    <div class="ml-canvas-wrap">
+      <div class="ml-canvas-frame" style="aspect-ratio: 1.4 / 1; padding: 24px">
+        <canvas id="canvas"></canvas>
+      </div>
+      <div class="ml-caption">
+        <span class="ml-cap-num">·</span>
+        Each column is one arm. The dashed line is the true mean reward; the <span class="ml-ink-orange">accent tick</span> is the agent's current estimate; the bar height is the number of pulls. Below, cumulative <em>regret</em> — the gap between optimal and chosen — should bend toward flat.
+      </div>
+    </div>
+
+    <aside class="right-rail">
+      <div class="ml-margin">
+        <div class="ml-margin-rule"></div>
+        <div class="ml-margin-h">Regret</div>
+        <div class="ml-equation" style="font-size:13px">R<sub>T</sub> = T · μ* − Σ<sub>t</sub> r<sub>t</sub></div>
+        <p>The cumulative gap between always pulling the best arm and what you actually got. The bandit goal: keep regret <em>sub-linear</em> in T.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">UCB</div>
+        <p class="quiet">Pull arm <em>i</em> with the highest <em>x̄<sub>i</sub> + √(2 ln t / n<sub>i</sub>)</em>. The bonus penalizes under-sampled arms; the term shrinks as you pull them.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Thompson sampling</div>
+        <p class="quiet">Beta posterior per arm; sample once from each; pull the arm whose sample is highest. Naturally balances exploration and exploitation; provably efficient.</p>
+      </div>
+    </aside>
+  </section>
+
+  <section class="ml-applications">
+    <div class="ml-section-rule"><span class="kicker">Where you've seen this</span><span class="meta">04 examples</span></div>
+    <div class="ml-app-grid">
+      <div class="ml-app">
+        <div class="ml-app-h">A/B testing infrastructure</div>
+        <p>Microsoft, Booking.com, Spotify, and most large product orgs use bandit-based experimentation to allocate traffic. Bandit allocation cuts the regret of running a "loser" variant for the full duration of a fixed-split test.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">News and content ranking</div>
+        <p>Yahoo News' 2009 paper popularized bandits for article recommendation. Reddit's "r/all" ranking, Hacker News' front page, and most personalization layers since use bandit variants to balance "popular" vs "let's see if this new thing pops."</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Adaptive clinical trials</div>
+        <p>Bandit-style allocation of patients to treatment arms — assign more people to the apparently-better arm as evidence accumulates. Reduces the ethical cost of randomly assigning patients to a likely-worse treatment.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Online ads &amp; bidding</div>
+        <p>Google Ads' "smart bidding" and Meta's ads platform pick which creative to show next using contextual bandits. Each impression is a pull; click-through rate is the reward; the user-and-page is the context.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="ml-further">
+    <div class="ml-section-rule"><span class="kicker">Further reading</span></div>
+    <ul class="ml-further-list">
+      <li>
+        <span class="title"><a href="https://tor-lattimore.com/downloads/book/book.pdf" target="_blank" rel="noopener">Bandit Algorithms</a></span>
+        <span class="kind">free book</span>
+        <span class="by">Lattimore &amp; Szepesvári · The reference textbook. Free PDF online; covers UCB, Thompson sampling, contextual and adversarial bandits in depth.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://arxiv.org/abs/1003.0146" target="_blank" rel="noopener">A Contextual-Bandit Approach to Personalized News Article Recommendation</a></span>
+        <span class="kind">paper</span>
+        <span class="by">Li et al. (2010) · The Yahoo News paper that brought bandits into web personalization. Foundational for every modern recommender's exploration layer.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://lilianweng.github.io/posts/2018-01-23-multi-armed-bandit/" target="_blank" rel="noopener">The Multi-Armed Bandit Problem and Its Solutions</a></span>
+        <span class="kind">essay</span>
+        <span class="by">Lilian Weng · Patient walkthrough of ε-greedy, UCB, Thompson sampling, with code. Pairs nicely with this page.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://www.cambridge.org/core/books/regret-analysis-of-stochastic-and-nonstochastic-multiarmed-bandit-problems/4D2DE0B5DD0F4F2C7F06D52D0CE9E19A" target="_blank" rel="noopener">Regret Analysis of Stochastic and Nonstochastic Multi-armed Bandit Problems</a></span>
+        <span class="kind">paper</span>
+        <span class="by">Bubeck &amp; Cesa-Bianchi · The theoretical foundation paper. Where the regret bounds come from.</span>
+      </li>
+    </ul>
+  </section>
+
+  <footer class="ml-foot">
+    <div class="line"><a href="index.html">← all entries</a> · <a href="policy-gradients.html">XXVIII. Policy Gradients</a></div>
+    <div class="line eq">argmax<sub>i</sub> x̄<sub>i</sub> + ε</div>
+    <div class="line"><a href="transfer-learning.html">XXX. Transfer Learning →</a></div>
+  </footer>
+</main>
+
+<script src="shared.js"></script>
+<script src="bandits.js"></script>
+</body>
+</html>

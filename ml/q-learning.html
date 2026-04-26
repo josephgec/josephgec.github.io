@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Q-Learning · ML, Visualized · Joseph Thomas</title>
+  <meta name="description" content="An agent stumbles around a grid; the values of each move slowly fill in. No model, no plan — just trial, error, and bookkeeping." />
+  <link rel="canonical" href="https://jthomas.site/ml/q-learning.html" />
+  <meta name="theme-color" content="#7a1f24" />
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;1,8..60,300;1,8..60,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body>
+<header class="nb-nav">
+  <div class="brand-block"><a class="brand" href="../index.html">jthomas.site</a><span class="brand-meta">// notebook · v.4.2026</span></div>
+  <nav>
+    <a href="../blog/index.html">writing</a>
+    <a href="index.html" style="color:var(--ink)">tutorial</a>
+    <a href="../index.html#research">research</a>
+    <a href="../index.html#work">work</a>
+    <a href="../index.html#projects">projects</a>
+    <a href="../consulting.html">consulting</a>
+    <a href="../index.html#contact" class="contact">→ contact</a>
+  </nav>
+</header>
+
+<main class="ml-page-shell">
+  <header class="ml-mast">
+    <div class="kicker">Machine Learning, Visualized · Vol. XXVII</div>
+    <h1><em>Q</em>-Learning</h1>
+    <p class="dek">An agent stumbles around a grid. Every move updates one cell of a giant table. No model of the environment, no plan — just trial, error, and bookkeeping. Eventually the table tells the agent what to do everywhere.</p>
+  </header>
+
+  <section class="ml-intro">
+    <div class="ml-intro-grid">
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">The concept</div>
+        <p class="lead"><span class="term">Q-learning</span> learns the value of every (state, action) pair — the table <em>Q(s, a)</em> — without knowing the transition probabilities or rewards in advance.</p>
+        <p>Each step: the agent picks an action (mostly greedy with respect to current Q, sometimes random — that's <em>ε-greedy exploration</em>), observes the reward and next state, then updates one cell: <em>Q(s, a) ← Q(s, a) + α [r + γ max Q(s′, ·) − Q(s, a)]</em>.</p>
+        <p>That single update rule, applied millions of times, converges to the optimal Q. The optimal policy is then "pick the action with the highest Q at every state." No symbolic reasoning required — just arithmetic and patience.</p>
+      </div>
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">Why ML cares</div>
+        <p>Q-learning is the foundational <em>model-free</em> RL algorithm — and the direct ancestor of DeepMind's DQN, the network that learned to play 49 Atari games from raw pixels in 2015.</p>
+        <p>Every modern deep-RL method (PPO, A3C, SAC, AlphaZero) descends from this idea: estimate value functions from experience, use them to drive better policy. Even RLHF for language models is, under the hood, Q-learning's spiritual cousin.</p>
+      </div>
+    </div>
+    <div class="ml-try">
+      <div class="ml-eyebrow accent">Try this</div>
+      <ol>
+        <li>Hit <em>Train</em>. Watch the agent (the dot) explore the grid; the Q-table on the right fills in cell by cell as it learns which moves earn reward.</li>
+        <li>Drag <em>ε</em> to 0 — pure greed. The agent stops exploring and may settle for a suboptimal policy. Drag to 1 — pure random — and learning is slow but eventually correct.</li>
+        <li>Reset and watch the agent's first 20 episodes. Initially it wanders aimlessly; after enough updates, it walks straight to the goal.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="ml-stage">
+    <aside class="left-rail">
+      <div class="ml-rail-label">Exploration ε</div>
+      <input id="eps-slider" type="range" min="0" max="1" step="0.02" value="0.2" style="width:100%; accent-color:var(--accent)" />
+      <div id="eps-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">ε = 0.20</div>
+
+      <div class="ml-rail-label" style="margin-top: 18px">Learning rate α</div>
+      <input id="alpha-slider" type="range" min="0.05" max="0.9" step="0.05" value="0.4" style="width:100%; accent-color:var(--accent)" />
+      <div id="alpha-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">α = 0.40</div>
+
+      <div class="ml-rail-label" style="margin-top: 18px">Speed</div>
+      <input id="speed-slider" type="range" min="1" max="200" step="1" value="50" style="width:100%; accent-color:var(--accent)" />
+      <div id="speed-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">50 steps / s</div>
+
+      <div style="display:flex; gap:8px; margin-top: 18px">
+        <button id="train-btn" class="ml-sbtn" style="flex:1; padding:10px 14px; font-family:var(--serif); font-style:italic; font-size:14px">▷ Train</button>
+        <button id="reset-btn" class="ml-sbtn ghost" style="padding:10px 14px; font-family:var(--serif); font-style:italic; font-size:13px">↻</button>
+      </div>
+
+      <div class="ml-readout" id="readout" style="margin-top: 18px"></div>
+    </aside>
+
+    <div class="ml-canvas-wrap">
+      <div class="ml-canvas-frame" style="aspect-ratio: 1.6 / 1">
+        <canvas id="canvas"></canvas>
+      </div>
+      <div class="ml-caption">
+        <span class="ml-cap-num">·</span>
+        Left: the grid world with the agent (accent dot), the goal (top-right), and a hazard. Right: the Q-table — each cell shows four wedges, one per action, colored by Q-value. As the agent learns, the wedges sharpen toward the optimal action.
+      </div>
+    </div>
+
+    <aside class="right-rail">
+      <div class="ml-margin">
+        <div class="ml-margin-rule"></div>
+        <div class="ml-margin-h">The Q-update</div>
+        <div class="ml-equation" style="font-size:13px">Q(s, a) ← Q(s, a) + α[r + γ max<sub>a′</sub> Q(s′, a′) − Q(s, a)]</div>
+        <p>The bracket is the <em>temporal-difference error</em> — the gap between the current estimate and the better one we just observed. The update nudges the estimate toward the new evidence.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">ε-greedy</div>
+        <p class="quiet">With probability ε, pick a random action; otherwise act greedily. The classical exploration-vs-exploitation knob.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">From table to network</div>
+        <p class="quiet">When states are too many to enumerate (Atari pixels, robot images), replace the table with a neural network <em>Q(s, a; θ)</em>. That's <em>DQN</em>.</p>
+      </div>
+    </aside>
+  </section>
+
+  <section class="ml-applications">
+    <div class="ml-section-rule"><span class="kicker">Where you've seen this</span><span class="meta">04 examples</span></div>
+    <div class="ml-app-grid">
+      <div class="ml-app">
+        <div class="ml-app-h">DeepMind's Atari DQN</div>
+        <p>The 2015 Nature paper that learned to play 49 Atari games from pixels. A convolutional Q-network, trained with the same update rule you see above. The first time deep learning beat humans on a non-trivial RL benchmark.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Recommendation systems</div>
+        <p>YouTube's "what to watch next" model uses Q-learning variants to balance long-term engagement (treat each session as a state, each video as an action). Netflix and TikTok do similar.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Adaptive ad bidding</div>
+        <p>Real-time auction systems use Q-learning to decide bid prices given user, page, and time-of-day state. Google Ads, Meta's ad system, and most large DSPs run Q-style updates at billions-of-events scale.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Game AI in production</div>
+        <p>Battle-grid AI in strategy games, NPC behavior in MMOs, drone racing — all Q-learning or its modern descendants. Often pre-trained offline, then frozen at runtime.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="ml-further">
+    <div class="ml-section-rule"><span class="kicker">Further reading</span></div>
+    <ul class="ml-further-list">
+      <li>
+        <span class="title"><a href="https://www.nature.com/articles/nature14236" target="_blank" rel="noopener">Human-level control through deep reinforcement learning</a></span>
+        <span class="kind">paper</span>
+        <span class="by">Mnih et al. (2015) · The DQN Nature paper. Established the recipe — Q-learning + deep nets + experience replay + target networks — that's still the foundation of value-based deep RL.</span>
+      </li>
+      <li>
+        <span class="title"><a href="http://incompleteideas.net/book/the-book.html" target="_blank" rel="noopener">Reinforcement Learning: An Introduction · Ch. 6</a></span>
+        <span class="kind">textbook</span>
+        <span class="by">Sutton &amp; Barto · The temporal-difference learning chapter. Q-learning is presented as a special case; SARSA is its on-policy sibling.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://spinningup.openai.com/en/latest/" target="_blank" rel="noopener">Spinning Up in Deep RL</a></span>
+        <span class="kind">course</span>
+        <span class="by">OpenAI · Practical, code-first introduction to modern deep-RL algorithms. The DQN section walks from tabular Q-learning to the full deep variant.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://karpathy.github.io/2016/05/31/rl/" target="_blank" rel="noopener">Deep Reinforcement Learning: Pong from Pixels</a></span>
+        <span class="kind">essay</span>
+        <span class="by">Andrej Karpathy · A from-scratch policy-gradient agent that learns Pong. Pairs nicely with this page — the same RL frame, different algorithm.</span>
+      </li>
+    </ul>
+  </section>
+
+  <footer class="ml-foot">
+    <div class="line"><a href="index.html">← all entries</a> · <a href="mdp.html">XXVI. MDPs</a></div>
+    <div class="line eq">Q ← Q + α(r + γ max Q′ − Q)</div>
+    <div class="line"><a href="policy-gradients.html">XXVIII. Policy Gradients →</a></div>
+  </footer>
+</main>
+
+<script src="shared.js"></script>
+<script src="q-learning.js"></script>
+</body>
+</html>

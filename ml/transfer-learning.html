@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Transfer Learning · ML, Visualized · Joseph Thomas</title>
+  <meta name="description" content="A network trained for one task is usually halfway to the next. Freeze, fine-tune, ship." />
+  <link rel="canonical" href="https://jthomas.site/ml/transfer-learning.html" />
+  <meta name="theme-color" content="#7a1f24" />
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;1,8..60,300;1,8..60,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body>
+<header class="nb-nav">
+  <div class="brand-block"><a class="brand" href="../index.html">jthomas.site</a><span class="brand-meta">// notebook · v.4.2026</span></div>
+  <nav>
+    <a href="../blog/index.html">writing</a>
+    <a href="index.html" style="color:var(--ink)">tutorial</a>
+    <a href="../index.html#research">research</a>
+    <a href="../index.html#work">work</a>
+    <a href="../index.html#projects">projects</a>
+    <a href="../consulting.html">consulting</a>
+    <a href="../index.html#contact" class="contact">→ contact</a>
+  </nav>
+</header>
+
+<main class="ml-page-shell">
+  <header class="ml-mast">
+    <div class="kicker">Machine Learning, Visualized · Vol. XXX</div>
+    <h1>Transfer<br /><em>Learning</em></h1>
+    <p class="dek">A network trained on a million ImageNet images already knows what edges, eyes, and wheels look like. To classify a new dataset of 200 X-rays, you don't start over — you re-use the early layers, re-train just the last one. Freeze, fine-tune, ship.</p>
+  </header>
+
+  <section class="ml-intro">
+    <div class="ml-intro-grid">
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">The concept</div>
+        <p class="lead"><span class="term">Transfer learning</span> takes a model pre-trained on a large source task and adapts it to a smaller target task with much less data.</p>
+        <p>Three flavors, increasingly invasive: <em>(1) feature extraction</em> — freeze all the pretrained weights and train only a small head on top; <em>(2) fine-tuning</em> — unfreeze the last few layers and continue training at a low learning rate; <em>(3) full fine-tuning</em> — update everything, slowly.</p>
+        <p>The earlier layers learn task-agnostic features (edges, color blobs, textures); later layers learn task-specific abstractions (cat-shaped, dog-shaped). Transfer works because the early features generalize across many vision tasks.</p>
+      </div>
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">Why ML cares</div>
+        <p>Transfer learning is the single most practical technique in modern ML. Almost no one trains image models from scratch anymore — they start from ImageNet-pretrained ResNet, ViT, or CLIP. Almost no one trains language models from scratch — they fine-tune Llama, Mistral, or a Gemma checkpoint.</p>
+        <p>The reason is data: pretraining on a billion items learns rich features; the target task may have only thousands of items. Without transfer, the small target dataset can't drag a deep network out of the random-initialization pit.</p>
+      </div>
+    </div>
+    <div class="ml-try">
+      <div class="ml-eyebrow accent">Try this</div>
+      <ol>
+        <li>Compare <em>train from scratch</em> vs <em>transfer + freeze</em> vs <em>transfer + fine-tune</em> on the small target dataset. Watch the accuracy curve: scratch is slowest; freeze is fastest start; fine-tune is highest final accuracy.</li>
+        <li>Drag the <em>frozen-layers</em> slider. Freezing more layers stabilizes training but caps potential. Freezing fewer gives more flexibility but risks "catastrophic forgetting" of the pretrained features.</li>
+        <li>Reduce <em>target data size</em>. Transfer's advantage grows as data shrinks — the gap between scratch and transfer widens dramatically.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="ml-stage">
+    <aside class="left-rail">
+      <div class="ml-rail-label">Strategy</div>
+      <div class="ml-presets" id="strategies"></div>
+
+      <div class="ml-rail-label" style="margin-top: 24px">Frozen layers</div>
+      <input id="frozen-slider" type="range" min="0" max="4" step="1" value="3" style="width:100%; accent-color:var(--accent)" />
+      <div id="frozen-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">3 / 4 layers frozen</div>
+
+      <div class="ml-rail-label" style="margin-top: 18px">Target data size</div>
+      <input id="data-slider" type="range" min="20" max="500" step="20" value="100" style="width:100%; accent-color:var(--accent)" />
+      <div id="data-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">100 examples</div>
+
+      <div style="display:flex; gap:8px; margin-top: 18px">
+        <button id="train-btn" class="ml-sbtn" style="flex:1; padding:10px 14px; font-family:var(--serif); font-style:italic; font-size:14px">▷ Train all three</button>
+        <button id="reset-btn" class="ml-sbtn ghost" style="padding:10px 14px; font-family:var(--serif); font-style:italic; font-size:13px">↻</button>
+      </div>
+
+      <div class="ml-readout" id="readout" style="margin-top: 18px"></div>
+    </aside>
+
+    <div class="ml-canvas-wrap">
+      <div class="ml-canvas-frame" style="aspect-ratio: 1.5 / 1; padding: 24px">
+        <canvas id="canvas"></canvas>
+      </div>
+      <div class="ml-caption">
+        <span class="ml-cap-num">·</span>
+        Three networks racing to fit the same target task. <em>Scratch</em> starts cold; <em>frozen</em> reuses pretrained features but only adapts the last layer; <em>fine-tune</em> unlocks the late layers and slowly adapts them too. The curves below show validation accuracy per epoch.
+      </div>
+    </div>
+
+    <aside class="right-rail">
+      <div class="ml-margin">
+        <div class="ml-margin-rule"></div>
+        <div class="ml-margin-h">Why it works</div>
+        <p>Early layers learn features that are generic across many tasks: edges, colors, textures. Late layers specialize. Pre-training on a large diverse dataset gets the early layers <em>nearly right</em>; the target task only needs to adjust the last few layers.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Catastrophic forgetting</div>
+        <p class="quiet">If you fine-tune too aggressively (high LR, all layers unfrozen), the network "forgets" what made it good on the source task — and may overfit the small target data. Layer-wise LR decay (lower LR for earlier layers) is the standard fix.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">In LLMs: LoRA</div>
+        <p class="quiet">Modern LLM fine-tuning rarely updates the full weight matrix. <em>LoRA</em> adds a tiny low-rank adapter and trains only that — drastically cheaper, comparable performance.</p>
+      </div>
+    </aside>
+  </section>
+
+  <section class="ml-applications">
+    <div class="ml-section-rule"><span class="kicker">Where you've seen this</span><span class="meta">04 examples</span></div>
+    <div class="ml-app-grid">
+      <div class="ml-app">
+        <div class="ml-app-h">Medical imaging</div>
+        <p>Classify diabetic retinopathy with 5,000 retinal images? Start from ImageNet-pretrained ResNet, swap the head, fine-tune. Almost every published medical-imaging classifier uses this recipe.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Custom LLM fine-tuning</div>
+        <p>"Train Llama 3 on our company's 100k support tickets" → LoRA adapters or full fine-tune. The base model already speaks English; you're just teaching it your domain.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Wildlife species classifiers</div>
+        <p>Conservation orgs use ImageNet-pretrained models to classify camera-trap photos by species. Often only a few hundred labeled examples per species — transfer is the only thing that makes it work.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Industrial defect detection</div>
+        <p>Detecting cracks in turbine blades or solder defects on PCBs — small, expensive-to-label datasets. Pretrained vision encoders + a fine-tuned head is the dominant recipe.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="ml-further">
+    <div class="ml-section-rule"><span class="kicker">Further reading</span></div>
+    <ul class="ml-further-list">
+      <li>
+        <span class="title"><a href="https://arxiv.org/abs/1411.1792" target="_blank" rel="noopener">How transferable are features in deep neural networks?</a></span>
+        <span class="kind">paper</span>
+        <span class="by">Yosinski et al. (2014) · The empirical paper that nailed down which layers transfer well and which don't. Foundational for the freeze/fine-tune choice.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://arxiv.org/abs/2106.09685" target="_blank" rel="noopener">LoRA: Low-Rank Adaptation</a></span>
+        <span class="kind">paper</span>
+        <span class="by">Hu et al. (2021) · The LoRA paper. The technique behind the explosion of fine-tuned Llama variants and most cost-conscious LLM customization today.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://www.fast.ai/" target="_blank" rel="noopener">fast.ai — Practical Deep Learning</a></span>
+        <span class="kind">course</span>
+        <span class="by">Howard &amp; Thomas · The course that operationalized "transfer learning by default" in modern practice. Lesson 1 fine-tunes ResNet on a custom dataset in 4 lines of code.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://huggingface.co/docs/transformers/training" target="_blank" rel="noopener">Hugging Face Transformers — Fine-tuning</a></span>
+        <span class="kind">docs</span>
+        <span class="by">The reference for fine-tuning pretrained transformers in production. Covers full fine-tuning, LoRA/QLoRA, parameter-efficient methods.</span>
+      </li>
+    </ul>
+  </section>
+
+  <footer class="ml-foot">
+    <div class="line"><a href="index.html">← all entries</a> · <a href="bandits.html">XXIX. Bandits</a></div>
+    <div class="line eq">θ ← θ_pre + Δ</div>
+    <div class="line"><a href="hyperparameter-tuning.html">XXXI. Hyperparameter Tuning →</a></div>
+  </footer>
+</main>
+
+<script src="shared.js"></script>
+<script src="transfer-learning.js"></script>
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Gradients &amp; Derivatives · ML, Visualized · Joseph Thomas</title>
+  <meta name="description" content="A derivative is a slope; a gradient generalizes it to surfaces. The vector every learning algorithm walks down." />
+  <link rel="canonical" href="https://jthomas.site/ml/gradients.html" />
+  <meta name="theme-color" content="#7a1f24" />
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Gradients &amp; Derivatives · ML, Visualized" />
+  <meta property="og:description" content="Tangent lines on curves, gradient arrows on surfaces. The slope every learning algorithm walks down." />
+  <meta property="og:url" content="https://jthomas.site/ml/gradients.html" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;1,8..60,300;1,8..60,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body>
+
+<header class="nb-nav">
+  <div class="brand-block">
+    <a class="brand" href="../index.html">jthomas.site</a><span class="brand-meta">// notebook · v.4.2026</span>
+  </div>
+  <nav>
+    <a href="../blog/index.html">writing</a>
+    <a href="index.html" style="color:var(--ink)">tutorial</a>
+    <a href="../index.html#research">research</a>
+    <a href="../index.html#work">work</a>
+    <a href="../index.html#projects">projects</a>
+    <a href="../consulting.html">consulting</a>
+    <a href="../index.html#contact" class="contact">→ contact</a>
+  </nav>
+</header>
+
+<main class="ml-page-shell">
+
+  <header class="ml-mast">
+    <div class="kicker">Machine Learning, Visualized · Vol. III</div>
+    <h1>Gradients<br /><em>&amp;</em> Derivatives</h1>
+    <p class="dek">A derivative is a slope: how steeply a curve rises at one spot. A gradient generalizes the idea to surfaces — a vector pointing in the direction of steepest ascent. Every learning algorithm is built on this.</p>
+  </header>
+
+  <section class="ml-intro">
+    <div class="ml-intro-grid">
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">The concept</div>
+        <p class="lead">A <span class="term">derivative</span> is the slope of a curve at one point. A <span class="term">gradient</span> is the same idea on a surface — a vector that points uphill.</p>
+        <p>The number <em>f ′(x)</em> tells you how fast f changes when you nudge x. Positive means rising; negative means falling; zero means flat. At a minimum or a maximum, the slope is exactly zero.</p>
+        <p>For a function of two variables <em>f(x, y)</em>, the gradient <em>∇f = (∂f/∂x, ∂f/∂y)</em> is a vector in the plane. It points in the direction the surface rises fastest, and its length tells you how steep that climb is.</p>
+      </div>
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">Why ML cares</div>
+        <p>Training a neural network <em>is</em> following a gradient. Cross every layer in reverse, multiply derivatives by the chain rule (that's backpropagation), and you have ∇L — the gradient of the loss. Take a small step in the opposite direction. Repeat a few million times.</p>
+        <p>Every modern optimizer — SGD, Adam, RMSProp, Adafactor — is a different recipe for "use the gradient cleverly." Understanding what a gradient <em>is</em> geometrically is the difference between training models and running them.</p>
+      </div>
+    </div>
+    <div class="ml-try">
+      <div class="ml-eyebrow accent">Try this</div>
+      <ol>
+        <li>In <em>1D mode</em>, hit Play and watch the orange tangent rotate as it sweeps the curve. At each peak and valley, the line goes flat — that's <em>f ′(x) = 0</em>.</li>
+        <li>Switch to <em>2D mode</em>, pick the <em>Saddle</em> surface, and drag the dot toward the center. The gradient arrow shrinks to nothing — that flat point is a critical point that's neither a min nor a max.</li>
+        <li>Try the <em>Banana</em> surface. The gradient arrow always points perpendicular to the level curves — drift sideways and the height stays the same.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="ml-stage">
+
+    <aside class="left-rail">
+      <div class="ml-rail-label">Mode</div>
+      <div class="ml-presets" id="mode-list">
+        <button class="ml-preset" data-mode="1d">One variable · f(x)</button>
+        <button class="ml-preset" data-mode="2d">Two variables · f(x, y)</button>
+      </div>
+
+      <div class="ml-rail-label" style="margin-top: 28px" id="func-label">Function</div>
+      <div class="ml-presets" id="funcs"></div>
+
+      <div class="ml-readout" id="readout"></div>
+    </aside>
+
+    <div class="ml-canvas-wrap">
+      <div class="ml-canvas-frame" id="canvas-frame">
+        <canvas id="canvas"></canvas>
+      </div>
+      <div class="ml-caption" id="caption"></div>
+      <div class="ml-iter" id="play-controls" style="display:none">
+        <button id="play-btn">Play</button>
+        <input id="x-slider" type="range" min="-3" max="3" step="0.01" value="0.8" />
+        <span class="step" id="x-label">x = 0.80</span>
+      </div>
+    </div>
+
+    <aside class="right-rail">
+      <div class="ml-margin" id="margin"></div>
+    </aside>
+
+  </section>
+
+  <section class="ml-applications">
+    <div class="ml-section-rule">
+      <span class="kicker">Where you've seen this</span>
+      <span class="meta">04 examples</span>
+    </div>
+    <div class="ml-app-grid">
+      <div class="ml-app">
+        <div class="ml-app-h">Training every neural network you've used</div>
+        <p>Each weight in a 100-billion-parameter LLM has a partial derivative ∂L/∂w. The training loop is one giant gradient calculation per batch, executed in reverse via backpropagation. Without this idea there is no GPT, no Gemini, no Claude.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Computer graphics and ray tracing</div>
+        <p>Light bouncing off a curved surface depends on the surface <em>normal</em> — the gradient of the height function, perpendicular to it. Every shaded pixel in a video game is, somewhere in the math, a gradient.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Image edge detection</div>
+        <p>The "edges" in a photo are places where pixel intensity changes fastest — large gradient magnitude. The Sobel and Canny edge filters are gradient operators in disguise; every Photoshop filter that "sharpens" or "embosses" is too.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Adversarial examples</div>
+        <p>To fool a classifier into mistaking a panda for a gibbon, attackers compute the gradient of the loss with respect to the <em>input pixels</em> and step in that direction. Gradient descent on the pixels, not the weights.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="ml-further">
+    <div class="ml-section-rule">
+      <span class="kicker">Further reading</span>
+    </div>
+    <ul class="ml-further-list">
+      <li>
+        <span class="title"><a href="https://www.3blue1brown.com/topics/calculus" target="_blank" rel="noopener">3Blue1Brown — Essence of Calculus</a></span>
+        <span class="kind">video series</span>
+        <span class="by">Grant Sanderson · The animation companion to this entry. Episodes 2 and 3 are exactly the tangent-line and chain-rule story.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://cs231n.github.io/optimization-1/" target="_blank" rel="noopener">CS231n — Optimization &amp; Gradient Descent</a></span>
+        <span class="kind">course notes</span>
+        <span class="by">Andrej Karpathy · Stanford notes that move from "what's a gradient" to "training a neural net" in twelve clear pages.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://www.deeplearningbook.org/contents/numerical.html" target="_blank" rel="noopener">Deep Learning · Chapter 4: Numerical Computation</a></span>
+        <span class="kind">textbook</span>
+        <span class="by">Goodfellow, Bengio, Courville · The chapter that bridges single-variable calculus and the gradient-based optimization actually used in practice.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://distill.pub/2017/momentum/" target="_blank" rel="noopener">Why Momentum Really Works</a></span>
+        <span class="kind">interactive essay</span>
+        <span class="by">Gabriel Goh (Distill) · A beautiful interactive on what happens after gradient descent — momentum, oscillation, and conditioning, with figures you can drag.</span>
+      </li>
+    </ul>
+  </section>
+
+  <footer class="ml-foot">
+    <div class="line"><a href="index.html">← all entries</a> · <a href="eigenvectors.html">II. Eigenvectors</a></div>
+    <div class="line eq">∇f · ds</div>
+    <div class="line"><a href="pca.html">IV. PCA →</a></div>
+  </footer>
+
+</main>
+
+<script src="shared.js"></script>
+<script src="gradients.js"></script>
+
+</body>
+</html>

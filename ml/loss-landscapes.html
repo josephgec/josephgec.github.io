@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Loss Landscapes · ML, Visualized · Joseph Thomas</title>
+  <meta name="description" content="Training is descent through high-dimensional terrain. Bowls, ravines, saddles — and what they teach." />
+  <link rel="canonical" href="https://jthomas.site/ml/loss-landscapes.html" />
+  <meta name="theme-color" content="#7a1f24" />
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Loss Landscapes · ML, Visualized" />
+  <meta property="og:description" content="Bowls, ravines, saddles — and what they teach." />
+  <meta property="og:url" content="https://jthomas.site/ml/loss-landscapes.html" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;1,8..60,300;1,8..60,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body>
+
+<header class="nb-nav">
+  <div class="brand-block">
+    <a class="brand" href="../index.html">jthomas.site</a><span class="brand-meta">// notebook · v.4.2026</span>
+  </div>
+  <nav>
+    <a href="../blog/index.html">writing</a>
+    <a href="index.html" style="color:var(--ink)">tutorial</a>
+    <a href="../index.html#research">research</a>
+    <a href="../index.html#work">work</a>
+    <a href="../index.html#projects">projects</a>
+    <a href="../consulting.html">consulting</a>
+    <a href="../index.html#contact" class="contact">→ contact</a>
+  </nav>
+</header>
+
+<main class="ml-page-shell">
+
+  <header class="ml-mast">
+    <div class="kicker">Machine Learning, Visualized · Vol. XII</div>
+    <h1>Loss<br /><em>Landscapes</em></h1>
+    <p class="dek">Training is descent through a high-dimensional terrain. We can't draw the real surface — millions of weights — but a 2D slice teaches the intuition. Every minimum is a hypothesis the network might settle into.</p>
+  </header>
+
+  <section class="ml-intro">
+    <div class="ml-intro-grid">
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">The concept</div>
+        <p class="lead">A <span class="term">loss landscape</span> is the surface defined by the loss function as the network's weights vary. Training is the act of finding a low point on it.</p>
+        <p>For a 2-weight model, the landscape is a 2D surface — like the terrain you see on the right. For a real network with millions of weights, it's a surface in millions of dimensions; we visualize 2D <em>slices</em> through that.</p>
+        <p>The geometry decides how easy training is. A clean bowl is solvable from anywhere. A long ravine forces zig-zags. Saddles stall progress. Rough terrain has many shallow minima, each a different network behavior.</p>
+      </div>
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">Why ML cares</div>
+        <p>Almost every result in modern optimization theory — momentum, Adam, learning-rate schedules, batch normalization — is a fix for some pathology of the loss landscape: ravines, plateaus, saddles, ill-conditioning. Knowing the shape tells you which fix to reach for.</p>
+        <p>In high dimensions, the geometry gets weird and counter-intuitive. Empirical work (Dauphin et al., Goodfellow et al.) suggests local minima are rare; <em>saddle points vastly outnumber them</em> and are where networks actually slow down. The pictures here are a 2D peek at that 3D-and-up reality.</p>
+      </div>
+    </div>
+    <div class="ml-try">
+      <div class="ml-eyebrow accent">Try this</div>
+      <ol>
+        <li>Pick <em>Convex bowl</em> and hit <em>Descend</em>. The marble walks straight to the minimum. Crank <em>η</em> way up — watch it overshoot and oscillate, then diverge.</li>
+        <li>Switch to <em>Narrow ravine</em>. Vanilla gradient descent zigzags miserably down the long axis. This is the pathology that <em>momentum</em> exists to solve.</li>
+        <li>Try <em>Two minima</em>. Click on different starting points around the map. Where you start determines which basin you fall into — initialization matters.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="ml-stage">
+
+    <aside class="left-rail">
+      <div class="ml-rail-label">Terrain</div>
+      <div class="ml-presets" id="terrains"></div>
+
+      <div class="ml-rail-label" style="margin-top: 24px">Step size η</div>
+      <input id="lr-slider" type="range" min="0.005" max="0.4" step="0.005" value="0.1" style="width:100%; accent-color:var(--accent)" />
+      <div style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center" id="lr-label">η = 0.100</div>
+
+      <div style="display: flex; gap: 8px; margin-top: 18px">
+        <button id="run-btn" class="ml-sbtn" style="flex:1; padding:10px 14px; font-family:var(--serif); font-style:italic; font-size:14px">▷ Descend</button>
+        <button id="reset-btn" class="ml-sbtn ghost" style="padding:10px 14px; font-family:var(--serif); font-style:italic; font-size:13px">↻</button>
+      </div>
+
+      <div class="ml-readout" id="readout" style="margin-top: 18px"></div>
+
+      <div style="font-style:italic; font-family:var(--serif); font-size:13px; color:var(--ml-ink-fade); margin-top:14px; line-height:1.5">
+        Click anywhere on the map to drop the marble there.
+      </div>
+    </aside>
+
+    <div class="ml-canvas-wrap">
+      <div class="ml-canvas-frame">
+        <canvas id="canvas"></canvas>
+      </div>
+      <div class="ml-caption">
+        <span class="ml-cap-num">·</span>
+        Contour lines mark equal-loss elevations. The marble follows the steepest descent — the <em style="color:#3a6b5e">green arrow</em> shows the direction it will move next, scaled by the step size.
+      </div>
+    </div>
+
+    <aside class="right-rail">
+      <div class="ml-margin" id="margin"></div>
+    </aside>
+
+  </section>
+
+  <section class="ml-applications">
+    <div class="ml-section-rule">
+      <span class="kicker">Where you've seen this</span>
+      <span class="meta">04 examples</span>
+    </div>
+    <div class="ml-app-grid">
+      <div class="ml-app">
+        <div class="ml-app-h">Why deep networks need good initialization</div>
+        <p>Two networks with the same architecture but different starting weights can converge to wildly different solutions — different basins of the loss landscape. Initialization schemes (Xavier, He) are essentially "drop the marble in a good neighborhood."</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Mode connectivity</div>
+        <p>2018 research (Garipov et al.) showed that distinct minima of large networks are often connected by low-loss paths — the landscape isn't isolated valleys but a network of them. This is unique to high dimensions; in 2D the picture lies.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Generalization and flatness</div>
+        <p>Sharp minima (steep walls) tend to generalize worse than flat ones (gentle slopes). Methods like <em>SAM</em> (sharpness-aware minimization) explicitly bias gradient descent toward flatter basins — and consistently improve test accuracy.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Loss landscapes as art</div>
+        <p>Hao Li's 2017 paper <em>Visualizing the Loss Landscape of Neural Nets</em> rendered the 2D slices for ResNet, with-and-without skip connections. The skip-connection version is dramatically smoother — a striking illustration of why ResNets train so much better than plain deep CNNs.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="ml-further">
+    <div class="ml-section-rule">
+      <span class="kicker">Further reading</span>
+    </div>
+    <ul class="ml-further-list">
+      <li>
+        <span class="title"><a href="https://distill.pub/2017/momentum/" target="_blank" rel="noopener">Why Momentum Really Works</a></span>
+        <span class="kind">interactive essay</span>
+        <span class="by">Gabriel Goh (Distill) · The same kind of contour-and-marble visualization, used to explain exactly why momentum solves the ravine pathology you're seeing on this page.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://arxiv.org/abs/1712.09913" target="_blank" rel="noopener">Visualizing the Loss Landscape of Neural Nets</a></span>
+        <span class="kind">paper</span>
+        <span class="by">Li, Xu, Taylor, Studer, Goldstein (2018) · The paper with the famous "ResNet vs no skip connections" landscape comparison. Page-long but image-heavy and worth the click.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://arxiv.org/abs/1406.2572" target="_blank" rel="noopener">Identifying and attacking the saddle point problem</a></span>
+        <span class="kind">paper</span>
+        <span class="by">Dauphin et al. (2014) · The argument that saddles, not local minima, are what slow down training in high dimensions. The result that reframed how the field thinks about non-convexity.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://losslandscape.com/" target="_blank" rel="noopener">losslandscape.com</a></span>
+        <span class="kind">gallery</span>
+        <span class="by">Javier Ideami · 3D-rendered loss landscapes, animated. The visceral version of the contour-map view above.</span>
+      </li>
+    </ul>
+  </section>
+
+  <footer class="ml-foot">
+    <div class="line"><a href="index.html">← all entries</a> · <a href="backprop.html">XI. Backpropagation</a></div>
+    <div class="line eq">w ← w − η ∇L(w)</div>
+    <div class="line"><a href="optimizers.html">XIII. Optimizers →</a></div>
+  </footer>
+
+</main>
+
+<script src="shared.js"></script>
+<script src="loss-landscapes.js"></script>
+
+</body>
+</html>

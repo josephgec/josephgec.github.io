@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Model Interpretability · ML, Visualized · Joseph Thomas</title>
+  <meta name="description" content="SHAP and LIME open the black box just enough to ask: which feature pushed the prediction which way?" />
+  <link rel="canonical" href="https://jthomas.site/ml/interpretability.html" />
+  <meta name="theme-color" content="#7a1f24" />
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;1,8..60,300;1,8..60,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body>
+<header class="nb-nav">
+  <div class="brand-block"><a class="brand" href="../index.html">jthomas.site</a><span class="brand-meta">// notebook · v.4.2026</span></div>
+  <nav>
+    <a href="../blog/index.html">writing</a>
+    <a href="index.html" style="color:var(--ink)">tutorial</a>
+    <a href="../index.html#research">research</a>
+    <a href="../index.html#work">work</a>
+    <a href="../index.html#projects">projects</a>
+    <a href="../consulting.html">consulting</a>
+    <a href="../index.html#contact" class="contact">→ contact</a>
+  </nav>
+</header>
+
+<main class="ml-page-shell">
+  <header class="ml-mast">
+    <div class="kicker">Machine Learning, Visualized · Vol. XXXIII</div>
+    <h1>Model<br /><em>Interpretability</em></h1>
+    <p class="dek">A modern model is a billion-parameter blackbox. SHAP and LIME crack it open just enough to answer the regulator's, the doctor's, and the user's question: <em>which features pushed this particular prediction which way?</em></p>
+  </header>
+
+  <section class="ml-intro">
+    <div class="ml-intro-grid">
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">The concept</div>
+        <p class="lead"><span class="term">SHAP</span> values assign each feature an additive contribution to a single prediction. Sum the contributions plus the baseline and you get the model's output, exactly.</p>
+        <p>The math is borrowed from cooperative game theory: each feature is a "player," the prediction is the "payout," and SHAP values distribute credit fairly using the Shapley value formula. Each feature's contribution averages over every possible coalition of features it could join.</p>
+        <p><span class="term">LIME</span> takes a different angle: fit a simple, interpretable model (a linear regression) to the local neighborhood of a single prediction. The simple model's coefficients become the explanation.</p>
+      </div>
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">Why ML cares</div>
+        <p>Regulated industries — credit scoring (Equal Credit Opportunity Act), insurance, healthcare, hiring — require <em>per-decision</em> explanations. SHAP became the de facto standard because it satisfies a clean axiomatic foundation while being computationally feasible.</p>
+        <p>Even outside regulated settings, interpretability matters for debugging ("why did my fraud model flag this transaction?"), trust ("why does the doctor's model recommend this treatment?"), and discovering biases ("does our hiring model rely on zip code?"). Every deployed ML team eventually needs at least one of these tools.</p>
+      </div>
+    </div>
+    <div class="ml-try">
+      <div class="ml-eyebrow accent">Try this</div>
+      <ol>
+        <li>Pick a sample customer. The right side shows the SHAP waterfall: each feature pushes the prediction up (oxblood) or down (ink) from the average. The total equals the model's prediction.</li>
+        <li>Try the <em>fraud — high-risk</em> sample. The "transaction amount" and "device new" features push fraud-probability sharply up; "user age" and "country match" push down.</li>
+        <li>Switch to the <em>credit — denied</em> sample. The same model, different inputs, different SHAP attributions. SHAP gives one explanation per prediction — not a global summary.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="ml-stage">
+    <aside class="left-rail">
+      <div class="ml-rail-label">Sample case</div>
+      <div class="ml-presets" id="cases"></div>
+
+      <div class="ml-rail-label" style="margin-top: 24px">View</div>
+      <div class="ml-presets" id="views"></div>
+
+      <div class="ml-readout" id="readout" style="margin-top: 18px"></div>
+    </aside>
+
+    <div class="ml-canvas-wrap">
+      <div class="ml-canvas-frame" style="aspect-ratio: 1.6 / 1; padding: 24px">
+        <canvas id="canvas"></canvas>
+      </div>
+      <div class="ml-caption">
+        <span class="ml-cap-num">·</span>
+        <em>SHAP waterfall:</em> start from the model's average prediction (left). Each feature is a step up or down based on its contribution to <em>this</em> sample's prediction. The final stop on the right is the model's actual output. <em>LIME view:</em> shows the local linear approximation around the same point.
+      </div>
+    </div>
+
+    <aside class="right-rail">
+      <div class="ml-margin">
+        <div class="ml-margin-rule"></div>
+        <div class="ml-margin-h">Shapley axioms</div>
+        <p>SHAP values are the <em>only</em> attribution method satisfying four reasonable properties: efficiency (sum to the prediction), symmetry (same role → same value), null-player (no contribution → zero value), and additivity (over linear combinations).</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">SHAP vs LIME</div>
+        <p class="quiet">SHAP is theoretically grounded but expensive (O(2^d) in features without approximations). LIME is faster but heuristic, and explanations can shift with the random sampling.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Caveats</div>
+        <p class="quiet">Both methods explain the model, not the world. If the model is biased, the explanation will be too — sometimes laundering the bias into seemingly-objective numbers.</p>
+      </div>
+    </aside>
+  </section>
+
+  <section class="ml-applications">
+    <div class="ml-section-rule"><span class="kicker">Where you've seen this</span><span class="meta">04 examples</span></div>
+    <div class="ml-app-grid">
+      <div class="ml-app">
+        <div class="ml-app-h">Credit scoring (FCRA / ECOA)</div>
+        <p>US law requires lenders to give "specific reasons" for adverse credit decisions. SHAP attributions are the standard method for generating these reason codes — automated, audit-able, and per-application.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Medical decision support</div>
+        <p>"This model says 78% chance of sepsis — but why?" SHAP-explained alerts let clinicians sanity-check and override the model when the explanation looks wrong.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Fraud detection</div>
+        <p>When a payment is flagged, the analyst's queue shows the top SHAP-attributed features — was it the merchant, the amount, the IP, or the velocity? Cuts investigation time dramatically.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Bias auditing</div>
+        <p>Aggregate SHAP attributions across protected subgroups (race, gender) reveal whether a model is leaning on proxies for disparate treatment. Now standard in fair-lending and HR audits.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="ml-further">
+    <div class="ml-section-rule"><span class="kicker">Further reading</span></div>
+    <ul class="ml-further-list">
+      <li>
+        <span class="title"><a href="https://arxiv.org/abs/1705.07874" target="_blank" rel="noopener">A Unified Approach to Interpreting Model Predictions (SHAP)</a></span>
+        <span class="kind">paper</span>
+        <span class="by">Lundberg &amp; Lee (2017) · The SHAP paper. Connects LIME, DeepLIFT, and several feature-attribution methods under the Shapley-value framework.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://arxiv.org/abs/1602.04938" target="_blank" rel="noopener">"Why Should I Trust You?" Explaining Predictions of Any Classifier (LIME)</a></span>
+        <span class="kind">paper</span>
+        <span class="by">Ribeiro, Singh, Guestrin (2016) · The original LIME paper. Local linear approximations as a model-agnostic explanation.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://christophm.github.io/interpretable-ml-book/" target="_blank" rel="noopener">Interpretable Machine Learning</a></span>
+        <span class="kind">free book</span>
+        <span class="by">Christoph Molnar · The standard reference for interpretability methods. Covers SHAP, LIME, ICE plots, partial dependence, and more, with code.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://github.com/shap/shap" target="_blank" rel="noopener">shap (Python library)</a></span>
+        <span class="kind">library</span>
+        <span class="by">The reference implementation. Wide model support, beautiful plots, used in nearly every production interpretability stack.</span>
+      </li>
+    </ul>
+  </section>
+
+  <footer class="ml-foot">
+    <div class="line"><a href="index.html">← all entries</a> · <a href="bias-variance.html">XXXII. Bias-Variance</a></div>
+    <div class="line eq">f(x) = E[f] + Σ φ<sub>i</sub></div>
+    <div class="line"><a href="federated-learning.html">XXXIV. Federated →</a></div>
+  </footer>
+</main>
+
+<script src="shared.js"></script>
+<script src="interpretability.js"></script>
+</body>
+</html>

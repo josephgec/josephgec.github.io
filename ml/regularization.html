@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Holding it Together · ML, Visualized · Joseph Thomas</title>
+  <meta name="description" content="Two simple tricks that make deep nets trainable: random silencing, and standardized activations." />
+  <link rel="canonical" href="https://jthomas.site/ml/regularization.html" />
+  <meta name="theme-color" content="#7a1f24" />
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;1,8..60,300;1,8..60,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body>
+<header class="nb-nav">
+  <div class="brand-block"><a class="brand" href="../index.html">jthomas.site</a><span class="brand-meta">// notebook · v.4.2026</span></div>
+  <nav>
+    <a href="../blog/index.html">writing</a>
+    <a href="index.html" style="color:var(--ink)">tutorial</a>
+    <a href="../index.html#research">research</a>
+    <a href="../index.html#work">work</a>
+    <a href="../index.html#projects">projects</a>
+    <a href="../consulting.html">consulting</a>
+    <a href="../index.html#contact" class="contact">→ contact</a>
+  </nav>
+</header>
+
+<main class="ml-page-shell">
+  <header class="ml-mast">
+    <div class="kicker">Machine Learning, Visualized · Vol. XIX</div>
+    <h1>Holding it<br /><em>Together</em></h1>
+    <p class="dek">Two simple tricks that make deep nets trainable: <em>dropout</em> randomly silences neurons during training, and <em>batch normalization</em> standardizes activations so each layer sees clean inputs. Both look like accidents that turned out to matter.</p>
+  </header>
+
+  <section class="ml-intro">
+    <div class="ml-intro-grid">
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">The concept</div>
+        <p class="lead">Deep networks overfit and drift. <span class="term">Dropout</span> and <span class="term">batch norm</span> are two cheap surgical fixes that quietly hold them together.</p>
+        <p><em>Dropout</em>: at training time, randomly zero out a fraction (say 30%) of neurons in each layer. Forces the network to spread responsibility across many units instead of relying on any single one. At test time, all neurons are active and outputs scaled.</p>
+        <p><em>Batch norm</em>: at every layer, subtract the mini-batch mean and divide by the standard deviation, then learn an affine rescale. Keeps activations from drifting to extreme values as the network trains.</p>
+      </div>
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">Why ML cares</div>
+        <p>These two tricks turned the dial from "deep nets don't really train well" to "deep nets are routine." The 2014–2016 explosion of computer-vision results — VGG, GoogLeNet, ResNet — was as much about these regularizers as about the architectures themselves.</p>
+        <p>Today, dropout still appears in many transformers; batch norm has been largely replaced by layer norm in language models (different statistics, same idea). Both are part of every working deep network's plumbing.</p>
+      </div>
+    </div>
+    <div class="ml-try">
+      <div class="ml-eyebrow accent">Try this</div>
+      <ol>
+        <li>Drag the <em>dropout rate</em> from 0 to 0.7. Watch random units fade to zero on each forward pass — and the test-time outputs stay almost identical thanks to scaling.</li>
+        <li>Toggle <em>BatchNorm off</em> on the comparison plot. Without it, deeper layers' activations drift to extreme values; with it, every layer's distribution stays roughly standard.</li>
+        <li>Try dropout = 1 — every unit silenced, output is zero. Then dropout = 0 — full network back. Anywhere in between is the regularization regime.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="ml-stage">
+    <aside class="left-rail">
+      <div class="ml-rail-label">Dropout rate p</div>
+      <input id="p-slider" type="range" min="0" max="0.9" step="0.05" value="0.3" style="width:100%; accent-color:var(--accent)" />
+      <div id="p-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">p = 0.30</div>
+
+      <div class="ml-rail-label" style="margin-top: 24px">BatchNorm</div>
+      <div class="ml-presets" id="bn-toggle"></div>
+
+      <div style="display:flex; gap:8px; margin-top: 18px">
+        <button id="resample" class="ml-sbtn" style="flex:1; padding:10px 14px; font-family:var(--serif); font-style:italic; font-size:14px">↻ Resample dropout mask</button>
+      </div>
+
+      <div class="ml-readout" id="readout" style="margin-top: 18px"></div>
+    </aside>
+
+    <div class="ml-canvas-wrap">
+      <div class="ml-canvas-frame" style="aspect-ratio: 1.4 / 1; padding: 24px">
+        <canvas id="canvas"></canvas>
+      </div>
+      <div class="ml-caption">
+        <span class="ml-cap-num">·</span>
+        Top: a 4-layer network's hidden activations on a single forward pass. Faded units are dropout-silenced. Bottom: activation distributions per layer, with and without BatchNorm. Without BN, distributions drift; with BN, they stay tight around zero with unit variance.
+      </div>
+    </div>
+
+    <aside class="right-rail">
+      <div class="ml-margin">
+        <div class="ml-margin-rule"></div>
+        <div class="ml-margin-h">Dropout, intuitively</div>
+        <p>Each forward pass uses a different random sub-network — the average over passes is the full network. It's an ensemble of <em>2^N</em> sub-networks for free, and works because the units that <em>do</em> survive can't get lazy.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">BatchNorm, intuitively</div>
+        <p class="quiet">If layer 5's input distribution shifts every step, layer 5 can't learn anything stable. BN clamps the distribution to (μ=0, σ=1) per mini-batch, then learns an affine map back if needed. Effectively decouples each layer from the others.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">LayerNorm</div>
+        <p class="quiet">Same idea but normalizes across <em>features</em> within a single sample, not across the batch. Less batch-dependent. The default in transformers since 2017.</p>
+      </div>
+    </aside>
+  </section>
+
+  <section class="ml-applications">
+    <div class="ml-section-rule"><span class="kicker">Where you've seen this</span><span class="meta">04 examples</span></div>
+    <div class="ml-app-grid">
+      <div class="ml-app">
+        <div class="ml-app-h">AlexNet to today</div>
+        <p>AlexNet (2012) used dropout aggressively in its dense layers — and was the first paper to show that very deep CNNs could actually generalize. Almost every CNN since has carried the trick.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">ResNet and BatchNorm</div>
+        <p>ResNet's 152-layer networks would not train without BatchNorm. The combination of skip connections + BN is what made depth go from "hard" to "trivial" — and is the architectural hand-shake of the deep-learning era.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Transformers and LayerNorm</div>
+        <p>Every transformer block ends with a LayerNorm. GPT, BERT, Gemini — all of them. Without it the residual stream drifts and training stalls within a few hundred steps.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">A/B-testing for deep learning</div>
+        <p>"Adding dropout p=0.1 helped on this task" / "BN actually hurt on this task" are still routine empirical findings. Both tools require tuning and can backfire — they're not free.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="ml-further">
+    <div class="ml-section-rule"><span class="kicker">Further reading</span></div>
+    <ul class="ml-further-list">
+      <li>
+        <span class="title"><a href="https://jmlr.org/papers/v15/srivastava14a.html" target="_blank" rel="noopener">Dropout: A Simple Way to Prevent Overfitting</a></span>
+        <span class="kind">paper</span>
+        <span class="by">Srivastava et al. (2014) · The original dropout paper. Ten thousand citations later, still required reading.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://arxiv.org/abs/1502.03167" target="_blank" rel="noopener">Batch Normalization</a></span>
+        <span class="kind">paper</span>
+        <span class="by">Ioffe &amp; Szegedy (2015) · The paper that introduced BatchNorm. Mostly an empirical result; the theoretical "why does it work" debate continues.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://arxiv.org/abs/1805.11604" target="_blank" rel="noopener">How Does Batch Normalization Help Optimization?</a></span>
+        <span class="kind">paper</span>
+        <span class="by">Santurkar et al. (2018) · The follow-up that argued BN's real benefit is loss-landscape smoothing, not the originally-proposed "internal covariate shift" reduction.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://arxiv.org/abs/1607.06450" target="_blank" rel="noopener">Layer Normalization</a></span>
+        <span class="kind">paper</span>
+        <span class="by">Ba, Kiros, Hinton (2016) · The variant that won out in transformers. Sample-wise normalization instead of batch-wise.</span>
+      </li>
+    </ul>
+  </section>
+
+  <footer class="ml-foot">
+    <div class="line"><a href="index.html">← all entries</a> · <a href="lstms.html">XVIII. LSTMs</a></div>
+    <div class="line eq">x ← (x − μ) / σ</div>
+    <div class="line"><a href="autoencoders.html">XX. Autoencoders →</a></div>
+  </footer>
+</main>
+
+<script src="shared.js"></script>
+<script src="regularization.js"></script>
+</body>
+</html>

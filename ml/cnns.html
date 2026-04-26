@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Convolutional Networks · ML, Visualized · Joseph Thomas</title>
+  <meta name="description" content="Slide a small kernel over an image. Edges, textures, parts — features compose themselves." />
+  <link rel="canonical" href="https://jthomas.site/ml/cnns.html" />
+  <meta name="theme-color" content="#7a1f24" />
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;1,8..60,300;1,8..60,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body>
+<header class="nb-nav">
+  <div class="brand-block">
+    <a class="brand" href="../index.html">jthomas.site</a><span class="brand-meta">// notebook · v.4.2026</span>
+  </div>
+  <nav>
+    <a href="../blog/index.html">writing</a>
+    <a href="index.html" style="color:var(--ink)">tutorial</a>
+    <a href="../index.html#research">research</a>
+    <a href="../index.html#work">work</a>
+    <a href="../index.html#projects">projects</a>
+    <a href="../consulting.html">consulting</a>
+    <a href="../index.html#contact" class="contact">→ contact</a>
+  </nav>
+</header>
+
+<main class="ml-page-shell">
+  <header class="ml-mast">
+    <div class="kicker">Machine Learning, Visualized · Vol. XV</div>
+    <h1>Convolutional<br /><em>Networks</em></h1>
+    <p class="dek">Slide a small kernel over an image and a single feature map appears. Stack feature maps, downsample, repeat — and the network discovers edges, textures, parts, then objects.</p>
+  </header>
+
+  <section class="ml-intro">
+    <div class="ml-intro-grid">
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">The concept</div>
+        <p class="lead">A <span class="term">convolution</span> is a small weight matrix (a <em>kernel</em>) that slides across the image, computing a weighted sum at every position.</p>
+        <p>The same kernel is applied everywhere — that's the key insight. A 3×3 horizontal-edge detector trained on the top-left of an image works equally well at the bottom-right. <em>Translation invariance</em> falls out of the architecture, not the training data.</p>
+        <p>Stack convolutions, intersperse with ReLU and pooling, and the network discovers a hierarchy: pixel-level edges → textures → object parts → whole objects. Every layer's filters are <em>learned</em>, not hand-coded.</p>
+      </div>
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">Why ML cares</div>
+        <p>From AlexNet (2012) through ResNet, EfficientNet, and ConvNeXt, CNNs dominated computer vision for over a decade. Today's vision-transformer alternatives are competitive only at scale — and even then, "ConvNeXt v2" with vanilla convolutions stays surprisingly close.</p>
+        <p>Beyond images, the same idea — a small filter sliding over a structured input — powers speech models (1D conv on audio), graph nets, and even tokenizers in some LLMs. Wherever the data has local structure, convolutions exploit it for free.</p>
+      </div>
+    </div>
+    <div class="ml-try">
+      <div class="ml-eyebrow accent">Try this</div>
+      <ol>
+        <li>Pick the <em>face</em> input and the <em>vertical edges</em> filter. The output highlights the eyes and mouth — vertical transitions between dark and light.</li>
+        <li>Switch to <em>blur</em>. The image goes soft. Try <em>sharpen</em> on the same input — edges pop. These are the same operations Photoshop's filters apply.</li>
+        <li>Compare <em>edge_h</em> on the <em>cross</em> vs <em>diag</em> images. A purely horizontal-edge kernel barely fires on a diagonal — the filter is direction-selective.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="ml-stage">
+    <aside class="left-rail">
+      <div class="ml-rail-label">Input image</div>
+      <div class="ml-presets" id="images"></div>
+
+      <div class="ml-rail-label" style="margin-top: 24px">Filter (kernel)</div>
+      <div class="ml-presets" id="filters"></div>
+      <div class="ml-preset-blurb" id="filter-blurb" style="margin-top: 14px"></div>
+
+      <div class="ml-rail-label" style="margin-top: 24px">Kernel weights</div>
+      <div id="kernel-grid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:4px; max-width:140px; font-family:var(--mono); font-size:12px"></div>
+    </aside>
+
+    <div class="ml-canvas-wrap">
+      <div class="ml-canvas-frame" style="aspect-ratio: 2.4 / 1; padding: 20px">
+        <canvas id="canvas"></canvas>
+      </div>
+      <div class="ml-caption">
+        <span class="ml-cap-num">·</span>
+        Left: input image. Middle: result of one convolution + ReLU (negative values clipped to 0). Right: 2×2 max-pool, halving the spatial resolution. Each downstream layer in a real CNN takes the previous map's output as <em>its</em> input.
+      </div>
+    </div>
+
+    <aside class="right-rail">
+      <div class="ml-margin">
+        <div class="ml-margin-rule"></div>
+        <div class="ml-margin-h">Why convolution</div>
+        <p>Reusing one kernel across the whole image cuts parameters by orders of magnitude vs a fully-connected layer — and bakes in <em>translation equivariance</em>: shift the input, the output shifts the same way.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Pooling</div>
+        <p class="quiet">Max-pool throws away exact positions and keeps the strongest activation in each 2×2 window. After several layers, a single output unit "sees" a large region of the original image — its <em>receptive field</em>.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Hierarchy</div>
+        <p class="quiet">Layer 1 learns edge detectors (like the ones above). Layer 5 learns part detectors (eyes, wheels). Layer 12 learns whole-object detectors. The hierarchy emerges from the data — nobody specifies it.</p>
+      </div>
+    </aside>
+  </section>
+
+  <section class="ml-applications">
+    <div class="ml-section-rule">
+      <span class="kicker">Where you've seen this</span>
+      <span class="meta">04 examples</span>
+    </div>
+    <div class="ml-app-grid">
+      <div class="ml-app">
+        <div class="ml-app-h">AlexNet, 2012</div>
+        <p>The model that beat ImageNet by 10 percentage points and convinced the field that deep learning was the future. Eight layers, ReLU, dropout, two GPUs — primitive by today's standards but a step-function in performance.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Phone cameras and Photos</div>
+        <p>Every "scene mode," "portrait blur," and face-finding box on your phone is a convolutional network. So is the auto-tagging in Apple Photos, Google Photos, and every album-cleanup app.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Medical imaging</div>
+        <p>CNNs detect tumors in mammograms, classify diabetic retinopathy from retinal scans, and segment organs in CT volumes. Often matching or exceeding specialist radiologists on benchmark tasks.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Self-driving perception</div>
+        <p>Lane detection, sign reading, pedestrian segmentation, depth estimation from camera feeds — all CNNs. Tesla's Autopilot stack famously runs a thicket of them.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="ml-further">
+    <div class="ml-section-rule">
+      <span class="kicker">Further reading</span>
+    </div>
+    <ul class="ml-further-list">
+      <li>
+        <span class="title"><a href="https://cs231n.github.io/convolutional-networks/" target="_blank" rel="noopener">CS231n — Convolutional Neural Networks</a></span>
+        <span class="kind">course notes</span>
+        <span class="by">Karpathy/Li · The reference notes for understanding CNNs end-to-end. Covers the math, the architectural choices, and the practical tricks.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://distill.pub/2017/feature-visualization/" target="_blank" rel="noopener">Feature Visualization</a></span>
+        <span class="kind">interactive essay</span>
+        <span class="by">Olah, Mordvintsev, Schubert (Distill) · What the filters in a trained CNN actually look at, layer by layer. The clearest visual evidence of the hierarchy described above.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://arxiv.org/abs/1512.03385" target="_blank" rel="noopener">Deep Residual Learning for Image Recognition</a></span>
+        <span class="kind">paper</span>
+        <span class="by">He et al. (2016) · ResNet. The skip-connection idea that made networks of 100+ layers trainable. Won ImageNet 2015 by a large margin.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://arxiv.org/abs/2201.03545" target="_blank" rel="noopener">A ConvNet for the 2020s</a></span>
+        <span class="kind">paper</span>
+        <span class="by">Liu et al. (2022) · ConvNeXt. The paper that showed pure CNNs (when modernized) can still match transformers on vision benchmarks. The conv idea isn't dead — it's just stylish.</span>
+      </li>
+    </ul>
+  </section>
+
+  <footer class="ml-foot">
+    <div class="line"><a href="index.html">← all entries</a> · <a href="mlp.html">XIV. MLP</a></div>
+    <div class="line eq">conv · ReLU · pool</div>
+    <div class="line"><a href="image-classifier.html">XVI. Classifier →</a></div>
+  </footer>
+</main>
+
+<script src="shared.js"></script>
+<script src="cnns.js"></script>
+</body>
+</html>

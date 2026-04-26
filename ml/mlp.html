@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Build a Network · ML, Visualized · Joseph Thomas</title>
+  <meta name="description" content="Stack layers, pick activations, watch a multi-layer perceptron carve up the plane in real time." />
+  <link rel="canonical" href="https://jthomas.site/ml/mlp.html" />
+  <meta name="theme-color" content="#7a1f24" />
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="The MLP Builder · ML, Visualized" />
+  <meta property="og:url" content="https://jthomas.site/ml/mlp.html" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;1,8..60,300;1,8..60,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body>
+
+<header class="nb-nav">
+  <div class="brand-block">
+    <a class="brand" href="../index.html">jthomas.site</a><span class="brand-meta">// notebook · v.4.2026</span>
+  </div>
+  <nav>
+    <a href="../blog/index.html">writing</a>
+    <a href="index.html" style="color:var(--ink)">tutorial</a>
+    <a href="../index.html#research">research</a>
+    <a href="../index.html#work">work</a>
+    <a href="../index.html#projects">projects</a>
+    <a href="../consulting.html">consulting</a>
+    <a href="../index.html#contact" class="contact">→ contact</a>
+  </nav>
+</header>
+
+<main class="ml-page-shell">
+
+  <header class="ml-mast">
+    <div class="kicker">Machine Learning, Visualized · Vol. XIV</div>
+    <h1>Build a<br /><em>Network</em></h1>
+    <p class="dek">Stack layers, pick a nonlinearity, point it at a dataset, and press play. The decision boundary forms in real time as the network learns.</p>
+  </header>
+
+  <section class="ml-intro">
+    <div class="ml-intro-grid">
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">The concept</div>
+        <p class="lead">A <span class="term">multi-layer perceptron</span> (MLP) is a stack of linear layers separated by nonlinearities. Add depth and width, and it becomes a universal function approximator.</p>
+        <p>Each hidden layer takes the previous activations, applies a weight matrix and bias, and bends the result through an activation function. Chain enough of these together and any continuous decision boundary becomes expressible.</p>
+        <p>The interesting question is no longer "can it fit this?" — almost always yes — but "how few neurons and layers does it take to fit it cleanly?" Watching a small network learn a hard pattern is the fastest way to develop intuition for that.</p>
+      </div>
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">Why ML cares</div>
+        <p>The MLP is the simplest deep network and the workhorse for tabular data — risk scoring, click-through prediction, recommender re-ranking. It's also the backbone of every transformer's feed-forward block, every autoencoder's encoder/decoder, every diffusion model's denoiser.</p>
+        <p>The universal approximation theorem (Cybenko 1989, Hornik 1991) proved that one hidden layer with enough neurons can approximate any continuous function. Modern practice uses <em>deeper, narrower</em> networks because depth makes the function easier to learn from limited data — even though shallow alternatives exist in principle.</p>
+      </div>
+    </div>
+    <div class="ml-try">
+      <div class="ml-eyebrow accent">Try this</div>
+      <ol>
+        <li>Pick the <em>spiral</em> dataset and start with one layer of 1 neuron. It can't curve enough — accuracy plateaus around chance. Add a layer; bump neurons; watch the boundary spiral.</li>
+        <li>Switch activation to <em>ReLU</em> on the spiral. Notice the boundary becomes piecewise-linear — sharp angular regions instead of smooth curves. That's the kink in ReLU showing through.</li>
+        <li>Try <em>XOR</em> with two hidden layers of 4 neurons. Watch the boundary fold itself into a clean cross in just a few seconds — the canonical "deep beats shallow" example.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="ml-stage">
+
+    <aside class="left-rail">
+      <div class="ml-rail-label">Dataset</div>
+      <div class="ml-presets" id="datasets"></div>
+
+      <div class="ml-rail-label" style="margin-top: 24px">Architecture</div>
+      <div id="arch-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); margin-bottom:8px"></div>
+      <div id="layer-sliders"></div>
+      <div style="display:flex; gap:8px; margin-top:8px">
+        <button id="add-layer" class="ml-sbtn ghost" style="flex:1; padding:6px 10px; font-family:var(--serif); font-style:italic; font-size:13px">+ layer</button>
+        <button id="remove-layer" class="ml-sbtn ghost" style="flex:1; padding:6px 10px; font-family:var(--serif); font-style:italic; font-size:13px">− layer</button>
+      </div>
+
+      <div class="ml-rail-label" style="margin-top: 20px">Activation</div>
+      <div class="ml-presets" id="activations"></div>
+
+      <div class="ml-rail-label" style="margin-top: 20px">Learning rate</div>
+      <input id="lr-slider" type="range" min="0.005" max="0.3" step="0.005" value="0.05" style="width:100%; accent-color:var(--accent)" />
+      <div id="lr-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">η = 0.050</div>
+
+      <div style="display:flex; gap:8px; margin-top: 18px">
+        <button id="train-btn" class="ml-sbtn" style="flex:1; padding:10px 14px; font-family:var(--serif); font-style:italic; font-size:14px">▷ Train</button>
+        <button id="reset-btn" class="ml-sbtn ghost" style="padding:10px 14px; font-family:var(--serif); font-style:italic; font-size:13px">↻</button>
+      </div>
+
+      <div class="ml-readout" id="readout" style="margin-top: 18px"></div>
+    </aside>
+
+    <div class="ml-canvas-wrap">
+      <div class="ml-canvas-frame">
+        <canvas id="canvas"></canvas>
+      </div>
+      <div class="ml-caption">
+        <span class="ml-cap-num">·</span>
+        The shaded heatmap is the network's confidence over the input plane. <span class="ml-ink-orange">Accent</span> means class 1, ink means class 0; intensity is the network's confidence.
+      </div>
+
+      <section style="margin-top: 32px; width: 100%">
+        <div style="font-family:var(--mono); font-size:11px; letter-spacing:0.22em; text-transform:uppercase; color:var(--ml-ink-fade); text-align:center; margin-bottom: 14px">
+          Network anatomy
+        </div>
+        <canvas id="net-canvas" style="width:100%; height:200px; display:block; background: var(--paper); border: 1px solid var(--rule)"></canvas>
+      </section>
+    </div>
+
+    <aside class="right-rail">
+      <div class="ml-margin">
+        <div class="ml-margin-rule"></div>
+        <div class="ml-margin-h">A universal approximator</div>
+        <p>One hidden layer with enough neurons can approximate any continuous function (Cybenko, 1989). In practice we use <em>many</em> layers with <em>fewer</em> neurons each — depth wins over width.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Try this</div>
+        <p class="quiet">→ One hidden layer of 1 neuron on the spiral. Fails — too few parameters to bend the boundary.</p>
+        <p class="quiet">→ Two layers of 6+ on XOR. Watch the boundary curve into a clean cross.</p>
+        <p class="quiet">→ ReLU on spiral. Sharp angular regions instead of smooth curves — that's the kink in the activation showing through.</p>
+      </div>
+    </aside>
+
+  </section>
+
+  <section class="ml-applications">
+    <div class="ml-section-rule">
+      <span class="kicker">Where you've seen this</span>
+      <span class="meta">04 examples</span>
+    </div>
+    <div class="ml-app-grid">
+      <div class="ml-app">
+        <div class="ml-app-h">Tabular ML in production</div>
+        <p>Credit risk, click-through prediction, propensity models — wherever the data is rows in a database, an MLP (or its gradient-boosted-tree cousin) is the workhorse model. Often beats more elaborate architectures on this regime.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Inside every transformer</div>
+        <p>Each transformer layer alternates self-attention with a 2-layer MLP (often called the FFN). Most of GPT and Gemini's parameters live in those MLPs — they do the heavy lifting of feature transformation.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Encoders, decoders, denoisers</div>
+        <p>Autoencoders, VAEs, and diffusion-model U-Nets all stack MLPs (or their convolutional variants) in encoder/decoder pairs. Same recipe, different scaffolding.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Physics &amp; scientific ML</div>
+        <p>Surrogate models for fluid dynamics, weather forecasting, and protein folding all use MLPs to approximate expensive simulators. AlphaFold's MSA features ride on top of MLP transformations.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="ml-further">
+    <div class="ml-section-rule">
+      <span class="kicker">Further reading</span>
+    </div>
+    <ul class="ml-further-list">
+      <li>
+        <span class="title"><a href="https://playground.tensorflow.org/" target="_blank" rel="noopener">TensorFlow Playground</a></span>
+        <span class="kind">interactive</span>
+        <span class="by">Smilkov et al. · The most polished version of the toy above. Same datasets, more architectural knobs, configurable feature crossings.</span>
+      </li>
+      <li>
+        <span class="title"><a href="http://neuralnetworksanddeeplearning.com/chap4.html" target="_blank" rel="noopener">A visual proof that neural nets can compute any function</a></span>
+        <span class="kind">free book</span>
+        <span class="by">Michael Nielsen · A patient construction showing how a single hidden layer can carve any shape, building up from a single sigmoid step. The clearest universal-approximation argument.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://arxiv.org/abs/1412.6614" target="_blank" rel="noopener">In Search of the Real Inductive Bias</a></span>
+        <span class="kind">paper</span>
+        <span class="by">Neyshabur, Tomioka, Srebro (2015) · Why depth wins over width — the implicit regularization that makes deeper networks generalize better than universal approximation alone would predict.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://www.deeplearningbook.org/contents/mlp.html" target="_blank" rel="noopener">Deep Learning · Chapter 6</a></span>
+        <span class="kind">textbook</span>
+        <span class="by">Goodfellow, Bengio, Courville · The textbook chapter on feedforward networks. The bridge between forward propagation and the architectures coming next in this series.</span>
+      </li>
+    </ul>
+  </section>
+
+  <footer class="ml-foot">
+    <div class="line"><a href="index.html">← all entries</a> · <a href="optimizers.html">XIII. Optimizers</a></div>
+    <div class="line eq">2 → h → 1</div>
+    <div class="line"><a href="cnns.html">XV. CNNs →</a></div>
+  </footer>
+
+</main>
+
+<script src="shared.js"></script>
+<script src="mlp.js"></script>
+
+</body>
+</html>

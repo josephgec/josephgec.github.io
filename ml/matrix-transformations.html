@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Matrix Transformations · ML, Visualized · Joseph Thomas</title>
+  <meta name="description" content="A 2×2 matrix is a recipe for reshaping the plane. An interactive visualization of basis vectors, determinants, and linear transformations." />
+  <link rel="canonical" href="https://jthomas.site/ml/matrix-transformations.html" />
+  <meta name="theme-color" content="#7a1f24" />
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Matrix Transformations · ML, Visualized" />
+  <meta property="og:description" content="A 2×2 matrix is a recipe for reshaping the plane. Two arrows tell you everything." />
+  <meta property="og:url" content="https://jthomas.site/ml/matrix-transformations.html" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;1,8..60,300;1,8..60,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body>
+
+<header class="nb-nav">
+  <div class="brand-block">
+    <a class="brand" href="../index.html">jthomas.site</a><span class="brand-meta">// notebook · v.4.2026</span>
+  </div>
+  <nav>
+    <a href="../blog/index.html">writing</a>
+    <a href="index.html" style="color:var(--ink)">tutorial</a>
+    <a href="../index.html#research">research</a>
+    <a href="../index.html#work">work</a>
+    <a href="../index.html#projects">projects</a>
+    <a href="../consulting.html">consulting</a>
+    <a href="../index.html#contact" class="contact">→ contact</a>
+  </nav>
+</header>
+
+<main class="ml-page-shell">
+
+  <header class="ml-mast">
+    <div class="kicker">Machine Learning, Visualized · Vol. I</div>
+    <h1>Matrix<br /><em>Transformations</em></h1>
+    <p class="dek">A 2×2 matrix is a recipe for reshaping the plane. Set its four numbers and watch the grid bend, stretch, twist, or fold — each motion the visible signature of a single matrix.</p>
+  </header>
+
+  <section class="ml-intro">
+    <div class="ml-intro-grid">
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">The concept</div>
+        <p class="lead">A matrix is a rule for moving every point in the plane to a new location.</p>
+        <p>The trick: you only need to know where two arrows go. <span class="term">î</span> is the unit arrow pointing right; <span class="term">ĵ</span> points up. If you know where these two land, every other point follows by simply adding scaled copies of those two destinations. The matrix's two columns are <em>literally</em> those destinations.</p>
+        <p>So <span class="term">det(A)</span> — the determinant — is just the area of the parallelogram those two arrows make. It tells you how much the transformation stretches or shrinks area, and a negative value means the orientation flipped.</p>
+      </div>
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">Why ML cares</div>
+        <p>Every layer of a neural network is, at its core, a matrix multiplication followed by a nonlinearity. Understanding what a matrix does to space — bend it, rotate it, collapse it — is the foundation for understanding what neural networks do to data.</p>
+        <p>Convolutions, embeddings, attention scores, even gradient steps: they are all matrices acting on vectors. Build the geometric intuition here and the rest of the curriculum gets dramatically easier.</p>
+      </div>
+    </div>
+    <div class="ml-try">
+      <div class="ml-eyebrow accent">Try this</div>
+      <ol>
+        <li>Drag the bottom-right number — see how the <em>ĵ</em> arrow stretches vertically.</li>
+        <li>Click <em>Singular</em> in the presets — det collapses to 0 and the whole plane folds onto a line.</li>
+        <li>Click <em>Reflect y</em>, then pick the <em>Letter F</em> shape — it lands mirror-image because det = −1.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="ml-stage">
+
+    <aside class="left-rail">
+      <div class="ml-rail-label">The matrix</div>
+      <div id="matrix"></div>
+      <div class="ml-hint">drag a number to scrub · click to type</div>
+
+      <div class="ml-readout" id="readout">
+        <div class="row"><span>tr(A)</span><b data-k="tr">—</b></div>
+        <div class="row"><span>det(A)</span><b data-k="det">—</b></div>
+        <div class="row"><span>î ↦</span><b data-k="iHat">—</b></div>
+        <div class="row"><span>ĵ ↦</span><b data-k="jHat">—</b></div>
+      </div>
+
+      <div class="ml-rail-label" style="margin-top: 28px">Presets</div>
+      <div class="ml-presets" id="presets"></div>
+      <div class="ml-preset-blurb" id="preset-blurb"></div>
+    </aside>
+
+    <div class="ml-canvas-wrap">
+      <div class="ml-mode-tabs" id="shape-tabs"></div>
+      <div class="ml-canvas-frame">
+        <canvas id="canvas"></canvas>
+      </div>
+      <div class="ml-caption">
+        <span class="ml-cap-num">·</span>
+        Watch the dashed unit square become the filled parallelogram. Its corners are
+        <span class="ml-ink">î′</span> and <span class="ml-ink-orange">ĵ′</span> — the destinations of
+        the unit basis vectors, which are <em>literally the two columns of the matrix</em>. The parallelogram's
+        area is |det(A)|, the factor by which the matrix scales every region in the plane.
+      </div>
+      <div class="ml-iter">
+        <button id="replay">Replay</button>
+        <input id="t-slider" type="range" min="0" max="1" step="0.01" value="1" />
+        <span class="step" id="t-label">t = 1.00</span>
+      </div>
+    </div>
+
+    <aside class="right-rail">
+      <div class="ml-margin">
+        <div class="ml-margin-rule"></div>
+        <div class="ml-margin-h">In the margin</div>
+        <p>Where do the basis vectors go?</p>
+        <div class="ml-equation">A = [ î′ &nbsp; ĵ′ ]</div>
+        <p>The first column of A says where the unit x-vector lands. The second column says where the unit y-vector lands. Every other vector follows from these two by linearity.</p>
+        <p class="quiet"><em>det(A)</em> measures how much the unit square's area changes. Negative determinant means the orientation flips — the letter F lands mirror-image.</p>
+
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Linearity</div>
+        <p class="quiet">A(u + v) = Au + Av. A(c·v) = c·Av. Straight lines stay straight; the origin stays put. Everything else is fair game.</p>
+
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Up next</div>
+        <p class="quiet">When you find directions a transform <em>doesn't</em> rotate, you've found its eigenvectors.</p>
+      </div>
+    </aside>
+
+  </section>
+
+  <section class="ml-applications">
+    <div class="ml-section-rule">
+      <span class="kicker">Where you've seen this</span>
+      <span class="meta">04 examples</span>
+    </div>
+    <div class="ml-app-grid">
+      <div class="ml-app">
+        <div class="ml-app-h">CSS transforms in your browser</div>
+        <p>Every <span class="term">transform: rotate(45deg) scale(1.5)</span> on a webpage compiles into a 2×2 (or 3×3) matrix that the browser multiplies against every pixel of the element. The same matrix you've been dragging is what makes Instagram's photo flips and your phone's Auto-rotate happen.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Game engines and 3D graphics</div>
+        <p>Each frame of an animation moves characters by chaining matrices through their bones — a walking robot's joints, a cloth simulation, the camera's view. Unity, Unreal, and Blender are matrix-multiplication factories, doing this 60 times a second.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Robot arms and self-driving cars</div>
+        <p>A six-jointed robot arm has six matrices chained together; when the controller wants to point the gripper at a coffee cup, it solves for which entries achieve that pose. Self-driving cars do the same with LIDAR points, transforming sensor coordinates into the world frame.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Aligning medical scans</div>
+        <p>When a radiologist compares an MRI from January with one from July, software finds a 2D or 3D matrix that <em>registers</em> them — rotating, scaling, and shearing one image onto the other. Tumor growth measurements depend on getting that registration matrix right.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="ml-further">
+    <div class="ml-section-rule">
+      <span class="kicker">Further reading</span>
+    </div>
+    <ul class="ml-further-list">
+      <li>
+        <span class="title"><a href="https://www.3blue1brown.com/topics/linear-algebra" target="_blank" rel="noopener">3Blue1Brown — Essence of Linear Algebra</a></span>
+        <span class="kind">video series</span>
+        <span class="by">Grant Sanderson · Chapter 3 covers linear transformations exactly the way the canvas above does, and is the single best 10-minute introduction to the subject.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/" target="_blank" rel="noopener">MIT 18.06 — Linear Algebra</a></span>
+        <span class="kind">lecture course</span>
+        <span class="by">Gilbert Strang · The canonical undergraduate course. Free on OCW, with full video lectures and problem sets.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://developer.mozilla.org/en-US/docs/Web/CSS/transform-function/matrix" target="_blank" rel="noopener">MDN — CSS <em>matrix()</em> transform function</a></span>
+        <span class="kind">reference</span>
+        <span class="by">The same six-number matrix that drives every CSS transform. Type one in the dev tools and watch this page's rotations apply to a real DOM element.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://immersivemath.com/ila/index.html" target="_blank" rel="noopener">Immersive Linear Algebra</a></span>
+        <span class="kind">interactive book</span>
+        <span class="by">Ström, Åström, Akenine-Möller · Free online textbook with 3D figures you can drag around — heavy on geometric intuition.</span>
+      </li>
+    </ul>
+  </section>
+
+  <footer class="ml-foot">
+    <div class="line"><a href="index.html">← all entries</a></div>
+    <div class="line eq">v ↦ Av</div>
+    <div class="line"><a href="eigenvectors.html">II. Eigenvalues &amp; Eigenvectors →</a></div>
+  </footer>
+
+</main>
+
+<script src="shared.js"></script>
+<script src="matrix-transformations.js"></script>
+
+</body>
+</html>

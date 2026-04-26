@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>A Field Guide to Activations · ML, Visualized · Joseph Thomas</title>
+  <meta name="description" content="Sigmoid, tanh, ReLU, Leaky ReLU, GELU. The bend that makes a stack of layers more than one matrix." />
+  <link rel="canonical" href="https://jthomas.site/ml/activations.html" />
+  <meta name="theme-color" content="#7a1f24" />
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="A Field Guide to Activations · ML, Visualized" />
+  <meta property="og:description" content="The five activation functions every ML practitioner should be able to draw." />
+  <meta property="og:url" content="https://jthomas.site/ml/activations.html" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;1,8..60,300;1,8..60,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="shared.css" />
+
+  <style>
+    .ml-act-checks {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+    .ml-act-checks label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      padding: 4px 0;
+      font-family: var(--serif);
+      font-size: 16px;
+      color: var(--ml-ink-soft);
+    }
+    .ml-act-checks label .swatch {
+      width: 12px; height: 12px;
+      display: inline-block;
+    }
+    .ml-act-toggle-deriv {
+      width: 100%;
+      padding: 10px 14px;
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 14px;
+      cursor: pointer;
+      border: 1px solid var(--ml-rule);
+    }
+    .ml-act-mini-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 24px;
+      max-width: 1080px;
+      margin: 64px auto 0;
+      padding: 36px 8px 0;
+      border-top: 1px solid var(--ml-rule);
+    }
+    .ml-act-mini-grid .mini {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .ml-act-mini-grid .mini canvas {
+      width: 180px; height: 120px;
+      max-width: 100%;
+    }
+    .ml-act-mini-grid .mini .name {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 15px;
+    }
+    .ml-act-mini-grid .mini .range {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--ml-ink-fade);
+    }
+    @media (max-width: 760px) {
+      .ml-act-mini-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<header class="nb-nav">
+  <div class="brand-block">
+    <a class="brand" href="../index.html">jthomas.site</a><span class="brand-meta">// notebook · v.4.2026</span>
+  </div>
+  <nav>
+    <a href="../blog/index.html">writing</a>
+    <a href="index.html" style="color:var(--ink)">tutorial</a>
+    <a href="../index.html#research">research</a>
+    <a href="../index.html#work">work</a>
+    <a href="../index.html#projects">projects</a>
+    <a href="../consulting.html">consulting</a>
+    <a href="../index.html#contact" class="contact">→ contact</a>
+  </nav>
+</header>
+
+<main class="ml-page-shell">
+
+  <header class="ml-mast">
+    <div class="kicker">Machine Learning, Visualized · Vol. IX</div>
+    <h1>A Field Guide to<br /><em>Activations</em></h1>
+    <p class="dek">A neural network is a stack of linear layers. Without nonlinearity between them, the whole thing collapses to a single matrix. The activation is what gives a network its bend.</p>
+  </header>
+
+  <section class="ml-intro">
+    <div class="ml-intro-grid">
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">The concept</div>
+        <p class="lead">An <span class="term">activation function</span> is the nonlinear bend applied to each neuron's output — without it, a deep network is no more powerful than a single matrix.</p>
+        <p>The math is brutal: chain N matrix multiplications and you still have one matrix multiplication (call it M = M_N · M_{N-1} · … · M_1). Insert a nonlinear function between layers and that simplification is no longer possible — the network can now express curves, decision boundaries, and shapes that no single linear map can.</p>
+        <p>Five workhorses dominate the literature: <em>sigmoid</em>, <em>tanh</em>, <em>ReLU</em>, <em>leaky ReLU</em>, and <em>GELU</em>. Each is a different choice about how steeply to bend, where to bend, and what happens on the negative side.</p>
+      </div>
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">Why ML cares</div>
+        <p>The choice of activation has decided whole eras of deep learning. The 1980s ran on sigmoid and stalled — gradients vanished as networks deepened. The 2012 AlexNet revolution was, in part, a switch to ReLU. The transformer era (GPT, BERT, Gemini) runs on GELU and SwiGLU.</p>
+        <p>The derivative matters as much as the function itself. Where the derivative goes flat, gradients during backprop go to zero — and learning stops. Sigmoid's flat tails are why you don't see it in modern deep networks.</p>
+      </div>
+    </div>
+    <div class="ml-try">
+      <div class="ml-eyebrow accent">Try this</div>
+      <ol>
+        <li>Toggle <em>Show derivatives</em>. Look at sigmoid's: it's a tiny bump that vanishes outside roughly (−4, 4). That's the vanishing gradient problem.</li>
+        <li>Compare <em>ReLU</em> and <em>leaky ReLU</em> derivatives. The leaky version keeps a tiny slope on the negative side — preventing "dead neurons" whose gradient is permanently zero.</li>
+        <li>Hover the chart at <em>x = 1</em>. ReLU and leaky agree; sigmoid is at ~0.73; GELU is between identity and ReLU. Each makes a different commitment about how to handle "moderately positive" signals.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="ml-stage">
+
+    <aside class="left-rail">
+      <div class="ml-rail-label">Compare</div>
+      <div class="ml-act-checks" id="checks"></div>
+
+      <button id="toggle-deriv" class="ml-act-toggle-deriv">Show derivatives</button>
+
+      <div class="ml-rail-label" style="margin-top: 24px">Focus</div>
+      <div class="ml-presets" id="focus"></div>
+    </aside>
+
+    <div class="ml-canvas-wrap">
+      <div class="ml-canvas-frame" style="aspect-ratio: 1.4 / 1">
+        <canvas id="canvas"></canvas>
+      </div>
+      <div class="ml-caption" id="caption"></div>
+    </div>
+
+    <aside class="right-rail">
+      <div class="ml-margin" id="margin"></div>
+    </aside>
+
+  </section>
+
+  <section class="ml-act-mini-grid" id="mini-grid"></section>
+
+  <section class="ml-applications">
+    <div class="ml-section-rule">
+      <span class="kicker">Where you've seen this</span>
+      <span class="meta">04 examples</span>
+    </div>
+    <div class="ml-app-grid">
+      <div class="ml-app">
+        <div class="ml-app-h">AlexNet, 2012 — the ReLU moment</div>
+        <p>The ImageNet winner that kicked off the deep-learning era used ReLU instead of tanh in its hidden layers. The paper attributes much of the speedup — and much of the depth that became practical — to that single change.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">GELU in transformers</div>
+        <p>BERT, GPT-2/3/4, and most modern LLMs use GELU between attention layers. Its smoothness and slight negative-side curvature seems to help with the optimization landscape — though "why exactly" remains an open question.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Sigmoid in binary classifiers</div>
+        <p>The output layer of any binary classifier — fraud detector, click-through model, medical risk score — is a sigmoid. It maps any real number to a probability in (0, 1). Hidden layers moved on; output layers didn't.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Tanh in old-school RNNs</div>
+        <p>LSTMs and vanilla RNNs used tanh on the hidden state because zero-centered outputs kept the recurrence stable. Now mostly displaced by attention, but the underlying intuition — "bend, but symmetrically" — explains why.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="ml-further">
+    <div class="ml-section-rule">
+      <span class="kicker">Further reading</span>
+    </div>
+    <ul class="ml-further-list">
+      <li>
+        <span class="title"><a href="https://arxiv.org/abs/1606.08415" target="_blank" rel="noopener">Gaussian Error Linear Units (GELUs)</a></span>
+        <span class="kind">paper</span>
+        <span class="by">Hendrycks &amp; Gimpel (2016) · The paper that introduced the activation that powers most modern transformers. The probabilistic motivation is unusual and worth reading.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://proceedings.neurips.cc/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html" target="_blank" rel="noopener">ImageNet Classification with Deep CNNs</a></span>
+        <span class="kind">paper</span>
+        <span class="by">Krizhevsky, Sutskever, Hinton (2012) · AlexNet. The footnote "we used ReLUs" was small; the consequences were not.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://www.deeplearningbook.org/contents/mlp.html" target="_blank" rel="noopener">Deep Learning · §6.3 Hidden Units</a></span>
+        <span class="kind">textbook</span>
+        <span class="by">Goodfellow, Bengio, Courville · The chapter that systematically compares activation functions and their gradient behavior. Background reading for this whole page.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://www.youtube.com/watch?v=VMj-3S1tku0" target="_blank" rel="noopener">The spelled-out intro to neural networks and backpropagation</a></span>
+        <span class="kind">video</span>
+        <span class="by">Andrej Karpathy · A from-scratch build of a neural network in Python that makes activation choices and their gradient consequences visible at every step.</span>
+      </li>
+    </ul>
+  </section>
+
+  <footer class="ml-foot">
+    <div class="line"><a href="index.html">← all entries</a> · <a href="perceptron.html">VIII. Perceptron</a></div>
+    <div class="line eq">σ · tanh · ReLU · …</div>
+    <div class="line"><a href="forward.html">X. Forward Propagation →</a></div>
+  </footer>
+
+</main>
+
+<script src="shared.js"></script>
+<script src="activations.js"></script>
+
+</body>
+</html>

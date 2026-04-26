@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>What the model looks at · ML, Visualized · Joseph Thomas</title>
+  <meta name="description" content="A learned, soft, content-addressed lookup. The mechanism that ate machine learning." />
+  <link rel="canonical" href="https://jthomas.site/ml/attention.html" />
+  <meta name="theme-color" content="#7a1f24" />
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;1,8..60,300;1,8..60,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body>
+<header class="nb-nav">
+  <div class="brand-block"><a class="brand" href="../index.html">jthomas.site</a><span class="brand-meta">// notebook · v.4.2026</span></div>
+  <nav>
+    <a href="../blog/index.html">writing</a>
+    <a href="index.html" style="color:var(--ink)">tutorial</a>
+    <a href="../index.html#research">research</a>
+    <a href="../index.html#work">work</a>
+    <a href="../index.html#projects">projects</a>
+    <a href="../consulting.html">consulting</a>
+    <a href="../index.html#contact" class="contact">→ contact</a>
+  </nav>
+</header>
+
+<main class="ml-page-shell">
+  <header class="ml-mast">
+    <div class="kicker">Machine Learning, Visualized · Vol. XXIII</div>
+    <h1>What the<br /><em>model looks at</em></h1>
+    <p class="dek">A neural network reading "the bat hit the ball" needs to know that <em>bat</em> here means <em>baseball</em>, not the animal. Attention is the mechanism that lets each token gather context from the others — a learned, soft, content-addressed lookup.</p>
+  </header>
+
+  <section class="ml-intro">
+    <div class="ml-intro-grid">
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">The concept</div>
+        <p class="lead"><span class="term">Attention</span> lets each position in a sequence look at every other position and choose what to absorb.</p>
+        <p>Each token emits three vectors: a <em>query</em> (what am I looking for?), a <em>key</em> (what do I represent?), and a <em>value</em> (what would I contribute?). To compute attention for a query: take its dot product with every key, scale, softmax — that gives a weight per token. The output is the weighted sum of values.</p>
+        <p>Written in math: <em>Attention(Q, K, V) = softmax(QKᵀ / √d) V</em>. One operation. One equation. The mechanism that ate machine learning.</p>
+      </div>
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">Why ML cares</div>
+        <p>Self-attention is the engine of every transformer — and transformers are now the default architecture for language (GPT, Gemini, Claude), code (Copilot), images (ViT, DiT), audio (Whisper), proteins (AlphaFold), and even reinforcement-learning agents.</p>
+        <p>Before attention, sequence models had to compress an entire sentence into a single bottleneck vector. Attention lets every output position freely query the whole input — context is a database lookup, not a memory squeeze. That's why long documents finally became tractable.</p>
+      </div>
+    </div>
+    <div class="ml-try">
+      <div class="ml-eyebrow accent">Try this</div>
+      <ol>
+        <li>Click <em>bank</em> in "river bank flooded." The bars show <em>bank</em> attending strongly to <em>river</em> and <em>flooded</em> — context disambiguates word sense.</li>
+        <li>Try <em>bat</em> in "swung the bat and hit a homer." It attends to <em>swung</em>, <em>hit</em>, <em>homer</em> — all baseball. The model doesn't know baseball; it just learns which words tend to co-occur.</li>
+        <li>Click each word in turn. Watch how function words (<em>the</em>, <em>a</em>) attend almost uniformly, while content words have sharp distributions.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="ml-stage">
+    <aside class="left-rail">
+      <div class="ml-rail-label">Sentence</div>
+      <div class="ml-presets" id="sentences"></div>
+
+      <div class="ml-rail-label" style="margin-top: 24px">Query word</div>
+      <p style="font-family:var(--serif); font-style:italic; font-size:13px; color:var(--ml-ink-fade); line-height:1.5">Click any word in the sentence to make it the query. Bars show how strongly that word attends to each other word.</p>
+
+      <div class="ml-readout" id="readout" style="margin-top: 18px"></div>
+    </aside>
+
+    <div class="ml-canvas-wrap">
+      <div class="ml-canvas-frame" style="aspect-ratio: 1.4 / 1; padding: 36px 28px">
+        <canvas id="canvas"></canvas>
+      </div>
+      <div class="ml-caption">
+        <span class="ml-cap-num">·</span>
+        The query word "looks at" the others through learned similarity. Strong matches get high weights; weak matches fade. The query then gets re-described as a weighted blend of everything it attended to.
+      </div>
+    </div>
+
+    <aside class="right-rail">
+      <div class="ml-margin">
+        <div class="ml-margin-rule"></div>
+        <div class="ml-margin-h">A library, not a list</div>
+        <p>Old recurrent models read tokens one at a time and squeezed everything into a single hidden state. Attention lets each token reach back to <em>any</em> prior token, with weights determined by what the model is currently looking for.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Q, K, V</div>
+        <p class="quiet">Each token emits three vectors: a <em>query</em> (what am I looking for?), a <em>key</em> (what do I represent?), and a <em>value</em> (what do I contribute?). Match queries against keys, blend values.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">In practice</div>
+        <p class="quiet">Real attention learns these patterns from data — no hand-coded semantics. Different attention heads in a trained model end up specializing in syntax, coreference, position, and stranger things.</p>
+      </div>
+    </aside>
+  </section>
+
+  <section class="ml-applications">
+    <div class="ml-section-rule"><span class="kicker">Where you've seen this</span><span class="meta">04 examples</span></div>
+    <div class="ml-app-grid">
+      <div class="ml-app">
+        <div class="ml-app-h">Every LLM you've used</div>
+        <p>GPT-4, Claude, Gemini, Llama — every one is a stack of self-attention layers. The "context window" you read about (128k tokens, 1M tokens) is exactly how many tokens each query can attend to.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">AlphaFold's protein folding</div>
+        <p>AlphaFold 2 used attention over residue-pair embeddings to predict 3D structure from amino-acid sequences. The 2020 result was a Nobel-Prize-level achievement; attention was the architectural backbone.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Image generation (DiT)</div>
+        <p>Modern diffusion models like DALL·E 3 and Imagen use attention layers in their denoiser networks instead of the older U-Net convolutions. Same recipe; different domain.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Recommender systems</div>
+        <p>YouTube's recommendation model uses attention over your watch history to score new candidate videos. Same Q/K/V structure; just videos instead of tokens.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="ml-further">
+    <div class="ml-section-rule"><span class="kicker">Further reading</span></div>
+    <ul class="ml-further-list">
+      <li>
+        <span class="title"><a href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noopener">Attention Is All You Need</a></span>
+        <span class="kind">paper</span>
+        <span class="by">Vaswani et al. (2017) · The transformer paper. Six pages that reorganized AI for the next decade. Read it once even if you don't follow every detail.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://jalammar.github.io/illustrated-transformer/" target="_blank" rel="noopener">The Illustrated Transformer</a></span>
+        <span class="kind">essay</span>
+        <span class="by">Jay Alammar · The most-shared visual explanation of attention and transformers. The diagrams that taught a generation.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://transformer-circuits.pub/2021/framework/index.html" target="_blank" rel="noopener">A Mathematical Framework for Transformer Circuits</a></span>
+        <span class="kind">essay</span>
+        <span class="by">Anthropic Interpretability · The deep-mechanism view of attention: how QK and OV circuits implement specific behaviors. Required reading if you want to <em>understand</em> what attention learns.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://lilianweng.github.io/posts/2018-06-24-attention/" target="_blank" rel="noopener">Attention? Attention!</a></span>
+        <span class="kind">essay</span>
+        <span class="by">Lilian Weng · A historical and technical survey of attention variants. Covers everything from Bahdanau's 2014 RNN attention to modern multi-head transformer attention.</span>
+      </li>
+    </ul>
+  </section>
+
+  <footer class="ml-foot">
+    <div class="line"><a href="index.html">← all entries</a> · <a href="gans.html">XXII. GANs</a></div>
+    <div class="line eq">softmax(QKᵀ/√d)V</div>
+    <div class="line"><a href="transformers.html">XXIV. Transformers →</a></div>
+  </footer>
+</main>
+
+<script src="shared.js"></script>
+<script src="attention.js"></script>
+</body>
+</html>

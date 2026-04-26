@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Probability Distributions · ML, Visualized · Joseph Thomas</title>
+  <meta name="description" content="Gaussian, Bernoulli, Poisson and more — interactive probability distributions with parameter sliders and live sampling." />
+  <link rel="canonical" href="https://jthomas.site/ml/distributions.html" />
+  <meta name="theme-color" content="#7a1f24" />
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Probability Distributions · ML, Visualized" />
+  <meta property="og:description" content="Tweak parameters; sample; watch the histogram converge." />
+  <meta property="og:url" content="https://jthomas.site/ml/distributions.html" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;1,8..60,300;1,8..60,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body>
+
+<header class="nb-nav">
+  <div class="brand-block">
+    <a class="brand" href="../index.html">jthomas.site</a><span class="brand-meta">// notebook · v.4.2026</span>
+  </div>
+  <nav>
+    <a href="../blog/index.html">writing</a>
+    <a href="index.html" style="color:var(--ink)">tutorial</a>
+    <a href="../index.html#research">research</a>
+    <a href="../index.html#work">work</a>
+    <a href="../index.html#projects">projects</a>
+    <a href="../consulting.html">consulting</a>
+    <a href="../index.html#contact" class="contact">→ contact</a>
+  </nav>
+</header>
+
+<main class="ml-page-shell">
+
+  <header class="ml-mast">
+    <div class="kicker">Machine Learning, Visualized · Vol. VI</div>
+    <h1>Probability<br /><em>Distributions</em></h1>
+    <p class="dek">A distribution assigns probability to outcomes — heads or tails, photon arrivals, tomorrow's temperature. Tweak the parameters and watch the shape morph. Then sample from it and see the histogram converge.</p>
+  </header>
+
+  <section class="ml-intro">
+    <div class="ml-intro-grid">
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">The concept</div>
+        <p class="lead">A <span class="term">probability distribution</span> is a function that assigns a number — a probability — to each possible outcome of a random process.</p>
+        <p>For continuous outcomes (height, temperature) it's a <em>density</em> — a curve <em>f(x)</em> whose area under each interval is the chance the value falls there. For discrete outcomes (coin flip, count) it's a <em>mass function</em> — a number <em>P(k)</em> for each outcome that sums to 1.</p>
+        <p>Most distributions are described by one or two parameters. The Gaussian's mean and standard deviation; the Bernoulli's success probability <em>p</em>; the Poisson's rate <em>λ</em>. Change the parameters and the curve breathes.</p>
+      </div>
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">Why ML cares</div>
+        <p>Every probabilistic model in machine learning is, under the hood, a parametrized distribution that the algorithm fits to data. Linear regression assumes Gaussian noise. Logistic regression outputs a Bernoulli. Variational autoencoders decode samples from a Gaussian prior. Diffusion models reverse a Gaussian noising process.</p>
+        <p>The Central Limit Theorem says: sum enough independent random things and you get a Gaussian, regardless of where you started. That single fact is why "errors are noisy" almost always means "errors are normally distributed" in practice.</p>
+      </div>
+    </div>
+    <div class="ml-try">
+      <div class="ml-eyebrow accent">Try this</div>
+      <ol>
+        <li>Open <em>Gaussian</em>, drag <em>μ</em> right and watch the bell shift; drag <em>σ</em> up and watch it fatten. Hit <em>+1000</em> and see the grey histogram pour into the orange curve.</li>
+        <li>Open <em>Binomial</em> with <em>n = 30, p = 0.5</em> — a discrete shape that already looks suspiciously bell-curved. That's the de Moivre–Laplace theorem in action.</li>
+        <li>Open <em>Poisson</em>, set <em>λ = 1</em>, sample 1000 times. The mean equals the variance — the Poisson's defining peculiarity.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="ml-stage">
+
+    <aside class="left-rail">
+      <div class="ml-rail-label">Distribution</div>
+      <div class="ml-presets" id="dist-list"></div>
+
+      <div class="ml-rail-label" style="margin-top: 28px">Parameters</div>
+      <div class="ml-params" id="params"></div>
+
+      <div class="ml-readout" id="readout"></div>
+
+      <div class="ml-rail-label" style="margin-top: 24px">Sample</div>
+      <div class="ml-sample-row">
+        <button class="ml-sbtn" data-n="1">+1</button>
+        <button class="ml-sbtn" data-n="10">+10</button>
+        <button class="ml-sbtn" data-n="100">+100</button>
+        <button class="ml-sbtn" data-n="1000">+1000</button>
+        <button class="ml-sbtn ghost" id="reset-samples">reset</button>
+      </div>
+    </aside>
+
+    <div class="ml-canvas-wrap">
+      <div class="ml-canvas-frame" style="aspect-ratio: 1.25 / 1">
+        <canvas id="canvas"></canvas>
+      </div>
+      <div class="ml-caption">
+        <span class="ml-cap-num">·</span>
+        The <span class="ml-ink-orange">accent curve</span> is the true distribution. Grey bars are random samples drawn from it. With enough samples, the histogram fills in the shape — that is the law of large numbers, made visual.
+      </div>
+      <div class="ml-preset-blurb" id="dist-blurb" style="margin-top: 18px; max-width: 580px"></div>
+    </div>
+
+    <aside class="right-rail">
+      <div class="ml-margin" id="margin"></div>
+    </aside>
+
+  </section>
+
+  <section class="ml-applications">
+    <div class="ml-section-rule">
+      <span class="kicker">Where you've seen this</span>
+      <span class="meta">04 examples</span>
+    </div>
+    <div class="ml-app-grid">
+      <div class="ml-app">
+        <div class="ml-app-h">A/B tests at every tech company</div>
+        <p>When Google or Meta rolls out a feature to 1% of users, conversion counts in each bucket follow a binomial. The "is the new design better?" question is answered by comparing two binomials — same math you can play with above by sliding <em>p</em>.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Web servers and queue capacity</div>
+        <p>Requests-per-second to a server are modeled as Poisson; wait-times between them are exponential. AWS auto-scaling rules, Twilio rate limits, and SLO budgets are all built on these two distributions.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Diffusion image models</div>
+        <p>Stable Diffusion, Imagen, and DALL·E start from pure Gaussian noise and denoise in steps. The forward process is "add a little Gaussian"; the reverse process — what a neural net learns — is "subtract the right Gaussian."</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Insurance and risk</div>
+        <p>Catastrophe pricing models claim frequencies as Poisson and claim sizes as log-normal or exponential. Every "1-in-100-year flood" calculation is a tail probability of a fitted distribution.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="ml-further">
+    <div class="ml-section-rule">
+      <span class="kicker">Further reading</span>
+    </div>
+    <ul class="ml-further-list">
+      <li>
+        <span class="title"><a href="https://seeing-theory.brown.edu/" target="_blank" rel="noopener">Seeing Theory</a></span>
+        <span class="kind">interactive</span>
+        <span class="by">Daniel Kunin (Brown) · A visual introduction to probability that makes the case for distributions through animation. Chapter 3 on distributions is the natural sequel to this page.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://en.wikipedia.org/wiki/Central_limit_theorem" target="_blank" rel="noopener">The Central Limit Theorem</a></span>
+        <span class="kind">reference</span>
+        <span class="by">Wikipedia · The single result that explains why Gaussians appear everywhere. The entry's "illustration" section has good intuition pumps.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://www.youtube.com/watch?v=zeJD6dqJ5lo" target="_blank" rel="noopener">3Blue1Brown — But what is the Central Limit Theorem?</a></span>
+        <span class="kind">video</span>
+        <span class="by">Grant Sanderson · A visual proof sketch of why sums of random variables become Gaussian. Pairs naturally with the binomial → Gaussian convergence above.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://docs.scipy.org/doc/scipy/reference/stats.html" target="_blank" rel="noopener">scipy.stats — distributions in Python</a></span>
+        <span class="kind">reference</span>
+        <span class="by">100+ distributions with consistent <em>pdf, cdf, sf, rvs, fit</em> APIs. The reference everyone reaches for.</span>
+      </li>
+    </ul>
+  </section>
+
+  <footer class="ml-foot">
+    <div class="line"><a href="index.html">← all entries</a> · <a href="svd.html">V. SVD</a></div>
+    <div class="line eq">P(x | θ)</div>
+    <div class="line"><a href="bayes.html">VII. Bayes' Theorem →</a></div>
+  </footer>
+
+</main>
+
+<script src="shared.js"></script>
+<script src="distributions.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bias-Variance Tradeoff · ML, Visualized · Joseph Thomas</title>
+  <meta name="description" content="Too simple a model misses the signal; too complex, it memorizes the noise. The dial every model has." />
+  <link rel="canonical" href="https://jthomas.site/ml/bias-variance.html" />
+  <meta name="theme-color" content="#7a1f24" />
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;1,8..60,300;1,8..60,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body>
+<header class="nb-nav">
+  <div class="brand-block"><a class="brand" href="../index.html">jthomas.site</a><span class="brand-meta">// notebook · v.4.2026</span></div>
+  <nav>
+    <a href="../blog/index.html">writing</a>
+    <a href="index.html" style="color:var(--ink)">tutorial</a>
+    <a href="../index.html#research">research</a>
+    <a href="../index.html#work">work</a>
+    <a href="../index.html#projects">projects</a>
+    <a href="../consulting.html">consulting</a>
+    <a href="../index.html#contact" class="contact">→ contact</a>
+  </nav>
+</header>
+
+<main class="ml-page-shell">
+  <header class="ml-mast">
+    <div class="kicker">Machine Learning, Visualized · Vol. XXXII</div>
+    <h1>Bias-Variance<br /><em>Tradeoff</em></h1>
+    <p class="dek">A linear fit on quadratic data misses the curve. A 12th-degree polynomial fits every point exactly — and bends wildly between them. Somewhere in the middle, just enough flexibility, sits the model you want.</p>
+  </header>
+
+  <section class="ml-intro">
+    <div class="ml-intro-grid">
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">The concept</div>
+        <p class="lead">Total prediction error decomposes into <span class="term">bias²</span> + <span class="term">variance</span> + irreducible noise.</p>
+        <p><em>Bias</em>: how far is the model's <em>average</em> prediction from the truth, across many training datasets? A linear model on quadratic data has high bias — it can't capture the curve. Underfitting.</p>
+        <p><em>Variance</em>: how much do the model's predictions <em>change</em> when the training set changes? A 12-degree polynomial has high variance — different training samples produce wildly different curves. Overfitting.</p>
+        <p>The sweet spot is whatever model complexity minimizes the sum. For a fixed dataset size, that's a specific degree, depth, or capacity.</p>
+      </div>
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">Why ML cares</div>
+        <p>Bias-variance is the conceptual frame for nearly every model-selection decision: "should I use a deeper network, more features, more regularization?" Each choice slides the dial.</p>
+        <p>It's also the lens through which the <em>double-descent</em> phenomenon was discovered — overparameterized neural networks (more parameters than data points) sometimes show <em>lower</em> test error than smaller models, breaking the classical U-shape. The story is more nuanced than the textbook curve, but the textbook curve is still the right starting point.</p>
+      </div>
+    </div>
+    <div class="ml-try">
+      <div class="ml-eyebrow accent">Try this</div>
+      <ol>
+        <li>Drag the <em>polynomial degree</em> slider from 1 to 15. At degree 1, the line misses the curve — high bias. At degree 15, the curve wiggles through every point — high variance.</li>
+        <li>Click <em>Resample</em> several times. Watch how degree-1 fits stay similar while degree-15 fits look completely different — that's variance.</li>
+        <li>The bottom plot decomposes total error: bias² (ink), variance (oxblood), and total (sum). The minimum sits at moderate complexity — the actual sweet spot.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="ml-stage">
+    <aside class="left-rail">
+      <div class="ml-rail-label">Polynomial degree</div>
+      <input id="deg-slider" type="range" min="1" max="15" step="1" value="3" style="width:100%; accent-color:var(--accent)" />
+      <div id="deg-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">degree 3</div>
+
+      <div class="ml-rail-label" style="margin-top: 18px">Noise σ</div>
+      <input id="noise-slider" type="range" min="0" max="0.6" step="0.02" value="0.25" style="width:100%; accent-color:var(--accent)" />
+      <div id="noise-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">σ = 0.25</div>
+
+      <div class="ml-rail-label" style="margin-top: 18px">Training points</div>
+      <input id="n-slider" type="range" min="8" max="40" step="1" value="20" style="width:100%; accent-color:var(--accent)" />
+      <div id="n-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">n = 20</div>
+
+      <div style="display:flex; gap:8px; margin-top: 18px">
+        <button id="resample" class="ml-sbtn" style="flex:1; padding:10px 14px; font-family:var(--serif); font-style:italic; font-size:14px">↻ Resample</button>
+      </div>
+
+      <div class="ml-readout" id="readout" style="margin-top: 18px"></div>
+    </aside>
+
+    <div class="ml-canvas-wrap">
+      <div class="ml-canvas-frame">
+        <canvas id="canvas"></canvas>
+      </div>
+      <div class="ml-caption">
+        <span class="ml-cap-num">·</span>
+        Top: a polynomial of the chosen degree fit to noisy samples of <em>f(x) = sin(πx)</em>. The <em>10 faded curves</em> are fits to different random training sets — their spread <em>is</em> the variance. Bottom: bias², variance, and total error vs polynomial degree.
+      </div>
+    </div>
+
+    <aside class="right-rail">
+      <div class="ml-margin">
+        <div class="ml-margin-rule"></div>
+        <div class="ml-margin-h">The decomposition</div>
+        <div class="ml-equation" style="font-size:13px">Error = bias² + variance + σ²</div>
+        <p>Squared bias plus variance plus irreducible noise. Total expected MSE on a new test point. Model complexity slides the bias-vs-variance balance; only adding data or regularization lowers the sum.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Double descent</div>
+        <p class="quiet">For very overparameterized models (degree ≫ n), the U-curve sometimes <em>descends again</em> — interpolating models can generalize. A 21st-century puzzle the textbook decomposition didn't predict.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Regularization</div>
+        <p class="quiet">L1/L2 penalties trade variance for bias. At the optimal regularization strength, you've moved closer to the sweet spot without changing model class.</p>
+      </div>
+    </aside>
+  </section>
+
+  <section class="ml-applications">
+    <div class="ml-section-rule"><span class="kicker">Where you've seen this</span><span class="meta">04 examples</span></div>
+    <div class="ml-app-grid">
+      <div class="ml-app">
+        <div class="ml-app-h">Choosing a model</div>
+        <p>"Linear regression vs gradient-boosted trees vs deep neural net" is a bias-variance question. Linear regression is high-bias; deep networks are flexible (low-bias) but variance-prone unless regularized.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Cross-validation</div>
+        <p>Held-out-set accuracy approximates the bias-variance sum on unseen data. The standard model-selection workflow — try many model variants, pick whichever gives best validation accuracy — is this curve, made empirical.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Ensemble methods</div>
+        <p>Random forests average many high-variance trees to drive variance down without raising bias. Bagging is, formally, a variance-reduction technique.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Double descent in deep learning</div>
+        <p>Empirical work (Belkin et al., 2019) showed that classical bias-variance curves break for very large neural networks. Generalization sometimes <em>improves</em> past the interpolation threshold — a still-debated frontier.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="ml-further">
+    <div class="ml-section-rule"><span class="kicker">Further reading</span></div>
+    <ul class="ml-further-list">
+      <li>
+        <span class="title"><a href="https://hastie.su.domains/ElemStatLearn/" target="_blank" rel="noopener">The Elements of Statistical Learning · Ch. 7</a></span>
+        <span class="kind">textbook</span>
+        <span class="by">Hastie, Tibshirani, Friedman · The classical chapter on model assessment, with the bias-variance decomposition. Free PDF.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://arxiv.org/abs/1812.11118" target="_blank" rel="noopener">Reconciling modern machine-learning practice and the classical bias-variance trade-off</a></span>
+        <span class="kind">paper</span>
+        <span class="by">Belkin et al. (2019) · The double-descent paper. Shows empirically that deep networks past the interpolation threshold can generalize <em>better</em>, breaking the U.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://www.cs.cornell.edu/courses/cs4780/2018fa/lectures/lecturenote12.html" target="_blank" rel="noopener">Cornell CS4780 · Bias-Variance Tradeoff</a></span>
+        <span class="kind">course notes</span>
+        <span class="by">Kilian Weinberger · The lucid academic introduction with the math worked out cleanly. Pairs nicely with this page's interactive.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://scott.fortmann-roe.com/docs/BiasVariance.html" target="_blank" rel="noopener">Understanding the Bias-Variance Tradeoff</a></span>
+        <span class="kind">essay</span>
+        <span class="by">Scott Fortmann-Roe · A patient visual essay with diagrams of dart-throwing as bias-variance metaphors. Often the first link in undergrad ML courses.</span>
+      </li>
+    </ul>
+  </section>
+
+  <footer class="ml-foot">
+    <div class="line"><a href="index.html">← all entries</a> · <a href="hyperparameter-tuning.html">XXXI. HP Tuning</a></div>
+    <div class="line eq">err = bias² + var + σ²</div>
+    <div class="line"><a href="interpretability.html">XXXIII. Interpretability →</a></div>
+  </footer>
+</main>
+
+<script src="shared.js"></script>
+<script src="bias-variance.js"></script>
+</body>
+</html>

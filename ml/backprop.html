@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Backpropagation · ML, Visualized · Joseph Thomas</title>
+  <meta name="description" content="The signal flows forward; the error flows back. Chain rule applied recursively — the engine that learns." />
+  <link rel="canonical" href="https://jthomas.site/ml/backprop.html" />
+  <meta name="theme-color" content="#7a1f24" />
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Backpropagation · ML, Visualized" />
+  <meta property="og:description" content="Chain rule, applied recursively. The engine that taught a generation of networks how to learn." />
+  <meta property="og:url" content="https://jthomas.site/ml/backprop.html" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;1,8..60,300;1,8..60,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body>
+
+<header class="nb-nav">
+  <div class="brand-block">
+    <a class="brand" href="../index.html">jthomas.site</a><span class="brand-meta">// notebook · v.4.2026</span>
+  </div>
+  <nav>
+    <a href="../blog/index.html">writing</a>
+    <a href="index.html" style="color:var(--ink)">tutorial</a>
+    <a href="../index.html#research">research</a>
+    <a href="../index.html#work">work</a>
+    <a href="../index.html#projects">projects</a>
+    <a href="../consulting.html">consulting</a>
+    <a href="../index.html#contact" class="contact">→ contact</a>
+  </nav>
+</header>
+
+<main class="ml-page-shell">
+
+  <header class="ml-mast">
+    <div class="kicker">Machine Learning, Visualized · Vol. XI</div>
+    <h1>Back<br /><em>propagation</em></h1>
+    <p class="dek">The signal flows forward to make a prediction. The error flows backward to fix the weights. Chain rule, applied layer by layer — the engine that taught a generation of networks how to learn.</p>
+  </header>
+
+  <section class="ml-intro">
+    <div class="ml-intro-grid">
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">The concept</div>
+        <p class="lead"><span class="term">Backpropagation</span> is how a neural network figures out which weight to blame for an error — and by how much.</p>
+        <p>The forward pass produces a prediction; comparing it to the truth gives a <em>loss</em>. To reduce the loss, you need <em>∂L/∂w</em> for every weight in the network. Backprop computes all of those at once, by applying the chain rule from the output backward toward the input.</p>
+        <p>The trick: each layer's gradient is the upstream gradient times the layer's local derivative. So gradients can be computed recursively in one backward sweep — exactly as fast as the forward pass, with no symbolic differentiation needed.</p>
+      </div>
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">Why ML cares</div>
+        <p>Backprop is the algorithm that made deep learning practical. Without it, training a network with billions of parameters would require billions of finite-difference probes per step — computationally infeasible. With it, training is just two passes per step: forward, then back.</p>
+        <p>Every modern training framework — PyTorch, JAX, TensorFlow — is essentially a tool for building computation graphs and running backprop on them automatically. The technical name is <em>automatic differentiation</em>; backprop is its workhorse mode.</p>
+      </div>
+    </div>
+    <div class="ml-try">
+      <div class="ml-eyebrow accent">Try this</div>
+      <ol>
+        <li>Press <em>Forward → Backward</em>. Watch the forward pass light up neurons left-to-right, then the backward pass light up gradient halos right-to-left.</li>
+        <li>Click <em>Train continuously</em>. The decision boundary on the bottom canvas reshapes as the network learns. Watch the loss curve drop in the rail.</li>
+        <li>Click <em>Next sample</em> a few times. Each sample produces a different gradient — different blame patterns light up different connections orange (increase) or green (decrease).</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="ml-stage">
+
+    <aside class="left-rail">
+      <div class="ml-rail-label">Sample point</div>
+      <div class="ml-readout" id="readout"></div>
+      <button id="next-btn" class="ml-resample-btn">↻ Next sample</button>
+
+      <div class="ml-rail-label" style="margin-top: 24px">Single step</div>
+      <button id="anim-btn" class="ml-sbtn" style="width:100%; padding:10px 14px; font-family:var(--serif); font-style:italic; font-size:14px">▷ Forward → Backward</button>
+      <div style="font-family:var(--mono); font-size:11px; color:var(--ml-ink-fade); margin-top:8px; text-align:center">
+        phase: <b id="phase-label" style="color:var(--ink)">idle</b>
+      </div>
+
+      <div class="ml-rail-label" style="margin-top: 24px">Train</div>
+      <button id="train-btn" class="ml-sbtn" style="width:100%; padding:10px 14px; font-family:var(--serif); font-style:italic; font-size:14px">▷ Train continuously</button>
+      <div style="display:flex; justify-content:space-between; font-family:var(--mono); font-size:11px; color:var(--ml-ink-fade); margin-top: 10px">
+        <span>epoch <b id="epoch-label" style="color:var(--ink)">0</b></span>
+        <span>acc <b id="acc-label" style="color:var(--ink)">0%</b></span>
+      </div>
+      <button id="reset-btn" class="ml-resample-btn" style="margin-top: 10px">↻ Reset network</button>
+
+      <div class="ml-rail-label" style="margin-top: 18px">Loss curve</div>
+      <canvas id="loss-canvas" style="width:100%; height:80px; display:block"></canvas>
+    </aside>
+
+    <div class="ml-canvas-wrap">
+      <div class="ml-canvas-frame" style="aspect-ratio: 1.3 / 1; background: var(--paper)">
+        <canvas id="canvas"></canvas>
+      </div>
+      <div class="ml-caption" id="caption"></div>
+
+      <section style="margin-top: 36px; width:100%; max-width: 580px">
+        <div style="font-family:var(--mono); font-size:11px; letter-spacing:0.22em; text-transform:uppercase; color:var(--ml-ink-fade); text-align:center; margin-bottom: 14px">
+          Decision boundary, evolving
+        </div>
+        <div style="aspect-ratio: 1.6 / 1; background: var(--paper); border: 1px solid var(--rule)">
+          <canvas id="decision-canvas"></canvas>
+        </div>
+      </section>
+    </div>
+
+    <aside class="right-rail">
+      <div class="ml-margin">
+        <div class="ml-margin-rule"></div>
+        <div class="ml-margin-h">Chain rule</div>
+        <div class="ml-equation" style="font-size:14px">∂L/∂W⁽ˡ⁾ = δ⁽ˡ⁾ a⁽ˡ⁻¹⁾ᵀ</div>
+        <p>The error δ at each layer is the upstream error multiplied by the local derivative — that's it. Backprop is just the chain rule applied recursively.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Reading the picture</div>
+        <p class="quiet">Connections turn <em style="color:var(--accent)">orange</em> when their weight will increase, green when it will decrease. Thickness reflects gradient magnitude — how much that weight is "blamed" for the error.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Decision boundary</div>
+        <p class="quiet">The contour map below shows the network's current confidence over the input plane. As you train, watch it warp to fit the data.</p>
+      </div>
+    </aside>
+
+  </section>
+
+  <section class="ml-applications">
+    <div class="ml-section-rule">
+      <span class="kicker">Where you've seen this</span>
+      <span class="meta">04 examples</span>
+    </div>
+    <div class="ml-app-grid">
+      <div class="ml-app">
+        <div class="ml-app-h">Training every modern ML model</div>
+        <p>Every weight in every neural network — Gemini, GPT, Stable Diffusion, AlphaFold — was nudged into place by some variant of backpropagation. The 1986 paper that popularized it is one of the most-cited results in machine learning.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Automatic differentiation in PyTorch &amp; JAX</div>
+        <p>Whenever you call <em>loss.backward()</em> in PyTorch, you're invoking reverse-mode automatic differentiation — the algorithmic generalization of backprop. JAX's <em>grad()</em> is the same idea, packaged differently.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Neural-network theorem provers</div>
+        <p>Backprop computes <em>∂loss/∂input</em> as a side-effect of computing <em>∂loss/∂weights</em>. Adversarial-example attacks, saliency maps, and many interpretability methods all exploit this gradient-of-input.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Beyond neural networks</div>
+        <p>Backprop also powers gradient-based learning in physical-system simulators, differentiable rendering for graphics, and even some classical optimization problems reformulated as differentiable programs.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="ml-further">
+    <div class="ml-section-rule">
+      <span class="kicker">Further reading</span>
+    </div>
+    <ul class="ml-further-list">
+      <li>
+        <span class="title"><a href="https://www.nature.com/articles/323533a0" target="_blank" rel="noopener">Learning representations by back-propagating errors</a></span>
+        <span class="kind">paper (1986)</span>
+        <span class="by">Rumelhart, Hinton, Williams · The paper that introduced backprop to mainstream ML and re-started a decade-long winter. Worth reading for the historical voice alone.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://www.youtube.com/watch?v=VMj-3S1tku0" target="_blank" rel="noopener">The spelled-out intro to neural networks and backpropagation</a></span>
+        <span class="kind">video</span>
+        <span class="by">Andrej Karpathy · A two-hour from-scratch build of micrograd — Python autodiff in ~100 lines. The clearest explanation of backprop currently available.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://colah.github.io/posts/2015-08-Backprop/" target="_blank" rel="noopener">Calculus on Computational Graphs: Backpropagation</a></span>
+        <span class="kind">essay</span>
+        <span class="by">Christopher Olah · The clearest visual derivation of backprop on the internet, from a graph-theoretic angle that explains why reverse-mode autodiff scales the way it does.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://pytorch.org/docs/stable/notes/autograd.html" target="_blank" rel="noopener">PyTorch autograd reference</a></span>
+        <span class="kind">reference</span>
+        <span class="by">The mechanics of how a modern framework actually does backprop on dynamic computation graphs. Read this once and you'll never look at <em>loss.backward()</em> the same way.</span>
+      </li>
+    </ul>
+  </section>
+
+  <footer class="ml-foot">
+    <div class="line"><a href="index.html">← all entries</a> · <a href="forward.html">X. Forward Propagation</a></div>
+    <div class="line eq">δ ← W⁽ˡ⁺¹⁾ᵀ δ⁽ˡ⁺¹⁾</div>
+    <div class="line"><a href="loss-landscapes.html">XII. Loss Landscapes →</a></div>
+  </footer>
+
+</main>
+
+<script src="shared.js"></script>
+<script src="backprop.js"></script>
+
+</body>
+</html>

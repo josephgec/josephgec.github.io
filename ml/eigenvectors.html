@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Eigenvalues &amp; Eigenvectors · ML, Visualized · Joseph Thomas</title>
+  <meta name="description" content="The directions a transform leaves alone. An interactive playground showing eigenvectors, eigenvalues, and power iteration." />
+  <link rel="canonical" href="https://jthomas.site/ml/eigenvectors.html" />
+  <meta name="theme-color" content="#7a1f24" />
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Eigenvalues &amp; Eigenvectors · ML, Visualized" />
+  <meta property="og:description" content="The directions a transform leaves alone. Iterate them and you've built PageRank." />
+  <meta property="og:url" content="https://jthomas.site/ml/eigenvectors.html" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;1,8..60,300;1,8..60,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body>
+
+<header class="nb-nav">
+  <div class="brand-block">
+    <a class="brand" href="../index.html">jthomas.site</a><span class="brand-meta">// notebook · v.4.2026</span>
+  </div>
+  <nav>
+    <a href="../blog/index.html">writing</a>
+    <a href="index.html" style="color:var(--ink)">tutorial</a>
+    <a href="../index.html#research">research</a>
+    <a href="../index.html#work">work</a>
+    <a href="../index.html#projects">projects</a>
+    <a href="../consulting.html">consulting</a>
+    <a href="../index.html#contact" class="contact">→ contact</a>
+  </nav>
+</header>
+
+<main class="ml-page-shell">
+
+  <header class="ml-mast">
+    <div class="kicker">Machine Learning, Visualized · Vol. II</div>
+    <h1>Eigenvalues<br /><em>&amp;</em> Eigenvectors</h1>
+    <p class="dek">A linear transformation reshapes the plane. Most vectors twist and turn under it — but a precious few keep pointing the same way, only stretched. Those are eigenvectors, and the amount they stretch is the eigenvalue.</p>
+  </header>
+
+  <section class="ml-intro">
+    <div class="ml-intro-grid">
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">The concept</div>
+        <p class="lead">An <span class="term">eigenvector</span> of a matrix A is a direction that A leaves alone — the matrix stretches it, but never rotates it.</p>
+        <p>The amount of stretch is the <span class="term">eigenvalue</span> λ, defined by <em>Av = λv</em>. A 2×2 matrix has at most two such directions (and sometimes none at all, if the matrix is essentially a rotation). They are the matrix's natural axes — the skeleton on which everything else hangs.</p>
+        <p>If you apply the matrix to <em>any</em> starting vector over and over and re-normalize, you converge to the eigenvector with the biggest |λ|. That move — power iteration — is the engine behind a surprising amount of machine learning.</p>
+      </div>
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">Why ML cares</div>
+        <p>Google's original PageRank ranked the web by computing the dominant eigenvector of a giant link-matrix. Spectral clustering finds groups using eigenvectors of a graph Laplacian. Diffusion maps, Laplacian eigenmaps, normal-mode analysis — all eigen-things.</p>
+        <p>Whenever a method "finds the dominant direction" or "decomposes into independent components," the underlying engine is almost always an eigenvector calculation. They are the most-reused primitive in unsupervised learning.</p>
+      </div>
+    </div>
+    <div class="ml-try">
+      <div class="ml-eyebrow accent">Try this</div>
+      <ol>
+        <li>Click <em>Symmetric</em> — the two accent arrows meet at a right angle. Symmetric matrices always have orthogonal eigenvectors.</li>
+        <li>Click <em>Rotation</em> — the eigenvectors disappear. A pure rotation has no real eigenvectors, because every direction changes.</li>
+        <li>Click <em>PageRank-ish</em>, switch to <em>III. Iterate</em>, hit Play. Watch every starting vector fall onto a single line — the dominant eigenvector.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="ml-stage">
+
+    <aside class="left-rail">
+      <div class="ml-rail-label">The matrix</div>
+      <div id="matrix"></div>
+      <div class="ml-hint">drag a number to scrub · click to type</div>
+
+      <div class="ml-readout" id="readout">
+        <div class="row"><span>tr(A)</span><b data-k="tr">—</b></div>
+        <div class="row"><span>det(A)</span><b data-k="det">—</b></div>
+        <div class="row"><span>λ₁</span><b data-k="l1">—</b></div>
+        <div class="row"><span>λ₂</span><b data-k="l2">—</b></div>
+      </div>
+
+      <div class="ml-rail-label" style="margin-top: 28px">Presets</div>
+      <div class="ml-presets" id="presets"></div>
+      <div class="ml-preset-blurb" id="preset-blurb"></div>
+    </aside>
+
+    <div class="ml-canvas-wrap">
+      <div class="ml-mode-tabs" id="mode-tabs">
+        <button data-mode="explore">I. The transform</button>
+        <button data-mode="rotate">II. Drag a vector</button>
+        <button data-mode="iterate">III. Iterate</button>
+      </div>
+      <div class="ml-canvas-frame">
+        <canvas id="canvas"></canvas>
+      </div>
+      <div class="ml-caption" id="caption"></div>
+      <div class="ml-iter" id="iter-controls" style="display:none">
+        <button id="play-btn">Play</button>
+        <input id="iter-slider" type="range" min="0" max="30" step="1" value="0" />
+        <span class="step" id="iter-label">step 0</span>
+      </div>
+    </div>
+
+    <aside class="right-rail">
+      <div class="ml-margin" id="margin"></div>
+    </aside>
+
+  </section>
+
+  <section class="ml-applications">
+    <div class="ml-section-rule">
+      <span class="kicker">Where you've seen this</span>
+      <span class="meta">04 examples</span>
+    </div>
+    <div class="ml-app-grid">
+      <div class="ml-app">
+        <div class="ml-app-h">Google's PageRank, 1998</div>
+        <p>When Google launched, it sorted the web by computing the <em>dominant eigenvector</em> of a link-matrix with billions of pages. The intuition: the web is a Markov chain of clicks; the page everyone keeps coming back to has the largest steady-state probability. You watched this happen in mode III above.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Spotify's "Discover Weekly"</div>
+        <p>Recommender systems factorize a (users × songs) matrix to find latent <em>music-taste</em> dimensions. Those dimensions are eigenvectors of the data — not "rock vs jazz" but abstract directions discovered from the listening data itself. New songs get scored against your profile.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Skyscrapers and bridge collapses</div>
+        <p>Engineers compute eigenvalues of a building's stiffness matrix to find its <em>natural vibration modes</em> — the frequencies at which it will sway. The eigenvectors are the shapes of those sways. The 1940 Tacoma Narrows bridge collapse happened because wind drove the bridge at one of its eigen-frequencies.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Quantum mechanics</div>
+        <p>In quantum systems, observable measurements (energy, momentum, spin) are <em>eigenvalues</em> of an operator; the states the system can be measured in are the eigenvectors. Schrödinger's equation is, ultimately, an eigenvalue problem.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="ml-further">
+    <div class="ml-section-rule">
+      <span class="kicker">Further reading</span>
+    </div>
+    <ul class="ml-further-list">
+      <li>
+        <span class="title"><a href="https://www.youtube.com/watch?v=PFDu9oVAE-g" target="_blank" rel="noopener">3Blue1Brown — Eigenvectors and Eigenvalues</a></span>
+        <span class="kind">video</span>
+        <span class="by">Grant Sanderson · The video to send anyone who has been told the definition but never seen what an eigenvector <em>is</em>.</span>
+      </li>
+      <li>
+        <span class="title"><a href="http://infolab.stanford.edu/~backrub/google.html" target="_blank" rel="noopener">The Anatomy of a Large-Scale Hypertextual Web Search Engine</a></span>
+        <span class="kind">paper</span>
+        <span class="by">Brin &amp; Page (1998) · The original PageRank paper, written when Google was a Stanford research project. Section 2.1.1 is the eigen-content.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://arxiv.org/abs/0711.0189" target="_blank" rel="noopener">A Tutorial on Spectral Clustering</a></span>
+        <span class="kind">tutorial</span>
+        <span class="by">Ulrike von Luxburg (2007) · The canonical walkthrough of how eigenvectors of a graph Laplacian reveal cluster structure.</span>
+      </li>
+      <li>
+        <span class="title"><a href="http://setosa.io/ev/eigenvectors-and-eigenvalues/" target="_blank" rel="noopener">Eigenvectors and Eigenvalues, Visually</a></span>
+        <span class="kind">interactive</span>
+        <span class="by">Setosa.io · A second pass at the geometric intuition with a different drag-the-matrix demo. Useful as reinforcement.</span>
+      </li>
+    </ul>
+  </section>
+
+  <footer class="ml-foot">
+    <div class="line"><a href="index.html">← all entries</a> · <a href="matrix-transformations.html">I. Matrix Transformations</a></div>
+    <div class="line eq">A v = λ v</div>
+    <div class="line"><a href="pca.html">IV. PCA →</a></div>
+  </footer>
+
+</main>
+
+<script src="shared.js"></script>
+<script src="eigenvectors.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Bottleneck · ML, Visualized · Joseph Thomas</title>
+  <meta name="description" content="Squeeze input through a narrow channel and decode it back. The channel learns the essence." />
+  <link rel="canonical" href="https://jthomas.site/ml/autoencoders.html" />
+  <meta name="theme-color" content="#7a1f24" />
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;1,8..60,300;1,8..60,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body>
+<header class="nb-nav">
+  <div class="brand-block"><a class="brand" href="../index.html">jthomas.site</a><span class="brand-meta">// notebook · v.4.2026</span></div>
+  <nav>
+    <a href="../blog/index.html">writing</a>
+    <a href="index.html" style="color:var(--ink)">tutorial</a>
+    <a href="../index.html#research">research</a>
+    <a href="../index.html#work">work</a>
+    <a href="../index.html#projects">projects</a>
+    <a href="../consulting.html">consulting</a>
+    <a href="../index.html#contact" class="contact">→ contact</a>
+  </nav>
+</header>
+
+<main class="ml-page-shell">
+  <header class="ml-mast">
+    <div class="kicker">Machine Learning, Visualized · Vol. XX</div>
+    <h1>The<br /><em>Bottleneck</em></h1>
+    <p class="dek">An autoencoder learns to compress an image through a tiny <em>k</em>-dimensional bottleneck and reconstruct it on the other side. Whatever survives the squeeze is the data's essence — its latent structure, discovered without supervision.</p>
+  </header>
+
+  <section class="ml-intro">
+    <div class="ml-intro-grid">
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">The concept</div>
+        <p class="lead">An <span class="term">autoencoder</span> is a neural network whose goal is to copy its input to its output — through a deliberately narrow middle layer.</p>
+        <p>If the middle (the <em>code</em> or <em>latent vector</em>) has only k dimensions, the network must discover a k-dimensional summary of the input that's just expressive enough to reconstruct it. With k = 2, you can plot the codes in a scatter and see the data organize itself by class without ever being told the labels.</p>
+        <p>Linear autoencoders converge to PCA. Nonlinear ones learn nonlinear manifolds — which is why autoencoders feel like "PCA, but smarter."</p>
+      </div>
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">Why ML cares</div>
+        <p>The bottleneck idea recurs everywhere in modern ML. U-Nets in image segmentation. The encoder of every machine-translation model. The compressor in every audio codec built since 2020. Stable Diffusion's "VAE" stage that compresses images to a small latent before the diffusion runs.</p>
+        <p>Even when not literally an autoencoder, "force the model through a narrow representation" is the trick that makes self-supervised pre-training work. The narrowness is a forcing function for abstraction.</p>
+      </div>
+    </div>
+    <div class="ml-try">
+      <div class="ml-eyebrow accent">Try this</div>
+      <ol>
+        <li>Drag the <em>latent dim</em> slider from 2 to 10. Watch the reconstruction quality climb. With 10 latent dims, the input is essentially recoverable; with 2, you see only the dominant structure.</li>
+        <li>Pick a <em>noisy</em> input. Watch the autoencoder's output remove noise — its latent only has room for the signal, not the noise. Denoising autoencoders are this principle, formalized.</li>
+        <li>Hit <em>Sweep latent</em> in 2D mode. Each slider sweeps one of the two latent dimensions; the decoder paints a continuous space of generated outputs. The network has learned a 2D <em>map</em> of plausible inputs.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="ml-stage">
+    <aside class="left-rail">
+      <div class="ml-rail-label">Input</div>
+      <div class="ml-presets" id="inputs"></div>
+
+      <div class="ml-rail-label" style="margin-top: 24px">Latent dimension</div>
+      <input id="k-slider" type="range" min="2" max="16" step="1" value="4" style="width:100%; accent-color:var(--accent)" />
+      <div id="k-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">k = 4</div>
+
+      <div class="ml-rail-label" style="margin-top: 24px">Latent values</div>
+      <div id="latent-sliders"></div>
+
+      <div class="ml-readout" id="readout" style="margin-top:18px"></div>
+    </aside>
+
+    <div class="ml-canvas-wrap">
+      <div class="ml-canvas-frame" style="aspect-ratio: 2.4 / 1; padding: 24px">
+        <canvas id="canvas"></canvas>
+      </div>
+      <div class="ml-caption">
+        <span class="ml-cap-num">·</span>
+        Left: the original input, an 8×8 grid. Middle: the latent vector — k learned numbers. Right: the network's reconstruction. With enough latent dimensions, the reconstruction is sharp; with too few, it blurs into the average.
+      </div>
+    </div>
+
+    <aside class="right-rail">
+      <div class="ml-margin">
+        <div class="ml-margin-rule"></div>
+        <div class="ml-margin-h">Autoencoder loss</div>
+        <div class="ml-equation" style="font-size:14px">L = ‖x − decoder(encoder(x))‖²</div>
+        <p>Mean-squared reconstruction error. The encoder learns to <em>throw away</em> as little useful information as possible; the decoder learns to <em>recover</em> as much as possible from what's left.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Linear ≡ PCA</div>
+        <p class="quiet">A linear autoencoder with mean-squared loss converges to the principal-component subspace. The latent dimensions become PC₁, PC₂, …, PC<em>k</em> — proven equivalent to Vol IV's eigen-of-covariance recipe.</p>
+        <div class="ml-margin-rule thin"></div>
+        <div class="ml-margin-h sm">Up next</div>
+        <p class="quiet">A <em>variational</em> autoencoder constrains the latent to a Gaussian — letting you sample new examples from latent space.</p>
+      </div>
+    </aside>
+  </section>
+
+  <section class="ml-applications">
+    <div class="ml-section-rule"><span class="kicker">Where you've seen this</span><span class="meta">04 examples</span></div>
+    <div class="ml-app-grid">
+      <div class="ml-app">
+        <div class="ml-app-h">Stable Diffusion's VAE stage</div>
+        <p>Stable Diffusion compresses 512×512 images into a 64×64×4 latent before running the diffusion process. That compression is an autoencoder — much of the model's efficiency comes from never working with raw pixels.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Anomaly detection</div>
+        <p>Train an autoencoder on normal data; flag anything it can't reconstruct cleanly as anomalous. Used for credit-card fraud, manufacturing defects, network-intrusion detection.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Image denoising</div>
+        <p>Add Gaussian noise to images, train an AE to map noisy → clean. The network learns "the manifold of real images" and projects everything onto it. The principle behind Photoshop's "Reduce Noise" filter and a thousand mobile camera enhancements.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Audio codecs</div>
+        <p>Modern neural audio codecs (SoundStream, Encodec, Lyra) are autoencoders trained to compress speech and music to ~1 kbps with surprisingly good quality. Used in WhatsApp calls, Discord, and the audio side of Gemini Live.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="ml-further">
+    <div class="ml-section-rule"><span class="kicker">Further reading</span></div>
+    <ul class="ml-further-list">
+      <li>
+        <span class="title"><a href="https://www.deeplearningbook.org/contents/autoencoders.html" target="_blank" rel="noopener">Deep Learning · Chapter 14: Autoencoders</a></span>
+        <span class="kind">textbook</span>
+        <span class="by">Goodfellow, Bengio, Courville · The systematic treatment. Linear autoencoders, denoising, sparse, contractive — all the variants.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://www.cs.toronto.edu/~hinton/science.pdf" target="_blank" rel="noopener">Reducing the Dimensionality of Data with Neural Networks</a></span>
+        <span class="kind">paper</span>
+        <span class="by">Hinton &amp; Salakhutdinov (2006) · The 2006 Science paper that introduced deep autoencoders. Pre-dates the modern deep-learning era and shows the idea was always there.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://arxiv.org/abs/2107.13586" target="_blank" rel="noopener">Self-Supervised Learning: Generative or Contrastive</a></span>
+        <span class="kind">survey</span>
+        <span class="by">Liu et al. (2021) · How autoencoders fit into the broader self-supervised learning landscape. Useful frame for where the bottleneck idea sits in 2024.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://arxiv.org/abs/2006.04558" target="_blank" rel="noopener">Estimating Mutual Information with Autoencoders</a></span>
+        <span class="kind">paper</span>
+        <span class="by">Belghazi et al. · The information-theoretic angle on what autoencoders are actually computing. The bottleneck has a precise statistical interpretation.</span>
+      </li>
+    </ul>
+  </section>
+
+  <footer class="ml-foot">
+    <div class="line"><a href="index.html">← all entries</a> · <a href="regularization.html">XIX. Regularization</a></div>
+    <div class="line eq">x → z → x̂</div>
+    <div class="line"><a href="vaes.html">XXI. VAEs →</a></div>
+  </footer>
+</main>
+
+<script src="shared.js"></script>
+<script src="autoencoders.js"></script>
+</body>
+</html>

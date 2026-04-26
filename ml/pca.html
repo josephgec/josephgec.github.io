@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Principal Components · ML, Visualized · Joseph Thomas</title>
+  <meta name="description" content="Find the grain of a data cloud. The first eigenvector of covariance is the line of best fit. An interactive look at PCA." />
+  <link rel="canonical" href="https://jthomas.site/ml/pca.html" />
+  <meta name="theme-color" content="#7a1f24" />
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Principal Components · ML, Visualized" />
+  <meta property="og:description" content="Find the grain of a data cloud. The first eigenvector of covariance is the line of best fit." />
+  <meta property="og:url" content="https://jthomas.site/ml/pca.html" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;1,8..60,300;1,8..60,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body>
+
+<header class="nb-nav">
+  <div class="brand-block">
+    <a class="brand" href="../index.html">jthomas.site</a><span class="brand-meta">// notebook · v.4.2026</span>
+  </div>
+  <nav>
+    <a href="../blog/index.html">writing</a>
+    <a href="index.html" style="color:var(--ink)">tutorial</a>
+    <a href="../index.html#research">research</a>
+    <a href="../index.html#work">work</a>
+    <a href="../index.html#projects">projects</a>
+    <a href="../consulting.html">consulting</a>
+    <a href="../index.html#contact" class="contact">→ contact</a>
+  </nav>
+</header>
+
+<main class="ml-page-shell">
+
+  <header class="ml-mast">
+    <div class="kicker">Machine Learning, Visualized · Vol. IV</div>
+    <h1>Principal<br /><em>Components</em></h1>
+    <p class="dek">A cloud of data has a grain — directions along which it spreads more, and directions where it barely moves. Find those directions and you have found what the data is really about. The math is just eigenvectors of the covariance matrix.</p>
+  </header>
+
+  <section class="ml-intro">
+    <div class="ml-intro-grid">
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">The concept</div>
+        <p class="lead">PCA finds the directions in your data along which it varies the most.</p>
+        <p>Picture a cloud of points. There's a "long way" through it and a "short way" through it. <span class="term">PC₁</span> is the long way; <span class="term">PC₂</span> is perpendicular and is the second-longest. These directions are, by recipe, the eigenvectors of the data's <span class="term">covariance matrix</span> — the matrix that measures how each pair of features moves together.</p>
+        <p>The eigenvalue λ for each direction is the variance along it. Big λ = the data spreads a lot in that direction (informative). Small λ = barely any spread (discardable). PCA is just: keep the directions with the biggest λ's.</p>
+      </div>
+      <div class="ml-intro-block">
+        <div class="ml-eyebrow">Why ML cares</div>
+        <p>PCA is the simplest way to compress data without losing much: keep only the directions that carry the most variance, throw the rest away. A 10,000-pixel face becomes a 50-number signature with almost no information lost — those signatures are called <em>eigenfaces</em>.</p>
+        <p>The same idea, different data, gives latent topics in text, motion modes in molecular dynamics, and the first stage of nearly every classical visualization pipeline. PCA is also the linear special case of every nonlinear dim-reduction method (t-SNE, UMAP, autoencoders).</p>
+      </div>
+    </div>
+    <div class="ml-try">
+      <div class="ml-eyebrow accent">Try this</div>
+      <ol>
+        <li>Try <em>Slanted blob</em> — PC₁ runs along the long axis. PC₂ is perpendicular and much shorter.</li>
+        <li>Click <em>Isotropic</em> — λ₁ ≈ λ₂. The cloud is round, so neither direction is meaningfully "principal."</li>
+        <li>Switch to <em>III. Reduce</em> — every point slides onto PC₁. That single number per point is the entire 1D compression of the dataset.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="ml-stage">
+
+    <aside class="left-rail">
+      <div class="ml-rail-label">Covariance</div>
+      <div id="cov-matrix"></div>
+      <div class="ml-hint">cov(X) = E[(x − μ)(x − μ)ᵀ]</div>
+
+      <div class="ml-readout" id="readout">
+        <div class="row"><span>λ₁</span><b data-k="l1">—</b></div>
+        <div class="row"><span>λ₂</span><b data-k="l2">—</b></div>
+        <div class="row"><span>variance ratio</span><b data-k="ratio">—</b></div>
+      </div>
+
+      <div class="ml-rail-label" style="margin-top: 28px">Datasets</div>
+      <div class="ml-presets" id="presets"></div>
+      <button id="resample" class="ml-resample-btn">↻ Resample</button>
+    </aside>
+
+    <div class="ml-canvas-wrap">
+      <div class="ml-mode-tabs" id="mode-tabs">
+        <button data-mode="explore">I. Find the grain</button>
+        <button data-mode="project">II. Project</button>
+        <button data-mode="reduce">III. Reduce</button>
+      </div>
+      <div class="ml-canvas-frame">
+        <canvas id="canvas"></canvas>
+      </div>
+      <div class="ml-caption" id="caption"></div>
+      <div class="ml-iter" id="angle-controls" style="display:none">
+        <span class="step" id="angle-label" style="min-width:70px;text-align:left">θ = 0°</span>
+        <input id="angle-slider" type="range" min="0" max="180" step="1" value="0" />
+        <span class="step" id="variance-label">var = 0.00</span>
+      </div>
+    </div>
+
+    <aside class="right-rail">
+      <div class="ml-margin" id="margin"></div>
+    </aside>
+
+  </section>
+
+  <section class="ml-applications">
+    <div class="ml-section-rule">
+      <span class="kicker">Where you've seen this</span>
+      <span class="meta">04 examples</span>
+    </div>
+    <div class="ml-app-grid">
+      <div class="ml-app">
+        <div class="ml-app-h">Eigenfaces — face recognition, 1991</div>
+        <p>Turk and Pentland ran PCA on a database of face photos and found the leading principal components looked like ghostly composite faces. Any new face could be reconstructed as a linear combination of, say, fifty <em>eigenfaces</em>. This was the dominant face-recognition technique through the 2000s.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Genetics maps reveal ancestry</div>
+        <p>Run PCA on the genomes of thousands of Europeans and the first two principal components reproduce a recognizable map of Europe — without telling the algorithm anything about geography. Norwegians cluster up-and-left; Greeks down-and-right. Continental ancestry is baked into the eigenvectors.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Stock-market "factors"</div>
+        <p>Quants run PCA on stock returns and find that PC₁ is essentially <em>the market</em> (everything moves together). PC₂ might be "tech vs banks." Modern factor-investing strategies bet on combinations of these PCs, and risk models are built on top of them.</p>
+      </div>
+      <div class="ml-app">
+        <div class="ml-app-h">Visualizing LLM embeddings</div>
+        <p>Almost every t-SNE or UMAP plot of language-model embeddings starts by reducing 1024- or 4096-dim vectors to ~50 dims via PCA, then refining that further with the nonlinear method. PCA does the heavy lifting; t-SNE just polishes.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="ml-further">
+    <div class="ml-section-rule">
+      <span class="kicker">Further reading</span>
+    </div>
+    <ul class="ml-further-list">
+      <li>
+        <span class="title"><a href="https://www.youtube.com/watch?v=FgakZw6K1QQ" target="_blank" rel="noopener">StatQuest — Principal Component Analysis (PCA)</a></span>
+        <span class="kind">video</span>
+        <span class="by">Josh Starmer · A patient walk-through that lands the geometric story (the "find the longest axis" picture) before any linear algebra.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://www.cs.ucsb.edu/~mturk/Papers/jcn.pdf" target="_blank" rel="noopener">Eigenfaces for Recognition</a></span>
+        <span class="kind">paper</span>
+        <span class="by">Turk &amp; Pentland (1991) · The original eigenfaces paper. Short, readable, and surprisingly modern in its framing.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://www.nature.com/articles/nature07331" target="_blank" rel="noopener">Genes mirror geography within Europe</a></span>
+        <span class="kind">paper</span>
+        <span class="by">Novembre et al. (2008) · The "PCA of genomes reproduces a map of Europe" paper. The figure on page 3 is one of the most striking results in modern statistics.</span>
+      </li>
+      <li>
+        <span class="title"><a href="https://scikit-learn.org/stable/modules/decomposition.html#pca" target="_blank" rel="noopener">scikit-learn — PCA documentation</a></span>
+        <span class="kind">reference</span>
+        <span class="by">The reference for actually running PCA on real data. Five lines of Python: <span class="term">PCA(n_components=2).fit_transform(X)</span>.</span>
+      </li>
+    </ul>
+  </section>
+
+  <footer class="ml-foot">
+    <div class="line"><a href="index.html">← all entries</a> · <a href="eigenvectors.html">II. Eigenvectors</a></div>
+    <div class="line eq">cov(X) v = λ v</div>
+    <div class="line"><a href="svd.html">V. SVD →</a></div>
+  </footer>
+
+</main>
+
+<script src="shared.js"></script>
+<script src="pca.js"></script>
+
+</body>
+</html>
