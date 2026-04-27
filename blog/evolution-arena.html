@@ -173,7 +173,7 @@
     </figure>
 
     <h3>The Ratchet Mechanism: Why "Only Forward" Matters</h3>
-    <p>The most critical architectural decision in any Autoresearch system is the <strong>Ratchet Script</strong>. This is the component that enforces <em>monotonic improvement</em> — fancy word, simple meaning: the recorded best score can only go up, never down. Like the toothed wheel in a socket wrench, the system clicks forward when it finds a better score and locks; it physically cannot regress.</p>
+    <p>The most critical architectural decision in any Autoresearch system is the <strong>Ratchet Script</strong>. This is the component that enforces <em>monotonic improvement</em> — the recorded best score can only go up, never down. Like the toothed wheel in a socket wrench, the system clicks forward when it finds a better score and locks; it physically cannot regress.</p>
 
     <p>Why is this so important? Without the ratchet, an autonomous agent can easily oscillate. It improves in one dimension, then breaks something in another, then "fixes" the breakage by reverting the original improvement. You end up with a random walk instead of a climb. The ratchet transforms exploration into accumulation. Every successful experiment becomes the new floor. The agent can try wild, speculative changes — because if they fail, the system snaps back to its best-ever state.</p>
 
@@ -408,7 +408,7 @@
     <p>This scoring asymmetry is what makes the arena a meaningful testbed for Autoresearch. The agent isn't just optimizing a single variable; it's learning to balance competing pressures. Every code change it proposes must navigate this tradeoff. A new steering algorithm that doubles food intake but triples damage will be reverted by the ratchet. Only changes that improve the <em>composite</em> score survive.</p>
 
     <h2>The Role of the Agent: Editing Its Own DNA</h2>
-    <p>Here is where Evolution Arena becomes genuinely fascinating. The AI agent — such as Claude Code running in a terminal — doesn't play the game in real time. Instead, it modifies the <em>source code</em> and <em>configuration files</em> that govern how the creature behaves.</p>
+    <p>The AI agent — Claude Code running in a terminal — doesn't play the game in real time. Instead, it modifies the <em>source code</em> and <em>configuration files</em> that govern how the creature behaves.</p>
 
     <p>The agent interacts primarily with two files:</p>
     <ul>
@@ -418,7 +418,7 @@
 
     <p>The <strong>Evaluation Wrapper</strong> orchestrates each experiment. It takes the agent's proposed changes, runs the simulation for a fixed number of steps, captures the score, and passes it back to the ratchet for the keep-or-revert decision. The wrapper ensures that every experiment is directly comparable — same number of steps, same initial conditions, same scoring formula.</p>
 
-    <p>What emerges is something that looks remarkably like evolution — in the loose sense of <em>random variation filtered by a fitness function</em>. (A "fitness function," borrowing the term from evolutionary computation, is just any function that takes a candidate solution and returns a score: higher means more fit. Here, the score formula <em>is</em> the fitness function.) Early iterations might produce simple changes: bump the vision range up, increase movement speed slightly. But as the easy gains are exhausted, the agent begins making structural changes — rewriting the pathfinding logic, introducing state machines for different behavioral modes, adding predictive avoidance for hazards that are still several steps away. The ratchet ensures that each of these structural leaps only sticks if it actually produces better outcomes.</p>
+    <p>What emerges is evolution: <em>random variation filtered by a fitness function</em>. Early iterations produce simple changes — bump the vision range up, increase movement speed slightly. But as the easy gains are exhausted, the agent begins making structural changes — rewriting the pathfinding logic, introducing state machines for different behavioral modes, adding predictive avoidance for hazards that are still several steps away. The ratchet ensures that each of these structural leaps only sticks if it actually produces better outcomes.</p>
 
     <figure class="svg-figure">
       <svg viewBox="0 0 720 360" width="100%" role="img" aria-label="System architecture: the agent edits game.py and config.json; the evaluation wrapper runs the simulation and emits a score; the ratchet script either commits via git or reverts to HEAD.">
