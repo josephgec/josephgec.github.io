@@ -61,11 +61,11 @@
 
   <section class="ml-stage">
     <aside class="left-rail">
-      <div class="ml-rail-label">Discount γ</div>
+      <label class="ml-rail-label" for="gamma-slider">Discount γ</label>
       <input id="gamma-slider" type="range" min="0" max="1" step="0.05" value="0.9" style="width:100%; accent-color:var(--accent)" />
       <div id="gamma-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">γ = 0.90</div>
 
-      <div class="ml-rail-label" style="margin-top: 24px">Step reward</div>
+      <label class="ml-rail-label" for="step-reward" style="margin-top: 24px">Step reward</label>
       <input id="step-reward" type="range" min="-0.2" max="0.05" step="0.01" value="-0.04" style="width:100%; accent-color:var(--accent)" />
       <div id="step-reward-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">step = −0.04</div>
 
@@ -80,7 +80,7 @@
         <button id="reset-btn" class="ml-sbtn ghost" style="padding:10px 14px; font-family:var(--serif); font-style:italic; font-size:13px">↻</button>
       </div>
 
-      <div class="ml-rail-label" style="margin-top: 18px">Auto-step speed</div>
+      <label class="ml-rail-label" for="speed-slider" style="margin-top: 18px">Auto-step speed</label>
       <input id="speed-slider" type="range" min="1" max="10" step="1" value="3" style="width:100%; accent-color:var(--accent)" />
       <div id="speed-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">slow</div>
 

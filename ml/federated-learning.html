@@ -74,18 +74,18 @@
 
   <section class="ml-stage">
     <aside class="left-rail">
-      <div class="ml-rail-label">Number of clients</div>
+      <label class="ml-rail-label" for="clients-slider">Number of clients</label>
       <input id="clients-slider" type="range" min="3" max="12" step="1" value="6" style="width:100%; accent-color:var(--accent)" />
       <div id="clients-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">6 clients</div>
 
       <div class="ml-rail-label" style="margin-top: 18px">Data distribution</div>
       <div class="ml-presets" id="distribution"></div>
 
-      <div class="ml-rail-label" style="margin-top: 18px">Privacy noise (DP-σ)</div>
+      <label class="ml-rail-label" for="dp-slider" style="margin-top: 18px">Privacy noise (DP-σ)</label>
       <input id="dp-slider" type="range" min="0" max="0.5" step="0.02" value="0" style="width:100%; accent-color:var(--accent)" />
       <div id="dp-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">σ = 0.00 (off)</div>
 
-      <div class="ml-rail-label" style="margin-top: 18px">Client dropout</div>
+      <label class="ml-rail-label" for="dropout-slider" style="margin-top: 18px">Client dropout</label>
       <input id="dropout-slider" type="range" min="0" max="0.5" step="0.05" value="0" style="width:100%; accent-color:var(--accent)" />
       <div id="dropout-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">0% drop per round</div>
 

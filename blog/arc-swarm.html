@@ -207,7 +207,7 @@
 
     <p>The update equations, as implemented in <code>pso_orchestrator.py</code>, are two lines:</p>
 
-    <pre class="codeblock"><code><span class="ck-comment"># one step per iteration, per particle i</span>
+    <pre class="codeblock" tabindex="0"><code><span class="ck-comment"># one step per iteration, per particle i</span>
 v_i      <span class="ck-cmd">=</span>  w · v_i  <span class="ck-cmd">+</span>  c1 · r1 · (pbest_i <span class="ck-cmd">-</span> x_i)  <span class="ck-cmd">+</span>  c2 · r2 · (gbest <span class="ck-cmd">-</span> x_i)
                 <span class="ck-comment">↑              ↑                          ↑</span>
                 <span class="ck-comment">inertia        cognitive (pull to        social (pull to</span>
@@ -475,7 +475,7 @@ target_i <span class="ck-cmd">=</span>  normalize(x_i <span class="ck-cmd">+</sp
 
     <p>A <strong>fitness function</strong>, in optimization vocabulary, is just a number you can compute on any candidate that says "how good is this." Bigger is better. The whole job of the swarm is to climb the fitness function. The continuous fitness function used here, implemented in <code>evaluate.py</code>, decomposes correctness into three weighted components:</p>
 
-    <pre class="codeblock"><code>fitness <span class="ck-cmd">=</span>  <span class="ck-flag">0.20</span> · dim_score      <span class="ck-comment"># is the output the right shape?</span>
+    <pre class="codeblock" tabindex="0"><code>fitness <span class="ck-cmd">=</span>  <span class="ck-flag">0.20</span> · dim_score      <span class="ck-comment"># is the output the right shape?</span>
           <span class="ck-cmd">+</span> <span class="ck-flag">0.30</span> · color_score    <span class="ck-comment"># are the right colours present?</span>
           <span class="ck-cmd">+</span> <span class="ck-flag">0.50</span> · pixel_score    <span class="ck-comment"># are individual cells correct?</span>
           <span class="ck-cmd">-</span> ast_complexity_penalty   <span class="ck-comment"># up to −0.15 for hardcoded lookup tables</span></code></pre>
@@ -490,7 +490,7 @@ target_i <span class="ck-cmd">=</span>  normalize(x_i <span class="ck-cmd">+</sp
 
     <p>The result is a fitness landscape with smooth gradients that PSO can actually navigate. A typical progression looks like:</p>
 
-    <pre class="codeblock"><code><span class="ck-comment">iteration  fitness   what happened</span>
+    <pre class="codeblock" tabindex="0"><code><span class="ck-comment">iteration  fitness   what happened</span>
 <span class="ck-flag">0</span>          <span class="ck-flag">0.12</span>      random code · wrong shape · wrong colors
 <span class="ck-flag">1</span>          <span class="ck-flag">0.31</span>      right colors emerging
 <span class="ck-flag">2</span>          <span class="ck-flag">0.54</span>      correct shape · ~50% pixel accuracy

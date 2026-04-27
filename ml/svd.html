@@ -103,12 +103,12 @@
       <div class="ml-caption" id="caption"></div>
       <div class="ml-iter" id="stage-controls">
         <button id="replay">Replay</button>
-        <input id="stage-slider" type="range" min="0" max="3" step="1" value="0" />
+        <input id="stage-slider" type="range" min="0" max="3" step="1" value="0" aria-label="animation stage" />
         <span class="step" id="stage-label">step 0/3</span>
       </div>
       <div class="ml-iter" id="rank-controls" style="display:none">
         <span class="step" id="rank-label" style="min-width:60px;text-align:left">k = 1</span>
-        <input id="rank-slider" type="range" min="1" max="2" step="1" value="1" />
+        <input id="rank-slider" type="range" min="1" max="2" step="1" value="1" aria-label="rank k" />
         <span class="step" id="residual-label">‖A − A_k‖ = 0.00</span>
       </div>
     </div>

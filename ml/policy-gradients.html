@@ -64,15 +64,15 @@
       <div class="ml-rail-label">View</div>
       <div class="ml-presets" id="view-toggle"></div>
 
-      <div class="ml-rail-label" style="margin-top: 24px">Learning rate α</div>
+      <label class="ml-rail-label" for="lr-slider" style="margin-top: 24px">Learning rate α</label>
       <input id="lr-slider" type="range" min="0.02" max="0.6" step="0.02" value="0.18" style="width:100%; accent-color:var(--accent)" />
       <div id="lr-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">α = 0.18</div>
 
-      <div class="ml-rail-label" style="margin-top: 18px">Discount γ</div>
+      <label class="ml-rail-label" for="gamma-slider" style="margin-top: 18px">Discount γ</label>
       <input id="gamma-slider" type="range" min="0.5" max="0.99" step="0.01" value="0.9" style="width:100%; accent-color:var(--accent)" />
       <div id="gamma-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">γ = 0.90</div>
 
-      <div class="ml-rail-label" style="margin-top: 18px">Speed</div>
+      <label class="ml-rail-label" for="speed-slider" style="margin-top: 18px">Speed</label>
       <input id="speed-slider" type="range" min="1" max="60" step="1" value="10" style="width:100%; accent-color:var(--accent)" />
       <div id="speed-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">10 rollouts / s</div>
 

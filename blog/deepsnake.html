@@ -220,7 +220,7 @@
 
     <p>The network architecture is compact and efficient:</p>
 
-    <pre class="codeblock"><code><span class="ck-comment"># snake_dqn/model.py (simplified)</span>
+    <pre class="codeblock" tabindex="0"><code><span class="ck-comment"># snake_dqn/model.py (simplified)</span>
 <span class="ck-cmd">class</span> DQN(nn.Module):
     <span class="ck-cmd">def</span> __init__(self, state_size=<span class="ck-str">24</span>, action_size=<span class="ck-str">3</span>):
         super().__init__()
@@ -613,7 +613,7 @@
 
     <p>The two pieces that do the actual work are the replay buffer sample and the loss computation. They're short:</p>
 
-    <pre class="codeblock"><code><span class="ck-comment"># snake_dqn/agent.py — one training step (annotated)</span>
+    <pre class="codeblock" tabindex="0"><code><span class="ck-comment"># snake_dqn/agent.py — one training step (annotated)</span>
 <span class="ck-cmd">def</span> learn(self):
     <span class="ck-comment"># 1. Pull a random minibatch of past experiences.</span>
     <span class="ck-comment">#    Random sampling breaks the temporal correlation between consecutive frames,</span>
@@ -732,20 +732,20 @@
     <p>Getting DeepSnake running on your machine takes about two minutes.</p>
 
     <p><strong>Step 1 — Clone the repository:</strong></p>
-    <pre class="codeblock"><code><span class="ck-cmd">git</span> clone https://github.com/josephgec/deepsnake.git
+    <pre class="codeblock" tabindex="0"><code><span class="ck-cmd">git</span> clone https://github.com/josephgec/deepsnake.git
 <span class="ck-cmd">cd</span> deepsnake</code></pre>
 
     <p><strong>Step 2 — Install dependencies:</strong></p>
-    <pre class="codeblock"><code><span class="ck-cmd">pip</span> install torch numpy pygame matplotlib</code></pre>
+    <pre class="codeblock" tabindex="0"><code><span class="ck-cmd">pip</span> install torch numpy pygame matplotlib</code></pre>
 
     <p><strong>Step 3 — Watch the pre-trained agent play:</strong></p>
-    <pre class="codeblock"><code><span class="ck-cmd">cd</span> snake_dqn
+    <pre class="codeblock" tabindex="0"><code><span class="ck-cmd">cd</span> snake_dqn
 <span class="ck-cmd">python</span> play.py</code></pre>
 
     <p>Use <code>SPACE</code> to pause/unpause, <code>R</code> to reset, and <code>Q</code> to quit.</p>
 
     <p><strong>Step 4 (optional) — Train from scratch:</strong></p>
-    <pre class="codeblock"><code><span class="ck-cmd">python</span> train.py
+    <pre class="codeblock" tabindex="0"><code><span class="ck-cmd">python</span> train.py
 <span class="ck-comment"># 2,000 episodes with automatic checkpointing</span>
 <span class="ck-cmd">python</span> plot_training.py  <span class="ck-comment"># render the score curve</span></code></pre>
 

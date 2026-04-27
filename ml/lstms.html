@@ -61,12 +61,12 @@
 
   <section class="ml-stage">
     <aside class="left-rail">
-      <div class="ml-rail-label">Sequence</div>
+      <label class="ml-rail-label" for="seq-input">Sequence</label>
       <input id="seq-input" type="text" value="abracadabra" maxlength="14"
              style="width:100%; padding:8px; font-family:var(--mono); font-size:14px; border:1px solid var(--rule); background:var(--paper)" />
       <div style="font-family:var(--mono); font-size:10px; color:var(--ml-ink-fade); margin-top:6px">chars: a b r c d · space</div>
 
-      <div class="ml-rail-label" style="margin-top: 24px">Step</div>
+      <label class="ml-rail-label" for="step-slider" style="margin-top: 24px">Step</label>
       <input id="step-slider" type="range" min="0" max="11" step="1" value="11" style="width:100%; accent-color:var(--accent)" />
       <div id="step-label" style="font-family:var(--mono); font-size:11px; color:var(--ml-ink-fade); text-align:center">t = 11</div>
 

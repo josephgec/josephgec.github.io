@@ -214,7 +214,7 @@
 
     <p>A minimal SFT loop looks like this — the entire training script, from cold start to a working sampler, in fourteen lines:</p>
 
-    <pre class="codeblock"><code><span class="ck-cmd">from</span> local_tinker <span class="ck-cmd">import</span> ServiceClient
+    <pre class="codeblock" tabindex="0"><code><span class="ck-cmd">from</span> local_tinker <span class="ck-cmd">import</span> ServiceClient
 
 service = ServiceClient()                                  <span class="ck-comment"># 1. discover hardware, pick a backend</span>
 trainer = service.create_lora_training_client(             <span class="ck-comment"># 2. attach a LoRA adapter to a quantized base</span>
@@ -236,7 +236,7 @@ output = sampler.sample(<span class="ck-str">"Explain gradient descent simply:"<
     <h3>Without Local Tinker, you'd write…</h3>
     <p>For comparison — here is roughly the same SFT setup expressed directly against HuggingFace, PEFT, and bitsandbytes. This is the boilerplate Local Tinker absorbs:</p>
 
-    <pre class="codeblock"><code><span class="ck-cmd">import</span> torch
+    <pre class="codeblock" tabindex="0"><code><span class="ck-cmd">import</span> torch
 <span class="ck-cmd">from</span> transformers <span class="ck-cmd">import</span> AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 <span class="ck-cmd">from</span> peft <span class="ck-cmd">import</span> LoraConfig, get_peft_model, prepare_model_for_kbit_training
 
@@ -440,7 +440,7 @@ accum = <span class="ck-flag">8</span>
 
     <p>A GRPO loop in code — the most involved of the four, but still the same shape:</p>
 
-    <pre class="codeblock"><code><span class="ck-cmd">from</span> local_tinker <span class="ck-cmd">import</span> ServiceClient
+    <pre class="codeblock" tabindex="0"><code><span class="ck-cmd">from</span> local_tinker <span class="ck-cmd">import</span> ServiceClient
 
 service = ServiceClient()
 trainer = service.create_lora_training_client(<span class="ck-str">"Qwen/Qwen2.5-7B"</span>, rank=<span class="ck-flag">16</span>)
@@ -474,12 +474,12 @@ trainer = service.create_lora_training_client(<span class="ck-str">"Qwen/Qwen2.5
     <h2>Getting Started</h2>
 
     <p><strong>Step 1 — clone and install</strong> (the package is editable so you can patch a recipe and rerun without reinstalling):</p>
-    <pre class="codeblock"><code><span class="ck-cmd">git</span> clone https://github.com/josephgec/finetuning.git
+    <pre class="codeblock" tabindex="0"><code><span class="ck-cmd">git</span> clone https://github.com/josephgec/finetuning.git
 <span class="ck-cmd">cd</span> finetuning
 <span class="ck-cmd">pip</span> install -e .</code></pre>
 
     <p><strong>Step 2 — see which models you can train on your current hardware.</strong> The CLI inspects your GPU and prints VRAM estimates next to a status flag for each base model in the catalog:</p>
-    <pre class="codeblock"><code>$ <span class="ck-cmd">local-tinker</span> models
+    <pre class="codeblock" tabindex="0"><code>$ <span class="ck-cmd">local-tinker</span> models
 
 MODEL                          PARAMS    QUANT   VRAM     STATUS
 meta-llama/Llama-3.2-1B        1.2B      4bit    ~3 GB    <span class="ck-str">ready</span>
@@ -491,7 +491,7 @@ meta-llama/Llama-3.1-13B       13.0B     4bit    ~16 GB   <span class="ck-commen
     <p>The status column is the useful one. <code>ready</code> means the model and a reasonable batch size fit comfortably. <code>tight</code> means it'll work but you may need to reduce micro-batch size or LoRA rank. <code>OOM</code> means don't bother — it won't fit on this card.</p>
 
     <p><strong>Step 3 — launch a training run.</strong> The CLI is a thin wrapper around the same primitives shown above; everything it does, you can do from Python:</p>
-    <pre class="codeblock"><code><span class="ck-cmd">local-tinker</span> run \
+    <pre class="codeblock" tabindex="0"><code><span class="ck-cmd">local-tinker</span> run \
   <span class="ck-flag">--model</span> meta-llama/Llama-3.2-3B \
   <span class="ck-flag">--dataset</span> ./data/instructions.jsonl \
   <span class="ck-flag">--rank</span> 32 \

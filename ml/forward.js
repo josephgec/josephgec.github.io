@@ -77,7 +77,7 @@
         <div class="ml-param-head">
           <span class="label">${lab}</span><b>${formatNum(state[k])}</b>
         </div>
-        <input type="range" min="-2" max="2" step="0.05" value="${state[k]}" />`;
+        <input type="range" min="-2" max="2" step="0.05" value="${state[k]}" aria-label="${lab}" />`;
       const inp = row.querySelector('input');
       inp.addEventListener('input', (e) => {
         stopPlay();

@@ -211,7 +211,7 @@
         <div class="ml-param-head">
           <span class="label">layer ${i + 1}</span><b>${n} neurons</b>
         </div>
-        <input type="range" min="1" max="8" step="1" value="${n}" />`;
+        <input type="range" min="1" max="8" step="1" value="${n}" aria-label="layer ${i + 1} neuron count" />`;
       const inp = row.querySelector('input');
       inp.addEventListener('input', (e) => {
         state.hidden = state.hidden.map((s, j) => (j === i ? +e.target.value : s));

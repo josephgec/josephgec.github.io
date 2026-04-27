@@ -82,7 +82,7 @@
           <span class="label">${sl.label}</span>
           <b>${formatNum(state[sl.key])}</b>
         </div>
-        <input type="range" min="${sl.min}" max="${sl.max}" step="${sl.step}" value="${state[sl.key]}" />`;
+        <input type="range" min="${sl.min}" max="${sl.max}" step="${sl.step}" value="${state[sl.key]}" aria-label="${sl.label}" />`;
       const inp = row.querySelector('input');
       inp.addEventListener('input', (e) => {
         stopTrain();

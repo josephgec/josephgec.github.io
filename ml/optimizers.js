@@ -192,6 +192,7 @@
       <input type="range" class="lr-slider"
              min="${o.lrMin}" max="${o.lrMax}" step="0.001"
              value="${state.lrs[k]}"
+             aria-label="${o.name} learning rate"
              style="grid-column: 1 / 4; width:100%; accent-color:${o.color}; height: 14px" />`;
     const cb = row.querySelector('input[type=checkbox]');
     cb.addEventListener('change', () => {

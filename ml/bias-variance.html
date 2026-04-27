@@ -73,15 +73,15 @@
 
   <section class="ml-stage">
     <aside class="left-rail">
-      <div class="ml-rail-label">Polynomial degree</div>
+      <label class="ml-rail-label" for="deg-slider">Polynomial degree</label>
       <input id="deg-slider" type="range" min="1" max="15" step="1" value="6" style="width:100%; accent-color:var(--accent)" />
       <div id="deg-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">degree 6</div>
 
-      <div class="ml-rail-label" style="margin-top: 18px">Noise σ</div>
+      <label class="ml-rail-label" for="noise-slider" style="margin-top: 18px">Noise σ</label>
       <input id="noise-slider" type="range" min="0" max="0.6" step="0.02" value="0.25" style="width:100%; accent-color:var(--accent)" />
       <div id="noise-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">σ = 0.25</div>
 
-      <div class="ml-rail-label" style="margin-top: 18px">Training points</div>
+      <label class="ml-rail-label" for="n-slider" style="margin-top: 18px">Training points</label>
       <input id="n-slider" type="range" min="8" max="40" step="1" value="20" style="width:100%; accent-color:var(--accent)" />
       <div id="n-label" style="font-family:var(--mono); font-size:12px; color:var(--ml-ink-fade); text-align:center">n = 20</div>
 
