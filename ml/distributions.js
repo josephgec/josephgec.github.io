@@ -628,11 +628,8 @@
       ctx.lineTo(...toPx(mean, yMax * 0.97));
       ctx.stroke();
       ctx.setLineDash([]);
-      ctx.fillStyle = INK_FADE;
-      ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
-      ctx.textAlign = 'left';
-      const [mx, my] = toPx(mean, yMax * 0.97);
-      ctx.fillText(`true mean = ${formatNum(mean)}`, mx + 4, my + 4);
+      // The mean is already marked 'μ' at the peak and shown in the rail readout,
+      // so no numeric label here — it used to collide with the σ arrow and sample badge.
     }
 
     // ── Sample-count badge top-right ──

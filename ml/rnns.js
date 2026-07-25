@@ -141,12 +141,15 @@
     ctx.fillStyle = INK_FADE;
     ctx.font = '10px "JetBrains Mono", monospace';
     ctx.textAlign = 'left';
-    ctx.fillText('UNROLLED RNN · same cell reused at every step', margin, margin);
+    ctx.fillText('UNROLLED RNN · one cell, reused each step', margin, margin);
     // Storytelling: anchor the eye to the recurring rhythm.
-    ctx.fillStyle = ACCENT;
-    ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
-    ctx.textAlign = 'right';
-    ctx.fillText('watch the hidden bars · repeating chars create a recurring rhythm', size.w - margin, margin);
+    // Only drawn when the canvas is wide enough to clear the left-hand title.
+    if (size.w > 520) {
+      ctx.fillStyle = ACCENT;
+      ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+      ctx.textAlign = 'right';
+      ctx.fillText('repeating chars → a recurring rhythm', size.w - margin, margin);
+    }
 
     // h_0 starting box on the far left
     drawHbar(ctx, margin + colW * 0.35, yH, 36, 18, new Array(Hd).fill(0));

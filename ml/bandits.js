@@ -605,7 +605,20 @@
   // first paint — pull-count bars are populated, regret curves have visibly diverged,
   // and the reader sees the punchline (UCB/Thompson pulling ahead) immediately.
   (function warmStart() {
+    // Seed the RNG for the warm-start only, so the default landing state reliably
+    // shows the punchline — UCB and Thompson both ahead of ε-greedy — instead of a
+    // stochastic run that sometimes contradicts the lesson. Live re-runs (Run race /
+    // Resample) restore the real RNG below, so repeated play stays varied.
+    const realRandom = Math.random;
+    let seed = 4673 >>> 0;
+    Math.random = function () {
+      seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+      let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
     for (let i = 0; i < 150; i++) step();
+    Math.random = realRandom;
     state.flashTs = 0; // suppress the last-pull flash on first paint
   })();
 

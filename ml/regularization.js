@@ -252,37 +252,8 @@
     ctx.textAlign = 'center';
     ctx.fillText(`p = ${state.p.toFixed(2)}  ·  hit Resample for fresh masks`, size.w / 2, size.h - 10);
 
-    // Inline legend strip (top-right of the canvas): striped = silenced, filled = active
-    const legX = size.w - 200, legY = 6;
-    // striped swatch
-    ctx.save();
-    ctx.beginPath();
-    ctx.rect(legX, legY, 14, 14);
-    ctx.clip();
-    ctx.fillStyle = 'rgba(38,35,32,0.05)';
-    ctx.fillRect(legX, legY, 14, 14);
-    ctx.strokeStyle = 'rgba(38,35,32,0.40)';
-    ctx.lineWidth = 1;
-    for (let s = -14; s < 28; s += 4) {
-      ctx.beginPath();
-      ctx.moveTo(legX + s, legY);
-      ctx.lineTo(legX + s + 14, legY + 14);
-      ctx.stroke();
-    }
-    ctx.restore();
-    ctx.strokeStyle = 'rgba(38,35,32,0.30)';
-    ctx.strokeRect(legX, legY, 14, 14);
-    // filled swatch
-    ctx.fillStyle = 'rgba(122,31,36,0.55)';
-    ctx.fillRect(legX + 90, legY, 14, 14);
-    ctx.strokeStyle = 'rgba(38,35,32,0.30)';
-    ctx.strokeRect(legX + 90, legY, 14, 14);
-    // labels
-    ctx.fillStyle = INK_FADE;
-    ctx.font = '10px "JetBrains Mono", monospace';
-    ctx.textAlign = 'left';
-    ctx.fillText('silenced', legX + 18, legY + 11);
-    ctx.fillText('active', legX + 108, legY + 11);
+    // (The striped = silenced / filled = active key lives in the caption below the
+    // canvas; an inline top-right legend used to collide with the AVERAGE column title.)
   }
 
   // ───────── View 2: Train vs test time ─────────

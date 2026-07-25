@@ -157,9 +157,11 @@
     ctx.fillStyle = INK_FADE;
     ctx.font = '11px "JetBrains Mono", monospace';
     ctx.textAlign = 'left';
-    ctx.fillText('PRE-TRAINED BACKBONE  (source task: ImageNet)', padX, 22);
+    // Terser labels on narrow canvases so the backbone/head banners never collide.
+    const wideHdr = size.w > 500;
+    ctx.fillText(wideHdr ? 'PRE-TRAINED BACKBONE · ImageNet' : 'BACKBONE', padX, 22);
     ctx.textAlign = 'right';
-    ctx.fillText('NEW HEAD  (target task)', padX + NUM_LAYERS * layerW + layerW - 8, 22);
+    ctx.fillText(wideHdr ? 'NEW HEAD · target task' : 'HEAD', padX + NUM_LAYERS * layerW + layerW - 8, 22);
 
     // Brace under backbone
     ctx.strokeStyle = 'rgba(38,35,32,0.35)';
@@ -211,13 +213,13 @@
     ctx.textAlign = 'left';
     ctx.fillText(
       `${trainable.toFixed(1)}M trainable / ${TOTAL_PARAMS_M.toFixed(1)}M total`,
-      padX, archH + 10
+      padX, archH + 6
     );
 
     // ───── Bottom: training curves ─────
     // Reserve space below the curves for: counter strip (≈46px) + storytelling line (≈20px) + bottom padding.
     // Without this reservation the wall-clock counters and headline tradeoff line render below the canvas.
-    const plotY0 = archH + 30;
+    const plotY0 = archH + 50;
     const plotH = size.h - plotY0 - 130;
     const plotX0 = 60;
     const plotW = size.w - plotX0 - 24;
