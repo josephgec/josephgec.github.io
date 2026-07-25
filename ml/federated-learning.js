@@ -261,21 +261,21 @@
     ctx.textAlign = 'left';
     const phaseDescription = {
       idle:      state.distribution === 'non-iid'
-        ? 'idle · each client below has a DIFFERENT local data histogram — yet they will train one shared model. click ▷ Run rounds.'
+        ? 'idle · clients hold different local data · ▷ Run rounds'
         : 'idle · click ▷ Run rounds',
-      broadcast: 'phase 1 · server broadcasts global w to all clients',
-      local:     'phase 2 · each client trains locally on its private data',
-      upload:    'phase 3 · clients upload Δw (with optional DP noise)',
-      aggregate: 'phase 4 · server averages, weighted by data size n_k',
+      broadcast: 'phase 1 · server broadcasts global w',
+      local:     'phase 2 · clients train on private data',
+      upload:    'phase 3 · clients upload Δw (+ DP noise)',
+      aggregate: 'phase 4 · server averages by data size n_k',
     };
-    ctx.fillText(phaseDescription[state.phase] || '', padX, 18);
+    ctx.fillText(phaseDescription[state.phase] || '', padX, 16);
 
     // ─── Tiny packet-color key (top, right-of-stage) ──
     // Two swatches: white-with-oxblood-ring = global weights; oxblood = gradient updates.
     // Helps newcomers read the animation without flipping back to the caption.
     {
-      const keyY = 14;
-      const keyX0 = padX + stageW - 230;
+      const keyY = 34;               // own line, below the phase header
+      const keyX0 = padX;            // left-aligned so it clears the loss panel on the right
       // White packet swatch
       ctx.fillStyle = '#fffdf6';
       ctx.strokeStyle = ACCENT;

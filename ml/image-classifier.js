@@ -88,9 +88,9 @@
     }
     const ch = l1.map(sumMap);
     const logitsRaw = [
-      0.6 * ch[3] - 0.2 * ch[0] - 0.2 * ch[1] - 0.2 * ch[2],     // circle
-      0.5 * ch[0] + 0.5 * ch[1] - 0.3 * ch[3] - 0.3 * ch[2],     // cross
-      0.7 * ch[2] - 0.2 * ch[0] - 0.2 * ch[1] - 0.2 * ch[3],     // diag
+      170 - 2 * ch[3],                                // circle — the ring filter fires least on a filled disk
+      0.5 * ch[0] + 0.5 * ch[1] - 0.35 * ch[2],       // cross  — strong horizontal + vertical edges, weak diagonal
+      0.7 * ch[2] - 0.15 * ch[0] - 0.15 * ch[1],      // diag   — dominant diagonal channel
     ];
     // Scale before softmax to keep things tame
     const logits = logitsRaw.map((v) => v * 0.05);

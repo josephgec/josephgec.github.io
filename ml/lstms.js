@@ -226,11 +226,8 @@
     ctx.font = '10px "JetBrains Mono", monospace';
     ctx.textAlign = 'left';
     ctx.fillText('LSTM CELL', x0 + 22, y0 + H * 0.08 + 14);
-    // Storytelling: σ = sigmoid maps the input to a 0..1 valve openness.
-    ctx.fillStyle = INK_FADE;
-    ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
-    ctx.textAlign = 'right';
-    ctx.fillText('σ = sigmoid · maps to (0, 1) valve openness · ⊙ = element-wise', x0 + W - 22, y0 + H * 0.08 + 14);
+    // (The σ = sigmoid / ⊙ = element-wise key lives in the "Reading the symbols"
+    // margin; an inline top-right line here collided with the OUTPUT gate label.)
 
     // ── Cell-state bus (the conveyor belt) ──
     ctx.strokeStyle = ACCENT;
@@ -246,10 +243,8 @@
     ctx.fillText('c_{t−1}', busLeft - 60, busY + 4);
     ctx.textAlign = 'right';
     ctx.fillText('c_t →', busRight + 56, busY + 4);
-    ctx.font = '10px "JetBrains Mono", monospace';
-    ctx.fillStyle = INK_FADE;
-    ctx.textAlign = 'center';
-    ctx.fillText('CELL-STATE BUS · memory conveyor belt · old memory mostly passes through', (busLeft + busRight) / 2, busY - 12);
+    // (The bus is labelled by its c_{t−1} → c_t carries and the caption; a centered
+    // "CELL-STATE BUS" line here collided with the INPUT gate label above the bus.)
 
     // Carry-in and carry-out tiny arrows
     drawArrow(ctx, busLeft - 24, busY, busLeft - 4, busY, ACCENT, 2, 7);
