@@ -10,7 +10,7 @@
   <link rel="canonical" href="https://jthomas.site/blog/" />
     <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
   <link rel="apple-touch-icon" href="../photo.jpg" />
-  <meta name="theme-color" content="#7a1f24" />
+  <meta name="theme-color" content="#F4F9FE" />
 
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://jthomas.site/blog/" />
@@ -29,11 +29,10 @@
   }
   </script>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,400;1,8..60,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-
+  <link rel="preload" href="/fonts/bricolage-grotesque.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="/css/fonts.css" />
   <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="/css/site.css" />
   <link rel="alternate" type="application/rss+xml" title="Joseph Thomas — Writing" href="feed.xml" />
 
   <!-- Twitter Card -->
@@ -44,18 +43,16 @@
 </head>
 <body>
 
-<header class="nb-nav">
-  <div class="brand-block">
-    <a class="brand" href="../index.html">jthomas.site</a><span class="brand-meta">// notebook · v.4.2026</span>
-  </div>
-  <nav>
-    <a href="../blog/index.html" style="color:var(--ink);">writing</a>
-    <a href="../ml/index.html">tutorial</a>
-    <a href="../index.html#research">research</a>
-    <a href="../index.html#work">work</a>
-    <a href="../index.html#projects">projects</a>
-    <a href="../consulting.html">consulting</a>
-    <a href="../index.html#contact" class="contact">→ contact</a>
+<header class="site-top">
+  <a class="brand" href="../index.html">Joseph Thomas</a>
+  <nav aria-label="Primary">
+    <a href="../blog/index.html" aria-current="page">Writing</a>
+    <a href="../ml/index.html">Tutorial</a>
+    <a href="../index.html#work">Work</a>
+    <a href="../index.html#research">Research</a>
+    <a href="../index.html#projects">Projects</a>
+    <a href="../consulting.html">Consulting</a>
+    <a class="pill-cta" href="../index.html#contact">Contact</a>
   </nav>
 </header>
 

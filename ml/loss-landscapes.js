@@ -150,9 +150,9 @@
   // Map a normalized loss t∈[0,1] → cream→oxblood color (consistent across heatmap and legend).
   function lossColor(t) {
     const tg = Math.pow(t, 0.55);
-    const r = Math.round(247 - tg * 200);
-    const g = Math.round(244 - tg * 200);
-    const b = Math.round(236 - tg * 210);
+    const r = Math.round(252 - tg * 237);
+    const g = Math.round(254 - tg * 220);
+    const b = Math.round(255 - tg * 199);
     return [r, g, b];
   }
 
@@ -225,7 +225,7 @@
     for (let k = 0; k < levels; k++) {
       const tLevel = Math.pow((k + 0.5) / levels, 1.7); // bias contour density toward low loss
       const lvl = lmin + tLevel * lrange;
-      ctx.strokeStyle = `rgba(38,35,32,${0.18 + (k % 3 === 0 ? 0.12 : 0)})`;
+      ctx.strokeStyle = `rgba(15,34,56,${0.18 + (k % 3 === 0 ? 0.12 : 0)})`;
       ctx.lineWidth = k % 3 === 0 ? 0.9 : 0.5;
       for (let i = 0; i < cells - 1; i++) {
         for (let j = 0; j < cells - 1; j++) {
@@ -258,19 +258,19 @@
       const [sx, sy] = [tx(0), ty(0)];
       const len = 36;
       // Descending axis (along y for this saddle: f decreases as |y| grows) — accent red.
-      ctx.strokeStyle = 'rgba(122,31,36,0.85)';
+      ctx.strokeStyle = 'rgba(31,95,204,0.85)';
       ctx.lineWidth = 2;
       drawArrow(ctx, sx, sy, sx, sy - len);
       drawArrow(ctx, sx, sy, sx, sy + len);
       // Ascending axis (along x) — faded.
-      ctx.strokeStyle = 'rgba(38,35,32,0.45)';
+      ctx.strokeStyle = 'rgba(15,34,56,0.45)';
       ctx.setLineDash([4, 3]);
       drawArrow(ctx, sx, sy, sx - len, sy);
       drawArrow(ctx, sx, sy, sx + len, sy);
       ctx.setLineDash([]);
       // Annotation
-      ctx.fillStyle = '#262320';
-      ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+      ctx.fillStyle = '#0f2238';
+      ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'left';
       ctx.fillText('saddle: gradient ≈ 0,', sx + len + 6, sy - 4);
       ctx.fillText('but not a minimum.', sx + len + 6, sy + 10);
@@ -278,7 +278,7 @@
 
     // Path
     if (state.path.length > 1) {
-      ctx.strokeStyle = 'rgba(122,31,36,0.85)';
+      ctx.strokeStyle = 'rgba(31,95,204,0.85)';
       ctx.lineWidth = 1.8;
       ctx.beginPath();
       state.path.forEach((p, i) => {
@@ -288,7 +288,7 @@
       ctx.stroke();
       // Step dots
       for (let i = 0; i < state.path.length; i += Math.max(1, Math.floor(state.path.length / 40))) {
-        ctx.fillStyle = 'rgba(122,31,36,0.6)';
+        ctx.fillStyle = 'rgba(31,95,204,0.6)';
         ctx.beginPath();
         ctx.arc(tx(state.path[i][0]), ty(state.path[i][1]), 1.5, 0, Math.PI * 2);
         ctx.fill();
@@ -296,11 +296,11 @@
     }
 
     // Marble
-    ctx.fillStyle = '#262320';
+    ctx.fillStyle = '#0f2238';
     ctx.beginPath();
     ctx.arc(tx(state.pos[0]), ty(state.pos[1]), 6, 0, Math.PI * 2);
     ctx.fill();
-    ctx.strokeStyle = '#fffdf6';
+    ctx.strokeStyle = '#FCFEFF';
     ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.arc(tx(state.pos[0]), ty(state.pos[1]), 6, 0, Math.PI * 2);
@@ -314,11 +314,11 @@
     if (gnorm < 0.02 && state.path.length > 3) {
       const [px, py] = [tx(state.pos[0]), ty(state.pos[1])];
       const tag = state.surfKey === 'saddle' ? 'stalled at saddle' : 'arrived · ‖∇L‖ ≈ 0';
-      ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+      ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
       const tw = ctx.measureText(tag).width + 12;
       let bx = px + 14, by = py - 22;
       if (bx + tw > size.w - legendW - 4) bx = px - tw - 14;
-      ctx.fillStyle = 'rgba(255,253,246,0.94)';
+      ctx.fillStyle = 'rgba(252,254,255,0.94)';
       ctx.strokeStyle = 'rgba(58,107,94,0.7)';
       ctx.lineWidth = 1;
       ctx.beginPath();
@@ -359,18 +359,18 @@
       ctx.fillStyle = `rgb(${r},${g},${b})`;
       ctx.fillRect(legendX, legendTop + py, legendBarW, 1);
     }
-    ctx.strokeStyle = 'rgba(38,35,32,0.4)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.4)';
     ctx.lineWidth = 1;
     ctx.strokeRect(legendX, legendTop, legendBarW, legendH);
     // Tick marks + numbers (5 ticks)
-    ctx.fillStyle = '#262320';
-    ctx.font = '9px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#0f2238';
+    ctx.font = '9px "IBM Plex Mono", monospace';
     ctx.textAlign = 'right';
     ctx.textBaseline = 'middle';
     for (let i = 0; i <= 4; i++) {
       const t = i / 4;
       const yy = legendTop + (1 - t) * legendH;
-      ctx.strokeStyle = 'rgba(38,35,32,0.4)';
+      ctx.strokeStyle = 'rgba(15,34,56,0.4)';
       ctx.beginPath();
       ctx.moveTo(legendX + legendBarW, yy);
       ctx.lineTo(legendX + legendBarW + 3, yy);
@@ -381,12 +381,12 @@
     }
     // Header
     ctx.fillStyle = INK_FADE;
-    ctx.font = '9px "JetBrains Mono", monospace';
+    ctx.font = '9px "IBM Plex Mono", monospace';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'alphabetic';
     ctx.fillText('LOSS', legendX + legendBarW / 2, legendTop - 8);
     // Hi / Lo annotations
-    ctx.font = 'italic 9px "Source Serif 4", Georgia, serif';
+    ctx.font = '9px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.fillText('hi', legendX + legendBarW / 2, legendTop - 16);
     ctx.fillText('lo', legendX + legendBarW / 2, legendBot + 18);
   }
@@ -436,11 +436,11 @@
     const myPx = yR(my);
     return `
       <svg viewBox="0 0 ${W} ${H}" style="width:100%; height:auto" aria-hidden="true">
-        <line x1="${pad}" y1="${H - pad}" x2="${W - pad}" y2="${H - pad}" stroke="rgba(38,35,32,0.30)" stroke-width="0.8"/>
-        <path d="${path}" fill="none" stroke="#262320" stroke-width="1.2"/>
-        <circle cx="${mx.toFixed(1)}" cy="${myPx.toFixed(1)}" r="3.5" fill="#262320"/>
-        <text x="${pad}" y="${pad + 6}" font-family="JetBrains Mono, monospace" font-size="8" fill="rgba(38,35,32,0.55)">f(x, 0)</text>
-        <text x="${W - pad}" y="${H - pad - 2}" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="8" fill="rgba(38,35,32,0.55)">x</text>
+        <line x1="${pad}" y1="${H - pad}" x2="${W - pad}" y2="${H - pad}" stroke="rgba(15,34,56,0.30)" stroke-width="0.8"/>
+        <path d="${path}" fill="none" stroke="#0f2238" stroke-width="1.2"/>
+        <circle cx="${mx.toFixed(1)}" cy="${myPx.toFixed(1)}" r="3.5" fill="#0f2238"/>
+        <text x="${pad}" y="${pad + 6}" font-family="IBM Plex Mono, monospace" font-size="8" fill="rgba(15,34,56,0.55)">f(x, 0)</text>
+        <text x="${W - pad}" y="${H - pad - 2}" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="8" fill="rgba(15,34,56,0.55)">x</text>
       </svg>`;
   }
 

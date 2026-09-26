@@ -186,12 +186,12 @@
 
     // Title
     ctx.fillStyle = INK_FADE;
-    ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+    ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('one block · residual stream picks up two updates', size.w / 2, 22);
 
     // Residual stream backbone
-    ctx.strokeStyle = 'rgba(122,31,36,0.55)';
+    ctx.strokeStyle = 'rgba(31,95,204,0.55)';
     ctx.lineWidth = 2;
     ctx.setLineDash([4, 4]);
     ctx.beginPath();
@@ -199,8 +199,8 @@
     ctx.lineTo(cx, padY + H);
     ctx.stroke();
     ctx.setLineDash([]);
-    ctx.fillStyle = 'rgba(122,31,36,0.7)';
-    ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+    ctx.fillStyle = 'rgba(31,95,204,0.7)';
+    ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'left';
     ctx.fillText('residual stream', cx + 8, padY - 6);
 
@@ -226,13 +226,13 @@
         const boxY = s.y - 28;
         const boxW = W - (branchX - padX) - 20;
         const boxH = 56;
-        ctx.fillStyle = 'rgba(122,31,36,0.06)';
+        ctx.fillStyle = 'rgba(31,95,204,0.06)';
         ctx.strokeStyle = ACCENT;
         ctx.lineWidth = 1;
         ctx.fillRect(boxX, boxY, boxW, boxH);
         ctx.strokeRect(boxX, boxY, boxW, boxH);
         ctx.fillStyle = ACCENT;
-        ctx.font = 'italic 13px "Source Serif 4", Georgia, serif';
+        ctx.font = '13px "Bricolage Grotesque", system-ui, sans-serif';
         ctx.textAlign = 'left';
         ctx.fillText(s.label, boxX + 8, boxY + 16);
 
@@ -245,15 +245,15 @@
           for (let q = 0; q < N; q++) {
             for (let k = 0; k < N; k++) {
               const w = M[q][k];
-              if (!isFinite(w)) ctx.fillStyle = 'rgba(38,35,32,0.04)';
-              else ctx.fillStyle = `rgba(122,31,36,${0.05 + w * 0.7})`;
+              if (!isFinite(w)) ctx.fillStyle = 'rgba(15,34,56,0.04)';
+              else ctx.fillStyle = `rgba(31,95,204,${0.05 + w * 0.7})`;
               ctx.fillRect(mx0 + k * cell, my0 + q * cell, cell + 0.5, cell + 0.5);
             }
           }
-          ctx.strokeStyle = 'rgba(38,35,32,0.30)';
+          ctx.strokeStyle = 'rgba(15,34,56,0.30)';
           ctx.strokeRect(mx0, my0, cell * N, cell * N);
           ctx.fillStyle = INK_FADE;
-          ctx.font = '9px "JetBrains Mono", monospace';
+          ctx.font = '9px "IBM Plex Mono", monospace';
           ctx.textAlign = 'left';
           ctx.fillText('softmax(QKᵀ/√d)', boxX + 8, boxY + 32);
           ctx.fillText('mixes across tokens', boxX + 8, boxY + 44);
@@ -264,25 +264,25 @@
           const my0 = boxY + 22;
           for (let i2 = 0; i2 < N; i2++) {
             const h = 24 + Math.sin((i2 + state.layer) * 1.3) * 6;
-            ctx.fillStyle = 'rgba(122,31,36,0.55)';
+            ctx.fillStyle = 'rgba(31,95,204,0.55)';
             ctx.fillRect(mx0 + i2 * cell, my0 + 28 - h, cell - 1, h);
           }
           ctx.fillStyle = INK_FADE;
-          ctx.font = '9px "JetBrains Mono", monospace';
+          ctx.font = '9px "IBM Plex Mono", monospace';
           ctx.textAlign = 'left';
           ctx.fillText('per-token MLP', boxX + 8, boxY + 32);
           ctx.fillText('no token mixing', boxX + 8, boxY + 44);
         }
 
         // Branch arrow from residual → box
-        ctx.strokeStyle = active ? ACCENT : 'rgba(122,31,36,0.25)';
+        ctx.strokeStyle = active ? ACCENT : 'rgba(31,95,204,0.25)';
         ctx.lineWidth = 1.4;
         ctx.beginPath();
         ctx.moveTo(cx, s.y);
         ctx.lineTo(boxX - 6, s.y);
         ctx.stroke();
         // arrowhead
-        ctx.fillStyle = active ? ACCENT : 'rgba(122,31,36,0.25)';
+        ctx.fillStyle = active ? ACCENT : 'rgba(31,95,204,0.25)';
         ctx.beginPath();
         ctx.moveTo(boxX, s.y);
         ctx.lineTo(boxX - 8, s.y - 4);
@@ -293,28 +293,28 @@
         // LayerNorm marker
         const lx = cx - 80;
         const ly = s.y - 10;
-        ctx.fillStyle = active ? 'rgba(38,35,32,0.85)' : 'rgba(38,35,32,0.4)';
-        ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+        ctx.fillStyle = active ? 'rgba(15,34,56,0.85)' : 'rgba(15,34,56,0.4)';
+        ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
         ctx.textAlign = 'right';
         ctx.fillText(s.label, cx - 14, s.y + 4);
         // tick on the residual stream
-        ctx.fillStyle = active ? '#262320' : 'rgba(38,35,32,0.4)';
+        ctx.fillStyle = active ? '#0f2238' : 'rgba(15,34,56,0.4)';
         ctx.fillRect(cx - 4, s.y - 1, 8, 2);
       } else {
         // ADD node — circle on stream
-        ctx.fillStyle = active ? ACCENT : 'rgba(122,31,36,0.25)';
+        ctx.fillStyle = active ? ACCENT : 'rgba(31,95,204,0.25)';
         ctx.beginPath();
         ctx.arc(cx, s.y, 6, 0, Math.PI * 2);
         ctx.fill();
-        ctx.fillStyle = '#fffdf6';
-        ctx.font = 'bold 9px "JetBrains Mono", monospace';
+        ctx.fillStyle = '#FCFEFF';
+        ctx.font = 'bold 9px "IBM Plex Mono", monospace';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText('+', cx, s.y + 1);
         ctx.textBaseline = 'alphabetic';
         // label to right of stream
-        ctx.fillStyle = active ? INK : 'rgba(38,35,32,0.4)';
-        ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+        ctx.fillStyle = active ? INK : 'rgba(15,34,56,0.4)';
+        ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
         ctx.textAlign = 'left';
         ctx.fillText(s.label, cx + 14, s.y + 4);
         // arrow back into stream
@@ -322,7 +322,7 @@
           const prev = stages[i - 1];
           if (prev.side === 'branch') {
             const boxX = branchX;
-            ctx.strokeStyle = active ? ACCENT : 'rgba(122,31,36,0.25)';
+            ctx.strokeStyle = active ? ACCENT : 'rgba(31,95,204,0.25)';
             ctx.lineWidth = 1.4;
             ctx.beginPath();
             ctx.moveTo(boxX - 6, prev.y);
@@ -330,7 +330,7 @@
             ctx.lineTo(boxX - 30, s.y);
             ctx.lineTo(cx + 8, s.y);
             ctx.stroke();
-            ctx.fillStyle = active ? ACCENT : 'rgba(122,31,36,0.25)';
+            ctx.fillStyle = active ? ACCENT : 'rgba(31,95,204,0.25)';
             ctx.beginPath();
             ctx.moveTo(cx + 6, s.y);
             ctx.lineTo(cx + 14, s.y - 4);
@@ -362,13 +362,13 @@
     ];
     const stageIdx = Math.min(stepLabels.length - 1, Math.floor(totalT));
     ctx.fillStyle = ACCENT;
-    ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+    ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'left';
     ctx.fillText(stepLabels[stageIdx], cx + 12, yPos + 4);
 
     // Hint
     ctx.fillStyle = INK_FADE;
-    ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+    ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('click canvas to replay', size.w / 2, size.h - 8);
   }
@@ -390,12 +390,12 @@
     const cellSize = Math.min(tileW / N, tileH / N);
 
     ctx.fillStyle = INK_FADE;
-    ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+    ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText(`layer ${layerIdx + 1} · ${heads} attention head${heads === 1 ? '' : 's'}`, size.w / 2, 20);
 
-    ctx.fillStyle = '#262320';
-    ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+    ctx.fillStyle = '#0f2238';
+    ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'right';
     for (let i = 0; i < N; i++) {
       ctx.fillText(words[i], padLeft - 6, padTop + i * cellSize + cellSize / 2 + 3);
@@ -409,17 +409,17 @@
       for (let q = 0; q < N; q++) {
         for (let k = 0; k < N; k++) {
           const w = M[q][k];
-          if (!isFinite(w)) ctx.fillStyle = 'rgba(38,35,32,0.04)';
-          else ctx.fillStyle = `rgba(122,31,36,${0.05 + w * 0.7})`;
+          if (!isFinite(w)) ctx.fillStyle = 'rgba(15,34,56,0.04)';
+          else ctx.fillStyle = `rgba(31,95,204,${0.05 + w * 0.7})`;
           ctx.fillRect(x0 + k * cellSize, y0 + q * cellSize, cellSize + 0.5, cellSize + 0.5);
         }
       }
-      ctx.strokeStyle = 'rgba(38,35,32,0.30)';
+      ctx.strokeStyle = 'rgba(15,34,56,0.30)';
       ctx.lineWidth = 1;
       ctx.strokeRect(x0, y0, N * cellSize, N * cellSize);
 
       ctx.fillStyle = INK_FADE;
-      ctx.font = '10px "JetBrains Mono", monospace';
+      ctx.font = '10px "IBM Plex Mono", monospace';
       ctx.textAlign = 'center';
       for (let k = 0; k < N; k++) {
         ctx.save();
@@ -432,7 +432,7 @@
       // Head label — empirical
       const desc = describeHead(words, h, layerIdx);
       ctx.fillStyle = INK_FADE;
-      ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+      ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText(`head ${h + 1} · ${desc}`, x0 + N * cellSize / 2, y0 - 8);
     }
@@ -462,12 +462,12 @@
 
     // Title
     ctx.fillStyle = INK_FADE;
-    ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+    ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText(`query word "${words[qIdx]}" — attention pattern across layers`, size.w / 2, 22);
 
     ctx.fillStyle = INK_FADE;
-    ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+    ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('click canvas to cycle query word', size.w / 2, 42);
 
@@ -479,7 +479,7 @@
       // Panel label — highlight the slider-selected layer
       const isActive = L === state.layer;
       ctx.fillStyle = isActive ? ACCENT : INK;
-      ctx.font = '10px "JetBrains Mono", monospace';
+      ctx.font = '10px "IBM Plex Mono", monospace';
       ctx.textAlign = 'center';
       ctx.fillText(`LAYER ${L + 1}${isActive ? ' ◄' : ''}`, x0 + tileW / 2, y0 - 6);
 
@@ -490,12 +490,12 @@
       for (let k = 0; k < N; k++) {
         const w = isFinite(row[k]) ? row[k] : 0;
         const h = w * (barBottom - barTop);
-        ctx.fillStyle = `rgba(122,31,36,${0.18 + w * 0.7})`;
+        ctx.fillStyle = `rgba(31,95,204,${0.18 + w * 0.7})`;
         ctx.fillRect(x0 + k * colW + 2, barBottom - h, colW - 4, h);
       }
       // Word labels under bars
       ctx.fillStyle = INK;
-      ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+      ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'center';
       for (let k = 0; k < N; k++) {
         const isQ = k === qIdx;
@@ -503,7 +503,7 @@
         ctx.fillText(words[k], x0 + k * colW + colW / 2, barBottom + 14);
       }
       // Frame
-      ctx.strokeStyle = 'rgba(38,35,32,0.18)';
+      ctx.strokeStyle = 'rgba(15,34,56,0.18)';
       ctx.strokeRect(x0, y0, tileW, barH + 4);
     });
   }

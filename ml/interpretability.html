@@ -6,25 +6,25 @@
   <title>Model Interpretability · ML, Visualized · Joseph Thomas</title>
   <meta name="description" content="SHAP and LIME open the black box just enough to ask: which feature pushed the prediction which way?" />
   <link rel="canonical" href="https://jthomas.site/ml/interpretability.html" />
-  <meta name="theme-color" content="#7a1f24" />
+  <meta name="theme-color" content="#F4F9FE" />
   <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;1,8..60,300;1,8..60,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="preload" href="/fonts/bricolage-grotesque.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="/css/fonts.css" />
   <link rel="stylesheet" href="../styles.css" />
   <link rel="stylesheet" href="shared.css" />
+  <link rel="stylesheet" href="/css/site.css" />
 </head>
 <body>
-<header class="nb-nav">
-  <div class="brand-block"><a class="brand" href="../index.html">jthomas.site</a><span class="brand-meta">// notebook · v.4.2026</span></div>
-  <nav>
-    <a href="../blog/index.html">writing</a>
-    <a href="index.html" style="color:var(--ink)">tutorial</a>
-    <a href="../index.html#research">research</a>
-    <a href="../index.html#work">work</a>
-    <a href="../index.html#projects">projects</a>
-    <a href="../consulting.html">consulting</a>
-    <a href="../index.html#contact" class="contact">→ contact</a>
+<header class="site-top">
+  <a class="brand" href="../index.html">Joseph Thomas</a>
+  <nav aria-label="Primary">
+    <a href="../blog/index.html">Writing</a>
+    <a href="../ml/index.html" aria-current="true">Tutorial</a>
+    <a href="../index.html#work">Work</a>
+    <a href="../index.html#research">Research</a>
+    <a href="../index.html#projects">Projects</a>
+    <a href="../consulting.html">Consulting</a>
+    <a class="pill-cta" href="../index.html#contact">Contact</a>
   </nav>
 </header>
 
@@ -58,7 +58,7 @@
       </ol>
     </div>
 
-    <div class="ml-try" style="margin-top:14px; background: rgba(38,35,32,0.025); border-left: 2px solid rgba(38,35,32,0.18); padding-left: 14px">
+    <div class="ml-try" style="margin-top:14px; background: rgba(15,34,56,0.025); border-left: 2px solid rgba(15,34,56,0.18); padding-left: 14px">
       <div class="ml-eyebrow">Plain-English math</div>
       <ul style="font-family:var(--serif); font-style:italic; font-size:14px; line-height:1.65; color:var(--ink); margin:6px 0 0; padding-left:18px">
         <li><b>f(x)</b> · the model's prediction for this case (e.g., 0.83 = 83% fraud probability).</li>
@@ -104,32 +104,32 @@
         <div class="ml-margin-h">A prediction, told as a story</div>
         <svg viewBox="0 0 220 200" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; margin:6px 0 4px">
           <!-- Vertical rail showing how a prediction builds up -->
-          <line x1="40" y1="14" x2="40" y2="186" stroke="rgba(38,35,32,0.35)" stroke-width="0.6"/>
+          <line x1="40" y1="14" x2="40" y2="186" stroke="rgba(15,34,56,0.35)" stroke-width="0.6"/>
           <!-- baseline -->
-          <circle cx="40" cy="20" r="3.5" fill="rgba(38,35,32,0.55)"/>
-          <text x="50" y="22" font-family="JetBrains Mono, monospace" font-size="7" fill="#262320">baseline E[f]</text>
-          <text x="50" y="32" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="8" fill="rgba(38,35,32,0.55)">model's average prediction</text>
+          <circle cx="40" cy="20" r="3.5" fill="rgba(15,34,56,0.55)"/>
+          <text x="50" y="22" font-family="IBM Plex Mono, monospace" font-size="7" fill="#0f2238">baseline E[f]</text>
+          <text x="50" y="32" font-family="Bricolage Grotesque, Georgia, serif" font-style="italic" font-size="8" fill="rgba(15,34,56,0.55)">model's average prediction</text>
           <!-- step 1: positive push -->
-          <line x1="40" y1="44" x2="40" y2="60" stroke="rgba(122,31,36,0.7)" stroke-width="3"/>
-          <polygon points="40,42 36,50 44,50" fill="rgba(122,31,36,0.7)"/>
-          <text x="50" y="56" font-family="JetBrains Mono, monospace" font-size="7" fill="#262320">+ feature₁  (push up)</text>
-          <text x="50" y="66" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="8" fill="rgba(38,35,32,0.55)">e.g., transaction = $2,500</text>
+          <line x1="40" y1="44" x2="40" y2="60" stroke="rgba(31,95,204,0.7)" stroke-width="3"/>
+          <polygon points="40,42 36,50 44,50" fill="rgba(31,95,204,0.7)"/>
+          <text x="50" y="56" font-family="IBM Plex Mono, monospace" font-size="7" fill="#0f2238">+ feature₁  (push up)</text>
+          <text x="50" y="66" font-family="Bricolage Grotesque, Georgia, serif" font-style="italic" font-size="8" fill="rgba(15,34,56,0.55)">e.g., transaction = $2,500</text>
           <!-- step 2: positive push -->
-          <line x1="40" y1="78" x2="40" y2="92" stroke="rgba(122,31,36,0.7)" stroke-width="3"/>
-          <polygon points="40,76 36,84 44,84" fill="rgba(122,31,36,0.7)"/>
-          <text x="50" y="88" font-family="JetBrains Mono, monospace" font-size="7" fill="#262320">+ feature₂  (push up)</text>
-          <text x="50" y="98" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="8" fill="rgba(38,35,32,0.55)">device new = yes</text>
+          <line x1="40" y1="78" x2="40" y2="92" stroke="rgba(31,95,204,0.7)" stroke-width="3"/>
+          <polygon points="40,76 36,84 44,84" fill="rgba(31,95,204,0.7)"/>
+          <text x="50" y="88" font-family="IBM Plex Mono, monospace" font-size="7" fill="#0f2238">+ feature₂  (push up)</text>
+          <text x="50" y="98" font-family="Bricolage Grotesque, Georgia, serif" font-style="italic" font-size="8" fill="rgba(15,34,56,0.55)">device new = yes</text>
           <!-- step 3: negative push -->
-          <line x1="40" y1="110" x2="40" y2="120" stroke="rgba(38,35,32,0.55)" stroke-width="3"/>
-          <polygon points="40,122 36,114 44,114" fill="rgba(38,35,32,0.55)"/>
-          <text x="50" y="120" font-family="JetBrains Mono, monospace" font-size="7" fill="#262320">− feature₃  (push down)</text>
-          <text x="50" y="130" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="8" fill="rgba(38,35,32,0.55)">country match = no</text>
+          <line x1="40" y1="110" x2="40" y2="120" stroke="rgba(15,34,56,0.55)" stroke-width="3"/>
+          <polygon points="40,122 36,114 44,114" fill="rgba(15,34,56,0.55)"/>
+          <text x="50" y="120" font-family="IBM Plex Mono, monospace" font-size="7" fill="#0f2238">− feature₃  (push down)</text>
+          <text x="50" y="130" font-family="Bricolage Grotesque, Georgia, serif" font-style="italic" font-size="8" fill="rgba(15,34,56,0.55)">country match = no</text>
           <!-- ellipsis -->
-          <text x="50" y="148" font-family="JetBrains Mono, monospace" font-size="7" fill="rgba(38,35,32,0.45)">… (more features) …</text>
+          <text x="50" y="148" font-family="IBM Plex Mono, monospace" font-size="7" fill="rgba(15,34,56,0.45)">… (more features) …</text>
           <!-- final -->
-          <circle cx="40" cy="170" r="5" fill="#7a1f24"/>
-          <text x="50" y="172" font-family="JetBrains Mono, monospace" font-size="7" fill="#7a1f24">f(x)  prediction</text>
-          <text x="50" y="182" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="8" fill="rgba(38,35,32,0.65)">baseline + Σ φᵢ</text>
+          <circle cx="40" cy="170" r="5" fill="#1f5fcc"/>
+          <text x="50" y="172" font-family="IBM Plex Mono, monospace" font-size="7" fill="#1f5fcc">f(x)  prediction</text>
+          <text x="50" y="182" font-family="Bricolage Grotesque, Georgia, serif" font-style="italic" font-size="8" fill="rgba(15,34,56,0.65)">baseline + Σ φᵢ</text>
         </svg>
         <p class="quiet" style="margin-top:6px">A SHAP explanation reads top-to-bottom like a story: start with the model's average, then each feature is one chapter that pushes the prediction up or down. The bottom of the rail is exactly this case's prediction.</p>
 

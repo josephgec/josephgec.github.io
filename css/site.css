@@ -1,0 +1,107 @@
+/* =================================================================
+   Site skin — brings the older "Notebook" pages (blog, /ml/,
+   consulting) onto the home page's Sky palette and Bricolage type.
+   Load order: fonts.css → ../styles.css → (ml/shared.css) → site.css.
+   Works by overriding the Notebook tokens, then reshaping a few
+   components. Page structure is unchanged.
+   ================================================================= */
+
+:root {
+  /* Notebook tokens → Sky */
+  --bg:        #F4F9FE;
+  --paper:     #FCFEFF;
+  --ink:       #0F2238;
+  --muted:     #4A5E75;
+  --rule:      #C9D6E3;
+  --accent:    #1F5FCC;
+  --accent-bg: rgba(31, 95, 204, 0.10);
+  --rule-soft: rgba(201, 214, 227, 0.35);
+  --serif: "Bricolage Grotesque", "Bricolage Fallback", system-ui, sans-serif;
+  --sans:  "Bricolage Grotesque", "Bricolage Fallback", system-ui, sans-serif;
+  --mono:  "IBM Plex Mono", ui-monospace, Menlo, monospace;
+
+  /* ml/shared.css tokens */
+  --ml-rule-soft:   rgba(201, 214, 227, 0.6);
+  --ml-ink-soft:    #33475E;
+  --ml-ink-fade:    rgba(15, 34, 56, 0.62);
+  --ml-accent-soft: rgba(31, 95, 204, 0.10);
+
+  --radius: 10px;
+  --radius-card: 16px;
+}
+
+/* Bricolage has no italic; render italic runs upright instead of a faked slant. */
+html { font-synthesis-style: none; }
+body { -webkit-font-smoothing: antialiased; }
+::selection { background: rgba(31, 95, 204, 0.22); color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+
+/* Display type: heavier and tighter, as on the home page. */
+h1, h2, h3,
+.post-title, .nb-head h2, .nb-hero h1, .cons-hero h1, .nb-contact h2 {
+  font-weight: 600 !important;
+  letter-spacing: -0.025em;
+}
+h1 em, h2 em, h3 em, h1 i, h2 i, h3 i { color: var(--accent); }
+.post-body em, .post-body i { font-weight: 600; }
+
+/* ───────── Header (matches the home page) ───────── */
+.site-top {
+  position: sticky; top: 0; z-index: 50;
+  display: flex; justify-content: space-between; align-items: center; gap: 24px;
+  padding: 16px clamp(20px, 4vw, 56px);
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--sans);
+}
+.site-top .brand { font-weight: 650; font-size: 18px; letter-spacing: -0.01em; color: var(--ink); text-decoration: none; }
+.site-top nav { display: flex; align-items: center; gap: 26px; font-size: 15px; }
+.site-top nav a { color: var(--muted); text-decoration: none; }
+.site-top nav a:hover { color: var(--ink); }
+.site-top nav a[aria-current] { color: var(--ink); text-decoration: underline; text-decoration-color: #2F7BFF; text-decoration-thickness: 2px; text-underline-offset: 6px; }
+.site-top nav .pill-cta { color: #fff; background: var(--accent); padding: 8px 14px; border-radius: var(--radius); }
+.site-top nav .pill-cta:hover { color: #fff; background: #1A52B3; }
+@media (max-width: 860px) {
+  .site-top nav a:not(.pill-cta):not([aria-current]) { display: none; }
+}
+
+/* ───────── Buttons: rounded, accent ───────── */
+.btn-primary, .nb-hero .actions .btn-primary, .nb-contact .btn-mail, .btn-mail {
+  background: var(--accent) !important; color: #fff !important;
+  border-radius: var(--radius) !important;
+  font-family: var(--sans) !important; font-weight: 600 !important; font-size: 16px !important;
+  padding: 13px 22px !important;
+}
+.btn-primary:hover, .btn-mail:hover { background: #1A52B3 !important; }
+
+/* ───────── Cards: softer corners ───────── */
+.nb-write-card, .nb-high-card, .nb-proj-card, .cons-card,
+.post-body figure, .svg-figure, .ml-card, .ml-vol, .ml-entry-card {
+  border-radius: var(--radius-card);
+}
+.post-body pre, .post-body .codeblock { border-radius: 12px; background: #0F2238; color: #DCE6F2; }
+.post-body code, .post-body p code, .post-body li code { background: rgba(31, 95, 204, 0.08); border-radius: 6px; }
+.ck-comment { color: #8FA6C0; }
+.post-body blockquote { border-radius: 0 12px 12px 0; border-left-color: #2F7BFF; }
+.post-meta .cat, .nb-tag { border-radius: 999px; }
+
+/* Drop cap: keep, but in the display weight. */
+.post-body p:first-of-type::first-letter { font-weight: 700; }
+
+/* Canvases and inline SVGs drawn on the old paper colour keep a
+   light surface so their ink-on-paper artwork still reads. */
+canvas { border-radius: 12px; }
+
+/* ───────── /ml/ fixes ───────── */
+/* Single-column stage must shrink to the viewport, not to its widest child. */
+@media (max-width: 1100px) {
+  .ml-stage { grid-template-columns: minmax(0, 1fr); }
+  .ml-stage > * { min-width: 0; }
+  .ml-canvas-wrap canvas { max-width: 100%; }
+}
+@media (max-width: 600px) {
+  .ml-further-list li .title { min-width: 0; }
+}
+
+.btn-primary, .btn-mail { text-decoration: none !important; }

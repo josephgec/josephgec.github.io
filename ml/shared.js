@@ -5,18 +5,18 @@ window.MLViz = (function () {
   'use strict';
 
   // ───────── Tokens (must mirror styles.css / shared.css for canvas drawing) ─────────
-  const ACCENT = '#7a1f24';
-  const INK = '#262320';
-  const INK_FADE = 'rgba(38,35,32,0.55)';
-  const RULE_DARK = 'rgba(38,35,32,0.32)';
-  const RULE_FAINT = 'rgba(38,35,32,0.06)';
-  const RULE_AXIS = 'rgba(38,35,32,0.18)';
-  const ACCENT_SOFT = 'rgba(122,31,36,0.18)';
-  const ACCENT_FAINT = 'rgba(122,31,36,0.35)';
-  const ACCENT_FILL = 'rgba(122,31,36,0.10)';
-  const SERIF_LABEL = 'italic 16px "Source Serif 4", Georgia, serif';
-  const SERIF_LABEL_SM = 'italic 14px "Source Serif 4", Georgia, serif';
-  const MONO_LABEL = '13px "JetBrains Mono", ui-monospace, monospace';
+  const ACCENT = '#1f5fcc';
+  const INK = '#0f2238';
+  const INK_FADE = 'rgba(15,34,56,0.55)';
+  const RULE_DARK = 'rgba(15,34,56,0.32)';
+  const RULE_FAINT = 'rgba(15,34,56,0.06)';
+  const RULE_AXIS = 'rgba(15,34,56,0.18)';
+  const ACCENT_SOFT = 'rgba(31,95,204,0.18)';
+  const ACCENT_FAINT = 'rgba(31,95,204,0.35)';
+  const ACCENT_FILL = 'rgba(31,95,204,0.10)';
+  const SERIF_LABEL = '16px "Bricolage Grotesque", system-ui, sans-serif';
+  const SERIF_LABEL_SM = '14px "Bricolage Grotesque", system-ui, sans-serif';
+  const MONO_LABEL = '13px "IBM Plex Mono", ui-monospace, monospace';
 
   // ───────── Math ─────────
   const mul = (M, [x, y]) => [M[0][0]*x + M[0][1]*y, M[1][0]*x + M[1][1]*y];

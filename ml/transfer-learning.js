@@ -140,7 +140,7 @@
 
   // Color per strategy — kept in one place for legend, curves, time counters.
   const STRAT_COLOR = {
-    scratch:  '#262320',
+    scratch:  '#0f2238',
     frozen:   '#3a6b5e',
     finetune: ACCENT,
   };
@@ -155,7 +155,7 @@
 
     // Header banner: "PRE-TRAINED BACKBONE → NEW HEAD"
     ctx.fillStyle = INK_FADE;
-    ctx.font = '11px "JetBrains Mono", monospace';
+    ctx.font = '11px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left';
     // Terser labels on narrow canvases so the backbone/head banners never collide.
     const wideHdr = size.w > 500;
@@ -164,7 +164,7 @@
     ctx.fillText(wideHdr ? 'NEW HEAD · target task' : 'HEAD', padX + NUM_LAYERS * layerW + layerW - 8, 22);
 
     // Brace under backbone
-    ctx.strokeStyle = 'rgba(38,35,32,0.35)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.35)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     const braceY = layerY + layerHpx + 14;
@@ -175,32 +175,32 @@
     for (let i = 0; i < NUM_LAYERS; i++) {
       const x = padX + i * layerW;
       const isFrozen = i < state.frozen;
-      ctx.fillStyle = isFrozen ? 'rgba(38,35,32,0.18)' : 'rgba(122,31,36,0.45)';
+      ctx.fillStyle = isFrozen ? 'rgba(15,34,56,0.18)' : 'rgba(31,95,204,0.45)';
       ctx.fillRect(x, layerY, layerW - 8, layerHpx);
-      ctx.strokeStyle = 'rgba(38,35,32,0.40)';
+      ctx.strokeStyle = 'rgba(15,34,56,0.40)';
       ctx.lineWidth = 1;
       ctx.strokeRect(x, layerY, layerW - 8, layerHpx);
-      ctx.fillStyle = isFrozen ? 'rgba(38,35,32,0.7)' : '#fffdf6';
-      ctx.font = '11px "JetBrains Mono", monospace';
+      ctx.fillStyle = isFrozen ? 'rgba(15,34,56,0.7)' : '#FCFEFF';
+      ctx.font = '11px "IBM Plex Mono", monospace';
       ctx.textAlign = 'center';
       ctx.fillText(`L${i + 1}`, x + layerW / 2 - 4, layerY + 22);
       ctx.fillText(isFrozen ? '🔒 frozen' : 'trainable', x + layerW / 2 - 4, layerY + 40);
       // params readout below
       ctx.fillStyle = INK_FADE;
-      ctx.font = '9px "JetBrains Mono", monospace';
+      ctx.font = '9px "IBM Plex Mono", monospace';
       ctx.fillText(`${LAYER_PARAMS_M[i].toFixed(1)}M`, x + layerW / 2 - 4, layerY + layerHpx + 28);
     }
     // Head (always trainable)
     const headX = padX + NUM_LAYERS * layerW;
-    ctx.fillStyle = 'rgba(122,31,36,0.85)';
+    ctx.fillStyle = 'rgba(31,95,204,0.85)';
     ctx.fillRect(headX, layerY, layerW - 8, layerHpx);
-    ctx.fillStyle = '#fffdf6';
-    ctx.font = '11px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#FCFEFF';
+    ctx.font = '11px "IBM Plex Mono", monospace';
     ctx.textAlign = 'center';
     ctx.fillText('head', headX + layerW / 2 - 4, layerY + 22);
     ctx.fillText('new', headX + layerW / 2 - 4, layerY + 40);
     ctx.fillStyle = INK_FADE;
-    ctx.font = '9px "JetBrains Mono", monospace';
+    ctx.font = '9px "IBM Plex Mono", monospace';
     ctx.fillText(`${HEAD_PARAMS_M.toFixed(1)}M`, headX + layerW / 2 - 4, layerY + layerHpx + 28);
 
     // Trainable parameter pill (right of head)
@@ -209,7 +209,7 @@
       state.frozen
     );
     ctx.fillStyle = INK;
-    ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+    ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'left';
     ctx.fillText(
       `${trainable.toFixed(1)}M trainable / ${TOTAL_PARAMS_M.toFixed(1)}M total`,
@@ -225,7 +225,7 @@
     const plotW = size.w - plotX0 - 24;
 
     // Frame
-    ctx.strokeStyle = 'rgba(38,35,32,0.30)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.30)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(plotX0, plotY0);
@@ -235,12 +235,12 @@
 
     // Y labels
     ctx.fillStyle = INK_FADE;
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'right';
     [0, 0.5, 1].forEach((y) => {
       const py = plotY0 + plotH - y * plotH;
       ctx.fillText((y * 100).toFixed(0) + '%', plotX0 - 6, py + 3);
-      ctx.strokeStyle = 'rgba(38,35,32,0.08)';
+      ctx.strokeStyle = 'rgba(15,34,56,0.08)';
       ctx.beginPath();
       ctx.moveTo(plotX0, py); ctx.lineTo(plotX0 + plotW, py);
       ctx.stroke();
@@ -266,7 +266,7 @@
         const x = plotX0 + (endIdx / state.maxEpoch) * plotW;
         const y = plotY0 + plotH - curve[endIdx] * plotH;
         ctx.fillStyle = color;
-        ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+        ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
         ctx.textAlign = 'left';
         ctx.fillText(`${label} · ${(curve[endIdx] * 100).toFixed(0)}%`, x + 6, y + 4);
       }
@@ -282,7 +282,7 @@
       drawCurve(state.curves.finetune, STRAT_COLOR.finetune, 'fine-tune');
     }
     ctx.fillStyle = INK_FADE;
-    ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+    ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'left';
     ctx.fillText('validation accuracy', plotX0, plotY0 - 6);
 
@@ -303,17 +303,17 @@
       ctx.fillStyle = STRAT_COLOR[row.key];
       ctx.fillRect(cx, counterY - 10, 4, 28);
       ctx.fillStyle = INK_FADE;
-      ctx.font = '10px "JetBrains Mono", monospace';
+      ctx.font = '10px "IBM Plex Mono", monospace';
       ctx.textAlign = 'left';
       ctx.fillText('WALL-CLOCK', cx + 12, counterY - 2);
       ctx.fillStyle = INK;
-      ctx.font = 'italic 18px "Source Serif 4", Georgia, serif';
+      ctx.font = '18px "Bricolage Grotesque", system-ui, sans-serif';
       const mm = Math.floor(row.sec / 60);
       const ss = (row.sec % 60).toFixed(1);
       const tt = mm > 0 ? `${mm}m ${ss}s` : `${ss}s`;
       ctx.fillText(tt, cx + 12, counterY + 18);
       ctx.fillStyle = INK_FADE;
-      ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+      ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.fillText(row.label, cx + 12, counterY + 36);
     });
 
@@ -323,8 +323,8 @@
     if (epoch >= 4 && epoch < state.maxEpoch && state.strategy === 'all') {
       const accFrozenNow  = state.curves.frozen[epoch]   * 100;
       const accScratchNow = state.curves.scratch[epoch]  * 100;
-      ctx.fillStyle = 'rgba(38,35,32,0.65)';
-      ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+      ctx.fillStyle = 'rgba(15,34,56,0.65)';
+      ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'left';
       ctx.fillText(
         `at epoch ${epoch}: frozen already ${(accFrozenNow - accScratchNow).toFixed(0)}% ahead of scratch — and fine-tune is climbing past frozen.`,
@@ -347,8 +347,8 @@
         const m = Math.floor(s / 60), x = Math.round(s % 60);
         return m > 0 ? `${m}m ${x}s` : `${s.toFixed(0)}s`;
       };
-      ctx.fillStyle = 'rgba(122,31,36,0.78)';
-      ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+      ctx.fillStyle = 'rgba(31,95,204,0.78)';
+      ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'left';
       ctx.fillText(
         `Frozen: ${fmt(totalFrozen)} total → ${accFrozen.toFixed(0)}%.  Fine-tune: ${fmt(totalFT)} → ${accFT.toFixed(0)}% — ${xMore}× longer for ${accGap}% more accuracy.`,

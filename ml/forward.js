@@ -155,7 +155,7 @@
   const canvasCtl = V.attachCanvas(canvas, draw, { square: false });
 
   function draw(ctx, size) {
-    ctx.fillStyle = '#fffdf6';
+    ctx.fillStyle = '#FCFEFF';
     ctx.fillRect(0, 0, size.w, size.h);
 
     const trace = forward([state.x1, state.x2]);
@@ -189,7 +189,7 @@
           const x2 = toCol.x - 22,    y2 = colY(toCol.n, i);
           const baseAlpha = isActive ? 0.45 : (isPast ? 0.20 : 0.10);
           const alpha = baseAlpha * Math.min(1, Math.abs(w) * 0.8 + 0.3);
-          ctx.strokeStyle = w > 0 ? `rgba(122,31,36,${alpha})` : `rgba(38,35,32,${alpha})`;
+          ctx.strokeStyle = w > 0 ? `rgba(31,95,204,${alpha})` : `rgba(15,34,56,${alpha})`;
           ctx.lineWidth = isActive ? 1.2 + Math.abs(w) * 0.7 : 0.6 + Math.abs(w) * 0.5;
           ctx.beginPath();
           ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
@@ -216,7 +216,7 @@
           const px = x1 + (x2 - x1) * seg;
           const py = y1 + (y2 - y1) * seg;
           const r = 1.5 + Math.min(3, contrib * 2.5);
-          ctx.fillStyle = (w * a) >= 0 ? 'rgba(122,31,36,0.95)' : 'rgba(38,35,32,0.95)';
+          ctx.fillStyle = (w * a) >= 0 ? 'rgba(31,95,204,0.95)' : 'rgba(15,34,56,0.95)';
           ctx.beginPath();
           ctx.arc(px, py, r, 0, Math.PI * 2);
           ctx.fill();
@@ -240,22 +240,22 @@
         // Pulse halo while particles arrive (grows with segProg).
         if (arriving) {
           const a = 0.10 + 0.25 * incomingSeg;
-          ctx.fillStyle = `rgba(122,31,36,${a})`;
+          ctx.fillStyle = `rgba(31,95,204,${a})`;
           ctx.beginPath();
           ctx.arc(x, y, 22 + 6 * incomingSeg, 0, Math.PI * 2);
           ctx.fill();
         }
         ctx.fillStyle = isLit
-          ? (v >= 0 ? `rgba(122,31,36,${0.15 + mag * 0.7})` : `rgba(38,35,32,${0.15 + mag * 0.7})`)
-          : '#fffdf6';
-        ctx.strokeStyle = isLit ? '#262320' : 'rgba(38,35,32,0.30)';
+          ? (v >= 0 ? `rgba(31,95,204,${0.15 + mag * 0.7})` : `rgba(15,34,56,${0.15 + mag * 0.7})`)
+          : '#FCFEFF';
+        ctx.strokeStyle = isLit ? '#0f2238' : 'rgba(15,34,56,0.30)';
         ctx.lineWidth = isLit ? 1.5 : 1;
         ctx.beginPath();
         ctx.arc(x, y, 22, 0, Math.PI * 2);
         ctx.fill(); ctx.stroke();
         if (isLit) {
-          ctx.fillStyle = mag > 0.5 ? '#fffdf6' : '#262320';
-          ctx.font = 'bold 11px "JetBrains Mono", monospace';
+          ctx.fillStyle = mag > 0.5 ? '#FCFEFF' : '#0f2238';
+          ctx.font = 'bold 11px "IBM Plex Mono", monospace';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
           ctx.fillText(formatNum(v), x, y);
@@ -263,12 +263,12 @@
       }
       // Column labels
       ctx.fillStyle = INK_FADE;
-      ctx.font = '11px "Source Serif 4", Georgia, serif';
+      ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'alphabetic';
       ctx.fillText(col.label, col.x, colY(col.n, col.n - 1) + Math.min(46, size.h * 0.10));
-      ctx.fillStyle = 'rgba(38,35,32,0.4)';
-      ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+      ctx.fillStyle = 'rgba(15,34,56,0.4)';
+      ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.fillText(col.sub, col.x, colY(col.n, 0) - 38);
     });
 
@@ -283,16 +283,16 @@
       const winIdx = probs[0] >= probs[1] ? 0 : 1;
       const winPct = (probs[winIdx] * 100).toFixed(0);
       const txt = `Prediction: class c${winIdx} (${winPct}%)`;
-      ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+      ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
       const tw = ctx.measureText(txt).width + 18;
       const tx0 = (size.w - tw) / 2;
-      ctx.fillStyle = 'rgba(255,253,246,0.92)';
-      ctx.strokeStyle = 'rgba(122,31,36,0.6)';
+      ctx.fillStyle = 'rgba(252,254,255,0.92)';
+      ctx.strokeStyle = 'rgba(31,95,204,0.6)';
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.rect(tx0, 8, tw, 22);
       ctx.fill(); ctx.stroke();
-      ctx.fillStyle = '#7a1f24';
+      ctx.fillStyle = '#1f5fcc';
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.fillText(txt, size.w / 2, 19);
     }
@@ -306,15 +306,15 @@
     const xL = size.w - 96;
     const yC = size.h * 0.5;
     // Background card
-    ctx.fillStyle = 'rgba(255,253,246,0.85)';
-    ctx.strokeStyle = 'rgba(38,35,32,0.18)';
+    ctx.fillStyle = 'rgba(252,254,255,0.85)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.18)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.rect(xL, yC - 76, xR - xL, 130);
     ctx.fill(); ctx.stroke();
     // Heading
     ctx.fillStyle = INK_FADE;
-    ctx.font = '9px "JetBrains Mono", monospace';
+    ctx.font = '9px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
     ctx.fillText('LOGITS  →  PROBS', xL + 6, yC - 64);
     // Bars
@@ -328,28 +328,28 @@
     for (let i = 0; i < 2; i++) {
       const yMid = colY0 + colH * (0.25 + i * 0.5);
       // Class label
-      ctx.fillStyle = '#262320';
-      ctx.font = '11px "JetBrains Mono", monospace';
+      ctx.fillStyle = '#0f2238';
+      ctx.font = '11px "IBM Plex Mono", monospace';
       ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
       ctx.fillText(`c${i}`, xL + 6, yMid);
       // Logit bar — faint, signed (centered baseline)
       const lx = groupX;
       const lcx = lx + colWLogit / 2;
       const lh = (logits[i] / maxLogit) * 18;
-      ctx.fillStyle = 'rgba(38,35,32,0.30)';
+      ctx.fillStyle = 'rgba(15,34,56,0.30)';
       if (lh >= 0) ctx.fillRect(lx, yMid - lh, colWLogit, lh);
       else         ctx.fillRect(lx, yMid,      colWLogit, -lh);
-      ctx.strokeStyle = 'rgba(38,35,32,0.45)';
+      ctx.strokeStyle = 'rgba(15,34,56,0.45)';
       ctx.lineWidth = 0.8;
       ctx.beginPath();
       ctx.moveTo(lx - 1, yMid); ctx.lineTo(lx + colWLogit + 1, yMid);
       ctx.stroke();
       ctx.fillStyle = INK_FADE;
-      ctx.font = '9px "JetBrains Mono", monospace';
+      ctx.font = '9px "IBM Plex Mono", monospace';
       ctx.textAlign = 'center';
       ctx.fillText(logits[i].toFixed(2), lcx, yMid + (lh >= 0 ? 16 : -14));
       // Arrow
-      ctx.strokeStyle = 'rgba(38,35,32,0.45)';
+      ctx.strokeStyle = 'rgba(15,34,56,0.45)';
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(lx + colWLogit + 2, yMid); ctx.lineTo(lx + colWLogit + gapMid - 2, yMid);
@@ -358,21 +358,21 @@
       const px = lx + colWLogit + gapMid;
       const ph = probs[i] * 32;
       const isWin = probs[i] === Math.max(probs[0], probs[1]);
-      ctx.fillStyle = isWin ? 'rgba(122,31,36,0.85)' : 'rgba(122,31,36,0.30)';
+      ctx.fillStyle = isWin ? 'rgba(31,95,204,0.85)' : 'rgba(31,95,204,0.30)';
       ctx.fillRect(px, yMid - ph / 2, colWProb, ph);
-      ctx.strokeStyle = 'rgba(38,35,32,0.4)';
+      ctx.strokeStyle = 'rgba(15,34,56,0.4)';
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(px, yMid + ph / 2 + 1); ctx.lineTo(px + colWProb, yMid + ph / 2 + 1);
       ctx.stroke();
-      ctx.fillStyle = isWin ? '#7a1f24' : '#262320';
-      ctx.font = '9px "JetBrains Mono", monospace';
+      ctx.fillStyle = isWin ? '#1f5fcc' : '#0f2238';
+      ctx.font = '9px "IBM Plex Mono", monospace';
       ctx.textAlign = 'center';
       ctx.fillText(`${(probs[i] * 100).toFixed(0)}%`, px + colWProb / 2, yMid + ph / 2 + 12);
     }
     // Footnote
     ctx.fillStyle = INK_FADE;
-    ctx.font = 'italic 10px "Source Serif 4", Georgia, serif';
+    ctx.font = '10px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'left';
     ctx.fillText('softmax', xL + 6, yC + 50);
   }

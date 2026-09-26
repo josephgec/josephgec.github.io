@@ -6,27 +6,25 @@
   <title>Convolutional Networks · ML, Visualized · Joseph Thomas</title>
   <meta name="description" content="Slide a small kernel over an image. Edges, textures, parts — features compose themselves." />
   <link rel="canonical" href="https://jthomas.site/ml/cnns.html" />
-  <meta name="theme-color" content="#7a1f24" />
+  <meta name="theme-color" content="#F4F9FE" />
   <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;1,8..60,300;1,8..60,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="preload" href="/fonts/bricolage-grotesque.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="/css/fonts.css" />
   <link rel="stylesheet" href="../styles.css" />
   <link rel="stylesheet" href="shared.css" />
+  <link rel="stylesheet" href="/css/site.css" />
 </head>
 <body>
-<header class="nb-nav">
-  <div class="brand-block">
-    <a class="brand" href="../index.html">jthomas.site</a><span class="brand-meta">// notebook · v.4.2026</span>
-  </div>
-  <nav>
-    <a href="../blog/index.html">writing</a>
-    <a href="index.html" style="color:var(--ink)">tutorial</a>
-    <a href="../index.html#research">research</a>
-    <a href="../index.html#work">work</a>
-    <a href="../index.html#projects">projects</a>
-    <a href="../consulting.html">consulting</a>
-    <a href="../index.html#contact" class="contact">→ contact</a>
+<header class="site-top">
+  <a class="brand" href="../index.html">Joseph Thomas</a>
+  <nav aria-label="Primary">
+    <a href="../blog/index.html">Writing</a>
+    <a href="../ml/index.html" aria-current="true">Tutorial</a>
+    <a href="../index.html#work">Work</a>
+    <a href="../index.html#research">Research</a>
+    <a href="../index.html#projects">Projects</a>
+    <a href="../consulting.html">Consulting</a>
+    <a class="pill-cta" href="../index.html#contact">Contact</a>
   </nav>
 </header>
 
@@ -73,8 +71,8 @@
       <div class="ml-rail-label" style="margin-top: 24px">Kernel weights</div>
       <div id="kernel-grid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:4px; max-width:140px; font-family:var(--mono); font-size:12px"></div>
       <div style="display:flex; gap:10px; margin-top:8px; font-family:var(--mono); font-size:10px; color:var(--ml-ink-fade)">
-        <span><span style="display:inline-block; width:10px; height:10px; background:rgba(122,31,36,0.65); vertical-align:middle; margin-right:4px"></span>positive</span>
-        <span><span style="display:inline-block; width:10px; height:10px; background:rgba(38,35,32,0.55); vertical-align:middle; margin-right:4px"></span>negative</span>
+        <span><span style="display:inline-block; width:10px; height:10px; background:rgba(31,95,204,0.65); vertical-align:middle; margin-right:4px"></span>positive</span>
+        <span><span style="display:inline-block; width:10px; height:10px; background:rgba(15,34,56,0.55); vertical-align:middle; margin-right:4px"></span>negative</span>
       </div>
       <div id="kernel-meaning" style="font-family:var(--serif); font-style:italic; font-size:12px; color:var(--ml-ink-fade); margin-top:10px; line-height:1.45"></div>
 

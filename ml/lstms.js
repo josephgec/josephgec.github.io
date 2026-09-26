@@ -217,13 +217,13 @@
     const oX = x0 + W * 0.78;
 
     // ── Frame the LSTM cell box ──
-    ctx.strokeStyle = 'rgba(38,35,32,0.18)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.18)';
     ctx.lineWidth = 1;
     ctx.setLineDash([4, 4]);
     ctx.strokeRect(x0 + 14, y0 + H * 0.08, W - 28, H * 0.82);
     ctx.setLineDash([]);
     ctx.fillStyle = INK_FADE;
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left';
     ctx.fillText('LSTM CELL', x0 + 22, y0 + H * 0.08 + 14);
     // (The σ = sigmoid / ⊙ = element-wise key lives in the "Reading the symbols"
@@ -238,7 +238,7 @@
     ctx.stroke();
     // Bus label and incoming/outgoing carry
     ctx.fillStyle = INK;
-    ctx.font = 'italic 14px "Source Serif 4", Georgia, serif';
+    ctx.font = '14px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'left';
     ctx.fillText('c_{t−1}', busLeft - 60, busY + 4);
     ctx.textAlign = 'right';
@@ -259,7 +259,7 @@
     ctx.lineTo(busLeft - 4, hOutY);
     ctx.stroke();
     ctx.fillStyle = INK;
-    ctx.font = 'italic 13px "Source Serif 4", Georgia, serif';
+    ctx.font = '13px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'left';
     ctx.fillText('h_{t−1}', busLeft - 60, hOutY + 4);
 
@@ -271,7 +271,7 @@
     ctx.lineTo(busRight + 4, inY);
     ctx.stroke();
     ctx.fillStyle = INK;
-    ctx.font = 'italic 13px "Source Serif 4", Georgia, serif';
+    ctx.font = '13px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'left';
     ctx.fillText('x_t', busLeft - 24, inY + 18);
     ctx.fillText('+ h_{t−1}', busLeft + 18, inY + 18);
@@ -280,18 +280,18 @@
     if (idx > 0 && idx <= state.seq.length) {
       const ch = state.seq[idx - 1] === ' ' ? '·' : state.seq[idx - 1];
       ctx.fillStyle = ACCENT;
-      ctx.font = 'italic 22px "Source Serif 4", Georgia, serif';
+      ctx.font = '22px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'left';
       ctx.fillText(`"${ch}"`, busRight - 60, inY + 18);
       ctx.fillStyle = INK_FADE;
-      ctx.font = '10px "JetBrains Mono", monospace';
+      ctx.font = '10px "IBM Plex Mono", monospace';
       ctx.fillText(`t = ${idx}`, busRight - 60, inY + 32);
     }
 
     // ── Forget gate ── multiplicative pinch on the bus
     drawValve(ctx, fX, busY, fOpen, 'σ', '1 · forget');
     // tap from input lane up to gate
-    ctx.strokeStyle = 'rgba(38,35,32,0.45)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.45)';
     ctx.lineWidth = 1;
     ctx.setLineDash([3, 3]);
     ctx.beginPath();
@@ -301,11 +301,11 @@
     ctx.setLineDash([]);
     // gate label
     ctx.fillStyle = INK;
-    ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+    ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('f_t = σ(W_f·[h, x] + b_f)', fX, busY + 60);
     ctx.fillStyle = ACCENT;
-    ctx.font = '11px "JetBrains Mono", monospace';
+    ctx.font = '11px "IBM Plex Mono", monospace';
     ctx.fillText(`f ≈ ${fOpen.toFixed(2)}`, fX, busY + 76);
 
     // ── Input gate + candidate (tanh) ──
@@ -315,7 +315,7 @@
     // input gate on the bus
     drawValve(ctx, iX, busY, iOpen, 'σ', '2 · input');
     // taps from input lane up to gate and candidate
-    ctx.strokeStyle = 'rgba(38,35,32,0.45)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.45)';
     ctx.lineWidth = 1;
     ctx.setLineDash([3, 3]);
     ctx.beginPath();
@@ -331,12 +331,12 @@
     drawArrow(ctx, iX - 30, candY - 14, iX - 6, busY + 4, ACCENT, 2, 7);
     // labels
     ctx.fillStyle = INK;
-    ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+    ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('i_t = σ(W_i·[h, x])', iX, busY + 96);
     ctx.fillText('c̃_t = tanh(W_c·[h, x])', iX - 30, busY + 110);
     ctx.fillStyle = ACCENT;
-    ctx.font = '11px "JetBrains Mono", monospace';
+    ctx.font = '11px "IBM Plex Mono", monospace';
     ctx.fillText(`i ≈ ${iOpen.toFixed(2)}`, iX, busY + 76);
 
     // ⊕ symbol on the bus to indicate addition right of input gate
@@ -346,14 +346,14 @@
     ctx.arc(iX + 24, busY, 9, 0, Math.PI * 2);
     ctx.stroke();
     ctx.fillStyle = ACCENT;
-    ctx.font = 'bold 12px "JetBrains Mono", monospace';
+    ctx.font = 'bold 12px "IBM Plex Mono", monospace';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText('+', iX + 24, busY);
     ctx.textBaseline = 'alphabetic';
     // tiny annotation: merge old kept memory + new gated candidate
     ctx.fillStyle = INK_FADE;
-    ctx.font = 'italic 9px "Source Serif 4", Georgia, serif';
+    ctx.font = '9px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('merge: kept + new', iX + 24, busY - 14);
 
@@ -371,7 +371,7 @@
 
     drawValve(ctx, oX, busY, oOpen, 'σ', '3 · output');
     // tap from input lane up to output gate
-    ctx.strokeStyle = 'rgba(38,35,32,0.45)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.45)';
     ctx.lineWidth = 1;
     ctx.setLineDash([3, 3]);
     ctx.beginPath();
@@ -390,16 +390,16 @@
     drawArrow(ctx, oX + 24, hOutY, oX + 50, hOutY, INK, 1.5, 7);
     // h_t output exit
     ctx.fillStyle = INK;
-    ctx.font = 'italic 14px "Source Serif 4", Georgia, serif';
+    ctx.font = '14px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'left';
     ctx.fillText('h_t →', oX + 56, hOutY + 4);
     ctx.fillStyle = INK;
-    ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+    ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('o_t = σ(W_o·[h, x])', oX, busY + 76);
     ctx.fillText('h_t = o_t · tanh(c_t)', oX, busY + 92);
     ctx.fillStyle = ACCENT;
-    ctx.font = '11px "JetBrains Mono", monospace';
+    ctx.font = '11px "IBM Plex Mono", monospace';
     ctx.fillText(`o ≈ ${oOpen.toFixed(2)}`, oX, busY + 60);
 
     // ── Tiny per-dimension bus tape underneath, anchored to bus position ──
@@ -410,16 +410,16 @@
     const cellsN = cur.c.length;
     const cw = tapeW / cellsN;
     ctx.fillStyle = INK_FADE;
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left';
     ctx.fillText('c_t (per-dim):', x0 + W * 0.04, tapeY - 2);
     for (let k = 0; k < cellsN; k++) {
       const v = cur.c[k];
       const a = Math.min(1, Math.abs(v));
-      ctx.fillStyle = v >= 0 ? `rgba(122,31,36,${0.15 + a * 0.7})` : `rgba(38,35,32,${0.15 + a * 0.7})`;
+      ctx.fillStyle = v >= 0 ? `rgba(31,95,204,${0.15 + a * 0.7})` : `rgba(15,34,56,${0.15 + a * 0.7})`;
       ctx.fillRect(tapeLeft + k * cw + 2, tapeY - 12, cw - 4, 14);
     }
-    ctx.strokeStyle = 'rgba(38,35,32,0.20)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.20)';
     ctx.lineWidth = 1;
     ctx.strokeRect(tapeLeft, tapeY - 12, tapeW, 14);
   }
@@ -429,18 +429,18 @@
     const r = 16;
     ctx.strokeStyle = INK;
     ctx.lineWidth = 1.5;
-    ctx.fillStyle = '#fffdf6';
+    ctx.fillStyle = '#FCFEFF';
     ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
     // Fill proportional to openness
     const fillH = r * 2 * openness;
     ctx.save();
     ctx.beginPath(); ctx.arc(x, y, r - 1, 0, Math.PI * 2); ctx.clip();
-    ctx.fillStyle = `rgba(122,31,36,${0.25 + openness * 0.5})`;
+    ctx.fillStyle = `rgba(31,95,204,${0.25 + openness * 0.5})`;
     ctx.fillRect(x - r, y + r - fillH, 2 * r, fillH);
     ctx.restore();
     // glyph (σ)
     ctx.fillStyle = INK;
-    ctx.font = 'italic 13px "Source Serif 4", Georgia, serif';
+    ctx.font = '13px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(glyph, x, y);
@@ -455,7 +455,7 @@
     ctx.stroke();
     // Label below
     ctx.fillStyle = INK;
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'center';
     ctx.fillText(label.toUpperCase(), x, y - r - 6);
   }
@@ -463,19 +463,19 @@
   function drawNode(ctx, x, y, glyph, label) {
     ctx.strokeStyle = INK;
     ctx.lineWidth = 1.2;
-    ctx.fillStyle = '#fffdf6';
+    ctx.fillStyle = '#FCFEFF';
     ctx.beginPath();
     ctx.rect(x - 22, y - 12, 44, 24);
     ctx.fill(); ctx.stroke();
     ctx.fillStyle = INK;
-    ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+    ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(glyph, x, y);
     ctx.textBaseline = 'alphabetic';
     if (label) {
       ctx.fillStyle = INK_FADE;
-      ctx.font = '9px "JetBrains Mono", monospace';
+      ctx.font = '9px "IBM Plex Mono", monospace';
       ctx.fillText(label.toUpperCase(), x, y + 22);
     }
   }
@@ -505,18 +505,18 @@
     const colW = size.w / (N + 1);
 
     ctx.fillStyle = INK_FADE;
-    ctx.font = '12px "JetBrains Mono", monospace';
+    ctx.font = '12px "IBM Plex Mono", monospace';
     ctx.textAlign = 'center';
     for (let t = 0; t < N; t++) {
-      ctx.fillStyle = t < state.step ? '#262320' : 'rgba(38,35,32,0.30)';
-      ctx.font = 'bold 13px "JetBrains Mono", monospace';
+      ctx.fillStyle = t < state.step ? '#0f2238' : 'rgba(15,34,56,0.30)';
+      ctx.font = 'bold 13px "IBM Plex Mono", monospace';
       ctx.fillText(state.seq[t] === ' ' ? '·' : state.seq[t], colW * (t + 1) + colW * 0.5, 18);
     }
 
     let y = headerH;
     labels.forEach((lbl, ci) => {
       ctx.fillStyle = INK_FADE;
-      ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+      ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'right';
       ctx.fillText(lbl, colW - 6, y + 12);
 
@@ -526,20 +526,20 @@
           const intensity = Math.min(1, Math.abs(v));
           let color;
           if (channels[ci] === 'f' || channels[ci] === 'i' || channels[ci] === 'o') {
-            const g = Math.round(247 - intensity * 200);
-            const grn = Math.round(244 - intensity * 200);
-            const b = Math.round(236 - intensity * 220);
+            const g = Math.round(252 - intensity * 237);
+            const grn = Math.round(254 - intensity * 220);
+            const b = Math.round(255 - intensity * 199);
             color = `rgb(${g},${grn},${b})`;
           } else {
             color = v >= 0
-              ? `rgba(122,31,36,${0.10 + intensity * 0.7})`
-              : `rgba(38,35,32,${0.10 + intensity * 0.7})`;
+              ? `rgba(31,95,204,${0.10 + intensity * 0.7})`
+              : `rgba(15,34,56,${0.10 + intensity * 0.7})`;
           }
           ctx.fillStyle = color;
           ctx.fillRect(colW * (t + 0.5), y + i * cellH, colW, cellH + 0.5);
         }
       }
-      ctx.strokeStyle = 'rgba(38,35,32,0.30)';
+      ctx.strokeStyle = 'rgba(15,34,56,0.30)';
       ctx.lineWidth = 1;
       ctx.strokeRect(colW * 0.5, y, colW * (N + 0.5), H * cellH);
       y += H * cellH + 1;
@@ -561,18 +561,18 @@
 
     // header
     ctx.fillStyle = INK_FADE;
-    ctx.font = '11px "JetBrains Mono", monospace';
+    ctx.font = '11px "IBM Plex Mono", monospace';
     ctx.textAlign = 'center';
     for (let t = 0; t < N; t++) {
-      ctx.fillStyle = t < state.step ? '#262320' : 'rgba(38,35,32,0.30)';
-      ctx.font = 'bold 13px "JetBrains Mono", monospace';
+      ctx.fillStyle = t < state.step ? '#0f2238' : 'rgba(15,34,56,0.30)';
+      ctx.font = 'bold 13px "IBM Plex Mono", monospace';
       ctx.fillText(state.seq[t] === ' ' ? '·' : state.seq[t], colW * (t + 1) + colW * 0.5, 18);
     }
 
     // LSTM cell-state row
     let y = headerH;
     ctx.fillStyle = INK;
-    ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+    ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'left';
     ctx.fillText('LSTM cell-state c_t — bounded, gently changing', colW * 0.5, y - 4);
     for (let i = 0; i < H; i++) {
@@ -580,25 +580,25 @@
         const v = lstm[t].c[i];
         const intensity = Math.min(1, Math.abs(v) / 2);
         ctx.fillStyle = v >= 0
-          ? `rgba(122,31,36,${0.10 + intensity * 0.7})`
-          : `rgba(38,35,32,${0.10 + intensity * 0.7})`;
+          ? `rgba(31,95,204,${0.10 + intensity * 0.7})`
+          : `rgba(15,34,56,${0.10 + intensity * 0.7})`;
         ctx.fillRect(colW * (t + 0.5), y + i * cellH, colW, cellH + 0.5);
       }
     }
-    ctx.strokeStyle = 'rgba(38,35,32,0.30)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.30)';
     ctx.lineWidth = 1;
     ctx.strokeRect(colW * 0.5, y, colW * (N + 0.5), H * cellH);
     // mean magnitude readout
     const lstmMag = avgMag(lstm.slice(1, state.step + 1).map((s) => s.c));
     ctx.fillStyle = INK_FADE;
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'right';
     ctx.fillText(`mean |c| = ${lstmMag.toFixed(2)}`, colW * (N + 0.5), y + H * cellH + 12);
 
     // Vanilla RNN row
     y = headerH + sectionH + 16;
     ctx.fillStyle = INK;
-    ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+    ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'left';
     ctx.fillText('Vanilla RNN h_t — no gating, drifts toward saturation', colW * 0.5, y - 4);
     for (let i = 0; i < H; i++) {
@@ -606,16 +606,16 @@
         const v = rnn[t][i];
         const intensity = Math.min(1, Math.abs(v));
         ctx.fillStyle = v >= 0
-          ? `rgba(122,31,36,${0.10 + intensity * 0.7})`
-          : `rgba(38,35,32,${0.10 + intensity * 0.7})`;
+          ? `rgba(31,95,204,${0.10 + intensity * 0.7})`
+          : `rgba(15,34,56,${0.10 + intensity * 0.7})`;
         ctx.fillRect(colW * (t + 0.5), y + i * cellH, colW, cellH + 0.5);
       }
     }
-    ctx.strokeStyle = 'rgba(38,35,32,0.30)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.30)';
     ctx.strokeRect(colW * 0.5, y, colW * (N + 0.5), H * cellH);
     const rnnMag = avgMag(rnn.slice(1, state.step + 1));
     ctx.fillStyle = INK_FADE;
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'right';
     ctx.fillText(`mean |h| = ${rnnMag.toFixed(2)}`, colW * (N + 0.5), y + H * cellH + 12);
   }

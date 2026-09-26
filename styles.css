@@ -1,18 +1,18 @@
 /* =================================================================
    The Notebook — 1:1 port of personal-site/project/notebook.jsx
    nbStyles + nbNavLink + every NB* component, mapped to CSS.
-   Compact density (measure = 720), oxblood accent (#7a1f24).
+   Compact density (measure = 720), oxblood accent (#1f5fcc).
    ================================================================= */
 
 :root {
-  --bg:        #f7f4ec;
-  --ink:       #262320;
-  --rule:      #cfc6b3;
-  --muted:     #65604f;
-  --paper:     #fffdf6;
-  --accent:    #7a1f24;
-  --accent-bg: rgba(122,31,36,0.10);
-  --rule-soft: rgba(207,198,179,0.20);
+  --bg:        #F4F9FE;
+  --ink:       #0f2238;
+  --rule:      #c9d6e3;
+  --muted:     #4a5e75;
+  --paper:     #FCFEFF;
+  --accent:    #1f5fcc;
+  --accent-bg: rgba(31,95,204,0.10);
+  --rule-soft: rgba(201,214,227,0.20);
 
   --serif: "Source Serif 4", "Newsreader", Georgia, serif;
   --sans:  Inter, system-ui, sans-serif;
@@ -67,7 +67,7 @@ body {
   font-size: 12px;
   color: var(--muted);
   background: var(--bg);
-  border-bottom: 1px solid rgba(207, 198, 179, 0.4);
+  border-bottom: 1px solid rgba(201,214,227, 0.4);
 }
 .nb-nav .brand-block { display: block; }
 .nb-nav .brand { color: var(--ink); font-weight: 500; }
@@ -344,9 +344,9 @@ body {
   border-radius: 3px;
 }
 .nb-tag.feat {
-  background: rgba(122, 31, 36, 0.18);
+  background: rgba(31,95,204, 0.18);
   font-weight: 600;
-  border: 1px solid rgba(122, 31, 36, 0.28);
+  border: 1px solid rgba(31,95,204, 0.28);
 }
 
 /* ─────────────────────────────────────────────────────────────────
@@ -804,7 +804,7 @@ body {
 .post-body code, .post-body p code, .post-body li code {
   font-family: var(--mono); font-size: 0.85em;
   padding: 1px 6px;
-  background: rgba(207,198,179,0.4);
+  background: rgba(201,214,227,0.4);
   color: var(--accent);
   border-radius: 3px;
 }

@@ -6,25 +6,25 @@
   <title>Multi-Armed Bandits · ML, Visualized · Joseph Thomas</title>
   <meta name="description" content="Many slot machines, one budget. Explore the unknown lever or exploit the best one so far?" />
   <link rel="canonical" href="https://jthomas.site/ml/bandits.html" />
-  <meta name="theme-color" content="#7a1f24" />
+  <meta name="theme-color" content="#F4F9FE" />
   <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;1,8..60,300;1,8..60,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="preload" href="/fonts/bricolage-grotesque.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="/css/fonts.css" />
   <link rel="stylesheet" href="../styles.css" />
   <link rel="stylesheet" href="shared.css" />
+  <link rel="stylesheet" href="/css/site.css" />
 </head>
 <body>
-<header class="nb-nav">
-  <div class="brand-block"><a class="brand" href="../index.html">jthomas.site</a><span class="brand-meta">// notebook · v.4.2026</span></div>
-  <nav>
-    <a href="../blog/index.html">writing</a>
-    <a href="index.html" style="color:var(--ink)">tutorial</a>
-    <a href="../index.html#research">research</a>
-    <a href="../index.html#work">work</a>
-    <a href="../index.html#projects">projects</a>
-    <a href="../consulting.html">consulting</a>
-    <a href="../index.html#contact" class="contact">→ contact</a>
+<header class="site-top">
+  <a class="brand" href="../index.html">Joseph Thomas</a>
+  <nav aria-label="Primary">
+    <a href="../blog/index.html">Writing</a>
+    <a href="../ml/index.html" aria-current="true">Tutorial</a>
+    <a href="../index.html#work">Work</a>
+    <a href="../index.html#research">Research</a>
+    <a href="../index.html#projects">Projects</a>
+    <a href="../consulting.html">Consulting</a>
+    <a class="pill-cta" href="../index.html#contact">Contact</a>
   </nav>
 </header>
 
@@ -98,10 +98,10 @@
 
       <div class="ml-legend" style="display:flex; flex-wrap:wrap; gap:14px; justify-content:center; margin-top:10px; font-family:var(--serif); font-style:italic; font-size:12px; color:var(--ml-ink-fade)">
         <span><span style="display:inline-block; width:18px; height:3px; background:rgba(58,107,74,0.85); vertical-align:middle; margin-right:5px"></span>ε-greedy (green)</span>
-        <span><span style="display:inline-block; width:18px; height:3px; background:rgba(122,31,36,0.85); vertical-align:middle; margin-right:5px"></span>UCB (accent)</span>
-        <span><span style="display:inline-block; width:18px; height:3px; background:rgba(38,35,32,0.85); vertical-align:middle; margin-right:5px"></span>Thompson (ink)</span>
-        <span><span style="display:inline-block; width:18px; border-top:1px dashed rgba(38,35,32,0.6); vertical-align:middle; margin-right:5px"></span>dashed = true mean of arm</span>
-        <span><span style="display:inline-block; width:10px; height:10px; background:rgba(122,31,36,0.04); border:1px solid rgba(122,31,36,0.5); vertical-align:middle; margin-right:5px"></span>tinted column = best arm</span>
+        <span><span style="display:inline-block; width:18px; height:3px; background:rgba(31,95,204,0.85); vertical-align:middle; margin-right:5px"></span>UCB (accent)</span>
+        <span><span style="display:inline-block; width:18px; height:3px; background:rgba(15,34,56,0.85); vertical-align:middle; margin-right:5px"></span>Thompson (ink)</span>
+        <span><span style="display:inline-block; width:18px; border-top:1px dashed rgba(15,34,56,0.6); vertical-align:middle; margin-right:5px"></span>dashed = true mean of arm</span>
+        <span><span style="display:inline-block; width:10px; height:10px; background:rgba(31,95,204,0.04); border:1px solid rgba(31,95,204,0.5); vertical-align:middle; margin-right:5px"></span>tinted column = best arm</span>
       </div>
     </div>
 
@@ -115,43 +115,43 @@
         <svg viewBox="0 0 240 120" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; margin:6px 0 10px">
           <defs>
             <marker id="bnd-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-              <path d="M 0 0 L 10 5 L 0 10 z" fill="#262320" />
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#0f2238" />
             </marker>
           </defs>
           <!-- Three stylized slot machines -->
           <g transform="translate(20,18)">
-            <rect x="0" y="0" width="34" height="60" rx="4" fill="none" stroke="#262320" stroke-width="1.2"/>
-            <rect x="4" y="8" width="26" height="22" fill="rgba(38,35,32,0.08)" stroke="#262320" stroke-width="0.8"/>
-            <text x="17" y="24" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#262320">?</text>
-            <rect x="4" y="36" width="26" height="6" fill="rgba(122,31,36,0.45)"/>
-            <line x1="32" y1="44" x2="38" y2="50" stroke="#262320" stroke-width="1.2" stroke-linecap="round"/>
-            <circle cx="38" cy="50" r="1.6" fill="#262320"/>
+            <rect x="0" y="0" width="34" height="60" rx="4" fill="none" stroke="#0f2238" stroke-width="1.2"/>
+            <rect x="4" y="8" width="26" height="22" fill="rgba(15,34,56,0.08)" stroke="#0f2238" stroke-width="0.8"/>
+            <text x="17" y="24" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#0f2238">?</text>
+            <rect x="4" y="36" width="26" height="6" fill="rgba(31,95,204,0.45)"/>
+            <line x1="32" y1="44" x2="38" y2="50" stroke="#0f2238" stroke-width="1.2" stroke-linecap="round"/>
+            <circle cx="38" cy="50" r="1.6" fill="#0f2238"/>
           </g>
           <g transform="translate(75,18)">
-            <rect x="0" y="0" width="34" height="60" rx="4" fill="none" stroke="#262320" stroke-width="1.2"/>
-            <rect x="4" y="8" width="26" height="22" fill="rgba(38,35,32,0.08)" stroke="#262320" stroke-width="0.8"/>
-            <text x="17" y="24" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#262320">?</text>
-            <rect x="4" y="36" width="26" height="6" fill="rgba(122,31,36,0.55)"/>
-            <line x1="32" y1="44" x2="38" y2="50" stroke="#262320" stroke-width="1.2" stroke-linecap="round"/>
-            <circle cx="38" cy="50" r="1.6" fill="#262320"/>
+            <rect x="0" y="0" width="34" height="60" rx="4" fill="none" stroke="#0f2238" stroke-width="1.2"/>
+            <rect x="4" y="8" width="26" height="22" fill="rgba(15,34,56,0.08)" stroke="#0f2238" stroke-width="0.8"/>
+            <text x="17" y="24" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#0f2238">?</text>
+            <rect x="4" y="36" width="26" height="6" fill="rgba(31,95,204,0.55)"/>
+            <line x1="32" y1="44" x2="38" y2="50" stroke="#0f2238" stroke-width="1.2" stroke-linecap="round"/>
+            <circle cx="38" cy="50" r="1.6" fill="#0f2238"/>
           </g>
           <g transform="translate(130,18)">
-            <rect x="0" y="0" width="34" height="60" rx="4" fill="none" stroke="#7a1f24" stroke-width="1.5"/>
-            <rect x="4" y="8" width="26" height="22" fill="rgba(122,31,36,0.18)" stroke="#7a1f24" stroke-width="0.8"/>
-            <text x="17" y="24" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#7a1f24">$</text>
-            <rect x="4" y="36" width="26" height="6" fill="rgba(122,31,36,0.85)"/>
-            <line x1="32" y1="44" x2="38" y2="50" stroke="#7a1f24" stroke-width="1.2" stroke-linecap="round"/>
-            <circle cx="38" cy="50" r="1.6" fill="#7a1f24"/>
+            <rect x="0" y="0" width="34" height="60" rx="4" fill="none" stroke="#1f5fcc" stroke-width="1.5"/>
+            <rect x="4" y="8" width="26" height="22" fill="rgba(31,95,204,0.18)" stroke="#1f5fcc" stroke-width="0.8"/>
+            <text x="17" y="24" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#1f5fcc">$</text>
+            <rect x="4" y="36" width="26" height="6" fill="rgba(31,95,204,0.85)"/>
+            <line x1="32" y1="44" x2="38" y2="50" stroke="#1f5fcc" stroke-width="1.2" stroke-linecap="round"/>
+            <circle cx="38" cy="50" r="1.6" fill="#1f5fcc"/>
           </g>
-          <text x="65" y="95" text-anchor="middle" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="10" fill="rgba(38,35,32,0.55)">unknown payout rates · pick one each round</text>
+          <text x="65" y="95" text-anchor="middle" font-family="Bricolage Grotesque, Georgia, serif" font-style="italic" font-size="10" fill="rgba(15,34,56,0.55)">unknown payout rates · pick one each round</text>
 
           <!-- Agent figure on the right -->
           <g transform="translate(190,30)">
-            <circle cx="14" cy="8" r="6" fill="none" stroke="#7a1f24" stroke-width="1.4"/>
-            <path d="M 14 14 L 14 32 M 14 20 L 4 26 M 14 20 L 24 26 M 14 32 L 6 46 M 14 32 L 22 46" stroke="#7a1f24" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+            <circle cx="14" cy="8" r="6" fill="none" stroke="#1f5fcc" stroke-width="1.4"/>
+            <path d="M 14 14 L 14 32 M 14 20 L 4 26 M 14 20 L 24 26 M 14 32 L 6 46 M 14 32 L 22 46" stroke="#1f5fcc" stroke-width="1.4" fill="none" stroke-linecap="round"/>
           </g>
-          <path d="M 188 50 Q 175 50 168 50" fill="none" stroke="#262320" stroke-width="1.2" marker-end="url(#bnd-arrow)"/>
-          <text x="180" y="42" text-anchor="middle" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="9" fill="rgba(38,35,32,0.55)">choose</text>
+          <path d="M 188 50 Q 175 50 168 50" fill="none" stroke="#0f2238" stroke-width="1.2" marker-end="url(#bnd-arrow)"/>
+          <text x="180" y="42" text-anchor="middle" font-family="Bricolage Grotesque, Georgia, serif" font-style="italic" font-size="9" fill="rgba(15,34,56,0.55)">choose</text>
         </svg>
         <p class="quiet">An agent with one job: pull the arm of the slot machine that pays best — without knowing the rates ahead of time. Each pull is a vote of confidence and an opportunity cost.</p>
         <div class="ml-margin-rule thin"></div>

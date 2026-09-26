@@ -139,7 +139,7 @@
     const intensity = Math.min(1, Math.abs(v) / 2);
     if (masked) {
       // base muted background
-      ctx.fillStyle = 'rgba(38,35,32,0.05)';
+      ctx.fillStyle = 'rgba(15,34,56,0.05)';
       ctx.fillRect(x, y, w, h);
       // diagonal stripes pattern, alpha grows with animT
       const stripeAlpha = 0.40 * Math.min(1, animT);
@@ -147,7 +147,7 @@
       ctx.beginPath();
       ctx.rect(x, y, w, h);
       ctx.clip();
-      ctx.strokeStyle = `rgba(38,35,32,${stripeAlpha})`;
+      ctx.strokeStyle = `rgba(15,34,56,${stripeAlpha})`;
       ctx.lineWidth = 1;
       const sp = 4;
       for (let s = -h; s < w + h; s += sp) {
@@ -158,14 +158,14 @@
       }
       ctx.restore();
       // border (faint)
-      ctx.strokeStyle = 'rgba(38,35,32,0.18)';
+      ctx.strokeStyle = 'rgba(15,34,56,0.18)';
       ctx.strokeRect(x, y, w, h);
     } else {
       ctx.fillStyle = v >= 0
-        ? `rgba(122,31,36,${0.12 + intensity * 0.7})`
-        : `rgba(38,35,32,${0.12 + intensity * 0.7})`;
+        ? `rgba(31,95,204,${0.12 + intensity * 0.7})`
+        : `rgba(15,34,56,${0.12 + intensity * 0.7})`;
       ctx.fillRect(x, y, w, h);
-      ctx.strokeStyle = 'rgba(38,35,32,0.18)';
+      ctx.strokeStyle = 'rgba(15,34,56,0.18)';
       ctx.strokeRect(x, y, w, h);
     }
   }
@@ -188,7 +188,7 @@
 
     // Title row
     ctx.fillStyle = INK_FADE;
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'center';
     ctx.fillText('PASS 1 (mask A)', margin + colW / 2, 20);
     ctx.fillText('PASS 2 (mask B)', margin + colW + gap + colW / 2, 20);
@@ -203,7 +203,7 @@
       for (let li = 0; li < layers; li++) {
         // Layer label
         ctx.fillStyle = INK_FADE;
-        ctx.font = '9px "JetBrains Mono", monospace';
+        ctx.font = '9px "IBM Plex Mono", monospace';
         ctx.textAlign = 'center';
         ctx.fillText(li === 0 ? 'in' : `L${li}`, x0 + li * layerW + layerW / 2, startY - 4);
         for (let i = 0; i < units; i++) {
@@ -219,7 +219,7 @@
     const layerW = (colW - 4) / layers;
     for (let li = 0; li < layers; li++) {
       ctx.fillStyle = INK_FADE;
-      ctx.font = '9px "JetBrains Mono", monospace';
+      ctx.font = '9px "IBM Plex Mono", monospace';
       ctx.textAlign = 'center';
       ctx.fillText(li === 0 ? 'in' : `L${li}`, x0 + li * layerW + layerW / 2, startY - 4);
       for (let i = 0; i < units; i++) {
@@ -235,7 +235,7 @@
     // Bottom: count of active units per pass + invariance equation
     const summaryY = size.h - 28;
     ctx.fillStyle = INK_FADE;
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'center';
     passes.forEach((sim, ci) => {
       const live = sim.masks.flat().filter((m) => m === 1).length;
@@ -243,12 +243,12 @@
       ctx.fillText(`active: ${live}/${total}`, margin + ci * (colW + gap) + colW / 2, summaryY);
     });
     ctx.fillStyle = ACCENT;
-    ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+    ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.fillText('= ensemble of sub-networks', margin + 3 * (colW + gap) + colW / 2, summaryY);
 
     // Click hint
     ctx.fillStyle = INK_FADE;
-    ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+    ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText(`p = ${state.p.toFixed(2)}  ·  hit Resample for fresh masks`, size.w / 2, size.h - 10);
 
@@ -271,12 +271,12 @@
 
     // Headers
     ctx.fillStyle = INK;
-    ctx.font = 'italic 14px "Source Serif 4", Georgia, serif';
+    ctx.font = '14px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('Training time', margin + colW / 2, 28);
     ctx.fillText('Test time', margin + colW + gap + colW / 2, 28);
     ctx.fillStyle = INK_FADE;
-    ctx.font = '11px "JetBrains Mono", monospace';
+    ctx.font = '11px "IBM Plex Mono", monospace';
     ctx.fillText('mask m, scale by 1/(1−p)', margin + colW / 2, 46);
     ctx.fillText('every neuron fires, no scaling', margin + colW + gap + colW / 2, 46);
 
@@ -284,7 +284,7 @@
     let leftLive = 0, leftTotal = 0;
     for (let li = 0; li < layers; li++) {
       ctx.fillStyle = INK_FADE;
-      ctx.font = '9px "JetBrains Mono", monospace';
+      ctx.font = '9px "IBM Plex Mono", monospace';
       ctx.textAlign = 'center';
       ctx.fillText(li === 0 ? 'in' : `L${li}`, margin + li * layerW + layerW / 2, startY - 6);
       for (let i = 0; i < units; i++) {
@@ -299,7 +299,7 @@
     const xR = margin + colW + gap;
     for (let li = 0; li < layers; li++) {
       ctx.fillStyle = INK_FADE;
-      ctx.font = '9px "JetBrains Mono", monospace';
+      ctx.font = '9px "IBM Plex Mono", monospace';
       ctx.textAlign = 'center';
       ctx.fillText(li === 0 ? 'in' : `L${li}`, xR + li * layerW + layerW / 2, startY - 6);
       for (let i = 0; i < units; i++) {
@@ -311,12 +311,12 @@
     // Footer formula
     const fy = size.h - 28;
     ctx.fillStyle = INK;
-    ctx.font = 'italic 13px "Source Serif 4", Georgia, serif';
+    ctx.font = '13px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('a\' = (m ⊙ a) / (1 − p)', margin + colW / 2, fy);
     ctx.fillText('a\' = a', xR + colW / 2, fy);
     ctx.fillStyle = INK_FADE;
-    ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+    ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.fillText(`active: ${leftLive}/${leftTotal} (≈ ${((1-state.p)*100).toFixed(0)}%)`, margin + colW / 2, fy + 14);
     ctx.fillText(`active: ${units * 4}/${units * 4} (100%)`, xR + colW / 2, fy + 14);
   }
@@ -350,33 +350,33 @@
 
     // Title and description
     ctx.fillStyle = INK_FADE;
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left';
     ctx.fillText('BATCH NORMALIZATION · standardize, then learn an affine map back', margin, 22);
 
     // Highlighted stage label
     const stage = stages[state.bnPhase];
     ctx.fillStyle = ACCENT;
-    ctx.font = 'italic 16px "Source Serif 4", Georgia, serif';
+    ctx.font = '16px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'left';
     ctx.fillText(`Step ${state.bnPhase + 1} / 4 · ${stage.lbl}`, margin, 50);
     ctx.fillStyle = INK;
-    ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+    ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.fillText(stage.gloss, margin, 70);
 
     // Track baseline
-    ctx.strokeStyle = 'rgba(38,35,32,0.20)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.20)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(margin, yAxis);
     ctx.lineTo(size.w - margin, yAxis);
     ctx.stroke();
     // Tick at 0
-    ctx.strokeStyle = 'rgba(38,35,32,0.40)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.40)';
     ctx.lineWidth = 1.5;
     ctx.beginPath(); ctx.moveTo(tx(0), yAxis - 50); ctx.lineTo(tx(0), yAxis + 50); ctx.stroke();
     ctx.fillStyle = INK_FADE;
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'center';
     ctx.fillText('0', tx(0), yAxis + 65);
 
@@ -384,7 +384,7 @@
     const transformed = inputs.map(stage.fn);
     transformed.forEach((v) => {
       const x = tx(Math.max(xMin, Math.min(xMax, v)));
-      ctx.strokeStyle = 'rgba(122,31,36,0.65)';
+      ctx.strokeStyle = 'rgba(31,95,204,0.65)';
       ctx.lineWidth = 1.5;
       ctx.beginPath();
       ctx.moveTo(x, yAxis - 12);
@@ -403,11 +403,11 @@
     ctx.beginPath(); ctx.moveTo(tx(meanT), yAxis - 30); ctx.lineTo(tx(meanT), yAxis + 30); ctx.stroke();
     ctx.setLineDash([]);
     ctx.fillStyle = ACCENT;
-    ctx.font = '11px "JetBrains Mono", monospace';
+    ctx.font = '11px "IBM Plex Mono", monospace';
     ctx.textAlign = 'center';
     ctx.fillText(`μ = ${meanT.toFixed(2)}`, tx(meanT), yAxis - 40);
     // σ band
-    ctx.strokeStyle = 'rgba(122,31,36,0.40)';
+    ctx.strokeStyle = 'rgba(31,95,204,0.40)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(tx(meanT - sdT), yAxis + 30);
@@ -416,7 +416,7 @@
     ctx.beginPath(); ctx.moveTo(tx(meanT - sdT), yAxis + 24); ctx.lineTo(tx(meanT - sdT), yAxis + 36); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(tx(meanT + sdT), yAxis + 24); ctx.lineTo(tx(meanT + sdT), yAxis + 36); ctx.stroke();
     ctx.fillStyle = INK_FADE;
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.fillText(`σ = ${sdT.toFixed(2)}`, tx(meanT), yAxis + 52);
 
     // Phase progression boxes
@@ -424,13 +424,13 @@
     const pbW = (size.w - margin * 2) / stages.length;
     stages.forEach((s, i) => {
       const x0 = margin + i * pbW;
-      ctx.fillStyle = i === state.bnPhase ? 'rgba(122,31,36,0.20)' : 'rgba(38,35,32,0.05)';
-      ctx.strokeStyle = i === state.bnPhase ? ACCENT : 'rgba(38,35,32,0.20)';
+      ctx.fillStyle = i === state.bnPhase ? 'rgba(31,95,204,0.20)' : 'rgba(15,34,56,0.05)';
+      ctx.strokeStyle = i === state.bnPhase ? ACCENT : 'rgba(15,34,56,0.20)';
       ctx.lineWidth = i === state.bnPhase ? 2 : 1;
       ctx.fillRect(x0 + 4, pbY, pbW - 8, 24);
       ctx.strokeRect(x0 + 4, pbY, pbW - 8, 24);
       ctx.fillStyle = i === state.bnPhase ? ACCENT : INK;
-      ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+      ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(s.lbl, x0 + pbW / 2, pbY + 12);
@@ -454,20 +454,20 @@
 
     // Common helpers
     function box(ctx, x, y, w, h, label, accent = false, sub = '') {
-      ctx.fillStyle = accent ? 'rgba(122,31,36,0.10)' : '#fffdf6';
+      ctx.fillStyle = accent ? 'rgba(31,95,204,0.10)' : '#FCFEFF';
       ctx.strokeStyle = INK;
       ctx.lineWidth = 1.2;
       ctx.fillRect(x, y, w, h);
       ctx.strokeRect(x, y, w, h);
       ctx.fillStyle = INK;
-      ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+      ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(label, x + w / 2, y + h / 2);
       ctx.textBaseline = 'alphabetic';
       if (sub) {
         ctx.fillStyle = INK_FADE;
-        ctx.font = '9px "JetBrains Mono", monospace';
+        ctx.font = '9px "IBM Plex Mono", monospace';
         ctx.fillText(sub, x + w / 2, y + h + 12);
       }
     }
@@ -490,7 +490,7 @@
 
     // ── Left: BatchNorm block ──
     ctx.fillStyle = INK_FADE;
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left';
     ctx.fillText('BATCHNORM BLOCK', margin, 18);
     const bnSteps = [
@@ -514,20 +514,20 @@
     // Surround the (μ, σ, γ, β) span with a faint bracket
     const bx0 = margin + bnStepW + 6;
     const bx1 = margin + 5 * bnStepW + 6 - 6;
-    ctx.strokeStyle = 'rgba(122,31,36,0.40)';
+    ctx.strokeStyle = 'rgba(31,95,204,0.40)';
     ctx.lineWidth = 1;
     ctx.setLineDash([3, 3]);
     ctx.strokeRect(bx0 - 4, baseY - 28, bx1 - bx0 + 8, 64);
     ctx.setLineDash([]);
     ctx.fillStyle = ACCENT;
-    ctx.font = 'italic 10px "Source Serif 4", Georgia, serif';
+    ctx.font = '10px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('the BN transform', (bx0 + bx1) / 2, baseY - 32);
 
     // ── Right: Dropout block ──
     const rx = margin * 2 + halfW;
     ctx.fillStyle = INK_FADE;
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left';
     ctx.fillText('DROPOUT BLOCK', rx, 18);
     const drSteps = [
@@ -549,13 +549,13 @@
     });
     const dx0 = rx + drStepW + 6;
     const dx1 = rx + 4 * drStepW + 6 - 6;
-    ctx.strokeStyle = 'rgba(122,31,36,0.40)';
+    ctx.strokeStyle = 'rgba(31,95,204,0.40)';
     ctx.lineWidth = 1;
     ctx.setLineDash([3, 3]);
     ctx.strokeRect(dx0 - 4, baseY - 28, dx1 - dx0 + 8, 64);
     ctx.setLineDash([]);
     ctx.fillStyle = ACCENT;
-    ctx.font = 'italic 10px "Source Serif 4", Georgia, serif';
+    ctx.font = '10px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('train-time only · removed at test', (dx0 + dx1) / 2, baseY - 32);
   }

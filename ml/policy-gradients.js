@@ -311,7 +311,7 @@
   function drawHeader(ctx, layout) {
     const { size } = layout;
     ctx.fillStyle = INK_FADE;
-    ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+    ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
     const label = state.view === 'grid'
@@ -328,31 +328,31 @@
         const y = gridY0 + r * cellSize;
         const isGoal = r === state.world.goal[0] && c === state.world.goal[1];
         const isPit  = r === state.world.pit[0]  && c === state.world.pit[1];
-        let bg = '#fffdf6';
-        if (isGoal) bg = 'rgba(122,31,36,0.55)';
-        else if (isPit) bg = 'rgba(38,35,32,0.50)';
+        let bg = '#FCFEFF';
+        if (isGoal) bg = 'rgba(31,95,204,0.55)';
+        else if (isPit) bg = 'rgba(15,34,56,0.50)';
         ctx.fillStyle = bg;
         ctx.fillRect(x, y, cellSize, cellSize);
-        ctx.strokeStyle = 'rgba(38,35,32,0.30)';
+        ctx.strokeStyle = 'rgba(15,34,56,0.30)';
         ctx.lineWidth = 1;
         ctx.strokeRect(x, y, cellSize, cellSize);
         if (isGoal) {
-          ctx.fillStyle = '#fffdf6';
-          ctx.font = 'bold 14px "JetBrains Mono", monospace';
+          ctx.fillStyle = '#FCFEFF';
+          ctx.font = 'bold 14px "IBM Plex Mono", monospace';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
           ctx.fillText('+1', x + cellSize / 2, y + cellSize / 2);
         } else if (isPit) {
-          ctx.fillStyle = '#fffdf6';
-          ctx.font = 'bold 14px "JetBrains Mono", monospace';
+          ctx.fillStyle = '#FCFEFF';
+          ctx.font = 'bold 14px "IBM Plex Mono", monospace';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
           ctx.fillText('−1', x + cellSize / 2, y + cellSize / 2);
         }
         // Mark start
         if (r === state.world.start[0] && c === state.world.start[1] && !isGoal && !isPit) {
-          ctx.fillStyle = 'rgba(38,35,32,0.45)';
-          ctx.font = '9px "JetBrains Mono", monospace';
+          ctx.fillStyle = 'rgba(15,34,56,0.45)';
+          ctx.font = '9px "IBM Plex Mono", monospace';
           ctx.textAlign = 'left';
           ctx.textBaseline = 'top';
           ctx.fillText('start', x + 4, y + 4);
@@ -384,17 +384,17 @@
           const bx = x + padInner + a * slot + slot * 0.15;
           const bw = slot * 0.7;
           const bh = p * barAreaH;
-          ctx.fillStyle = `rgba(122,31,36,${0.18 + p * 0.65})`;
+          ctx.fillStyle = `rgba(31,95,204,${0.18 + p * 0.65})`;
           ctx.fillRect(bx, baseY - bh, bw, bh);
           // glyph
           ctx.fillStyle = INK_FADE;
-          ctx.font = '10px "JetBrains Mono", monospace';
+          ctx.font = '10px "IBM Plex Mono", monospace';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'top';
           ctx.fillText(ACTION_GLYPHS[a], bx + bw / 2, baseY + 2);
         }
         // Faint divider between bars area and lower (reserved) area.
-        ctx.strokeStyle = 'rgba(38,35,32,0.10)';
+        ctx.strokeStyle = 'rgba(15,34,56,0.10)';
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.moveTo(x + padInner, y + padInner + barAreaH + 14);
@@ -408,7 +408,7 @@
         const ar = cellSize * 0.16;
         const [dr, dc] = ACTIONS[bestA];
         drawArrow(ctx, cx - dc * ar, cy - dr * ar, cx + dc * ar, cy + dr * ar,
-          `rgba(122,31,36,${0.4 + probs[bestA] * 0.6})`,
+          `rgba(31,95,204,${0.4 + probs[bestA] * 0.6})`,
           1 + probs[bestA] * 4);
       }
     }
@@ -432,10 +432,10 @@
           const ex = cx + dc * len;
           const ey = cy + dr * len;
           const alpha = 0.30 + p * 0.55;
-          drawArrow(ctx, cx, cy, ex, ey, `rgba(122,31,36,${alpha})`, 1 + p * 3.5);
+          drawArrow(ctx, cx, cy, ex, ey, `rgba(31,95,204,${alpha})`, 1 + p * 3.5);
         }
         // Tiny dot at center
-        ctx.fillStyle = 'rgba(38,35,32,0.45)';
+        ctx.fillStyle = 'rgba(15,34,56,0.45)';
         ctx.beginPath();
         ctx.arc(cx, cy, 2, 0, Math.PI * 2);
         ctx.fill();
@@ -450,8 +450,8 @@
       const losing = finalRew < -0.5;
       let color;
       if (winning) color = 'rgba(58,107,74,0.85)';   // green
-      else if (losing) color = 'rgba(122,31,36,0.85)'; // accent
-      else color = 'rgba(38,35,32,0.55)';
+      else if (losing) color = 'rgba(31,95,204,0.85)'; // accent
+      else color = 'rgba(15,34,56,0.55)';
       const visible = state.flashStep > 0 ? Math.min(trace.length, state.flashStep) : trace.length;
       for (let i = 0; i < visible; i++) {
         const t = trace[i];
@@ -465,7 +465,7 @@
       // Outcome label
       if (state.flashStep >= trace.length) {
         ctx.fillStyle = winning ? '#3a6b4a' : losing ? ACCENT : INK_FADE;
-        ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+        ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
         ctx.textAlign = 'left';
         ctx.textBaseline = 'top';
         const lbl = winning ? 'rollout reached the goal · push these actions UP'
@@ -489,7 +489,7 @@
       const tx = layout.gridX0 + tk.c * layout.cellSize + layout.cellSize / 2;
       const ty = layout.gridY0 + tk.r * layout.cellSize + layout.cellSize / 2;
       const a = (k + 1) / (i + 1) * 0.40;
-      ctx.fillStyle = `rgba(38,35,32,${a})`;
+      ctx.fillStyle = `rgba(15,34,56,${a})`;
       ctx.beginPath();
       ctx.arc(tx, ty, layout.cellSize * 0.06, 0, Math.PI * 2);
       ctx.fill();
@@ -499,7 +499,7 @@
     ctx.beginPath();
     ctx.arc(cx, cy, layout.cellSize * 0.10, 0, Math.PI * 2);
     ctx.fill();
-    ctx.strokeStyle = '#fffdf6';
+    ctx.strokeStyle = '#FCFEFF';
     ctx.lineWidth = 1.5;
     ctx.stroke();
   }
@@ -531,13 +531,13 @@
     const panelW = size.w - 32;
     const panelX = 16;
     const panelY = size.h - panelH - 4;
-    ctx.fillStyle = 'rgba(38,35,32,0.04)';
+    ctx.fillStyle = 'rgba(15,34,56,0.04)';
     ctx.fillRect(panelX, panelY, panelW, panelH);
-    ctx.strokeStyle = 'rgba(38,35,32,0.20)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.20)';
     ctx.lineWidth = 1;
     ctx.strokeRect(panelX, panelY, panelW, panelH);
     ctx.fillStyle = INK_FADE;
-    ctx.font = '9px "JetBrains Mono", monospace';
+    ctx.font = '9px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
     ctx.fillText('REWARD PER ROLLOUT', panelX + 6, panelY + 3);
@@ -547,7 +547,7 @@
       const minV = -1.5, maxV = 1.2;
       const range = maxV - minV;
       const zeroY = panelY + panelH - 4 - ((0 - minV) / range) * (panelH - 12);
-      ctx.strokeStyle = 'rgba(38,35,32,0.25)';
+      ctx.strokeStyle = 'rgba(15,34,56,0.25)';
       ctx.setLineDash([2, 3]);
       ctx.beginPath();
       ctx.moveTo(panelX + 4, zeroY);
@@ -565,12 +565,12 @@
       ctx.stroke();
       const last = hist[hist.length - 1];
       ctx.fillStyle = ACCENT;
-      ctx.font = '9px "JetBrains Mono", monospace';
+      ctx.font = '9px "IBM Plex Mono", monospace';
       ctx.textAlign = 'right';
       ctx.fillText(`last R = ${last.toFixed(2)}`, panelX + panelW - 6, panelY + 3);
     } else {
-      ctx.fillStyle = 'rgba(38,35,32,0.45)';
-      ctx.font = 'italic 10px "Source Serif 4", Georgia, serif';
+      ctx.fillStyle = 'rgba(15,34,56,0.45)';
+      ctx.font = '10px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText('train to see reward curve', panelX + panelW / 2, panelY + panelH / 2 + 2);
@@ -589,19 +589,19 @@
         const x = -R + (j + 0.5) / cells * 2 * R;
         const y = R - (i + 0.5) / cells * 2 * R;
         const r = gaussianReward([x, y], state.cTarget);
-        ctx.fillStyle = `rgba(122,31,36,${0.04 + r * 0.30})`;
+        ctx.fillStyle = `rgba(31,95,204,${0.04 + r * 0.30})`;
         ctx.fillRect(j * size.w / cells, i * size.h / cells, size.w / cells + 1, size.h / cells + 1);
       }
     }
     // Grid
-    ctx.strokeStyle = 'rgba(38,35,32,0.08)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.08)';
     ctx.lineWidth = 1;
     for (let i = -3; i <= 3; i++) {
       ctx.beginPath(); ctx.moveTo(tx(i), 0); ctx.lineTo(tx(i), size.h); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(0, ty(i)); ctx.lineTo(size.w, ty(i)); ctx.stroke();
     }
     // Policy contour
-    ctx.strokeStyle = 'rgba(38,35,32,0.55)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.55)';
     ctx.lineWidth = 1.5;
     for (const factor of [1, 2]) {
       ctx.beginPath();
@@ -620,7 +620,7 @@
       const mx = tx(state.cMu[0]), my = ty(state.cMu[1]);
       const intensity = Math.max(0, Math.min(1, r));
       // Green for high reward, gray for low
-      const color = r > 0.4 ? `rgba(58,107,74,${0.30 + intensity * 0.55})` : `rgba(38,35,32,${0.20 + r * 0.25})`;
+      const color = r > 0.4 ? `rgba(58,107,74,${0.30 + intensity * 0.55})` : `rgba(15,34,56,${0.20 + r * 0.25})`;
       ctx.strokeStyle = color;
       ctx.lineWidth = 1 + intensity * 1.5;
       ctx.beginPath();
@@ -633,11 +633,11 @@
       ctx.fill();
     }
     // μ marker
-    ctx.fillStyle = '#262320';
+    ctx.fillStyle = '#0f2238';
     ctx.beginPath();
     ctx.arc(tx(state.cMu[0]), ty(state.cMu[1]), 5, 0, Math.PI * 2);
     ctx.fill();
-    ctx.strokeStyle = '#fffdf6';
+    ctx.strokeStyle = '#FCFEFF';
     ctx.lineWidth = 1.5;
     ctx.stroke();
     // Target star
@@ -645,7 +645,7 @@
     drawStar(ctx, tx(state.cTarget[0]), ty(state.cTarget[1]), 9);
     // Header
     ctx.fillStyle = INK_FADE;
-    ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+    ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
     ctx.fillText('continuous Gaussian policy · μ drifts toward high-reward samples', size.w / 2, 6);

@@ -7,7 +7,7 @@
   <title>Forward Propagation · ML, Visualized · Joseph Thomas</title>
   <meta name="description" content="Watch the signal travel: weighted sums, bent through nonlinearities, layer by layer into a prediction." />
   <link rel="canonical" href="https://jthomas.site/ml/forward.html" />
-  <meta name="theme-color" content="#7a1f24" />
+  <meta name="theme-color" content="#F4F9FE" />
   <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
 
   <meta property="og:type" content="article" />
@@ -15,27 +15,24 @@
   <meta property="og:description" content="A neural network is a pipeline. Watch the signal travel." />
   <meta property="og:url" content="https://jthomas.site/ml/forward.html" />
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;1,8..60,300;1,8..60,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-
+  <link rel="preload" href="/fonts/bricolage-grotesque.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="/css/fonts.css" />
   <link rel="stylesheet" href="../styles.css" />
   <link rel="stylesheet" href="shared.css" />
+  <link rel="stylesheet" href="/css/site.css" />
 </head>
 <body>
 
-<header class="nb-nav">
-  <div class="brand-block">
-    <a class="brand" href="../index.html">jthomas.site</a><span class="brand-meta">// notebook · v.4.2026</span>
-  </div>
-  <nav>
-    <a href="../blog/index.html">writing</a>
-    <a href="index.html" style="color:var(--ink)">tutorial</a>
-    <a href="../index.html#research">research</a>
-    <a href="../index.html#work">work</a>
-    <a href="../index.html#projects">projects</a>
-    <a href="../consulting.html">consulting</a>
-    <a href="../index.html#contact" class="contact">→ contact</a>
+<header class="site-top">
+  <a class="brand" href="../index.html">Joseph Thomas</a>
+  <nav aria-label="Primary">
+    <a href="../blog/index.html">Writing</a>
+    <a href="../ml/index.html" aria-current="true">Tutorial</a>
+    <a href="../index.html#work">Work</a>
+    <a href="../index.html#research">Research</a>
+    <a href="../index.html#projects">Projects</a>
+    <a href="../consulting.html">Consulting</a>
+    <a class="pill-cta" href="../index.html#contact">Contact</a>
   </nav>
 </header>
 
@@ -113,31 +110,31 @@
         <div class="ml-margin-h">The recipe — one layer</div>
         <svg viewBox="0 0 220 90" style="width:100%; height:auto; margin: 6px 0 8px" aria-hidden="true">
           <!-- input -->
-          <rect x="2"   y="35" width="32" height="20" fill="none" stroke="#262320" stroke-width="1"/>
-          <text x="18"  y="49" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#262320">a⁽ˡ⁻¹⁾</text>
+          <rect x="2"   y="35" width="32" height="20" fill="none" stroke="#0f2238" stroke-width="1"/>
+          <text x="18"  y="49" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#0f2238">a⁽ˡ⁻¹⁾</text>
           <!-- linear map W·a -->
-          <rect x="42"  y="30" width="36" height="30" fill="rgba(122,31,36,0.10)" stroke="#7a1f24" stroke-width="1"/>
-          <text x="60"  y="46" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="11" fill="#7a1f24">W·a</text>
-          <text x="60"  y="74" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="rgba(38,35,32,0.6)">linear</text>
+          <rect x="42"  y="30" width="36" height="30" fill="rgba(31,95,204,0.10)" stroke="#1f5fcc" stroke-width="1"/>
+          <text x="60"  y="46" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="11" fill="#1f5fcc">W·a</text>
+          <text x="60"  y="74" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="rgba(15,34,56,0.6)">linear</text>
           <!-- bias add -->
-          <rect x="86"  y="30" width="34" height="30" fill="none" stroke="#262320" stroke-width="1"/>
-          <text x="103" y="48" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#262320">+ b</text>
-          <text x="103" y="74" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="rgba(38,35,32,0.6)">shift</text>
+          <rect x="86"  y="30" width="34" height="30" fill="none" stroke="#0f2238" stroke-width="1"/>
+          <text x="103" y="48" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="#0f2238">+ b</text>
+          <text x="103" y="74" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="rgba(15,34,56,0.6)">shift</text>
           <!-- nonlinearity -->
-          <rect x="128" y="30" width="38" height="30" fill="none" stroke="#262320" stroke-width="1"/>
-          <text x="147" y="49" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="13" fill="#262320">ƒ( · )</text>
-          <text x="147" y="74" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="rgba(38,35,32,0.6)">bend</text>
+          <rect x="128" y="30" width="38" height="30" fill="none" stroke="#0f2238" stroke-width="1"/>
+          <text x="147" y="49" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="13" fill="#0f2238">ƒ( · )</text>
+          <text x="147" y="74" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="rgba(15,34,56,0.6)">bend</text>
           <!-- output -->
-          <rect x="178" y="35" width="36" height="20" fill="none" stroke="#262320" stroke-width="1"/>
-          <text x="196" y="49" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#262320">a⁽ˡ⁾</text>
+          <rect x="178" y="35" width="36" height="20" fill="none" stroke="#0f2238" stroke-width="1"/>
+          <text x="196" y="49" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#0f2238">a⁽ˡ⁾</text>
           <!-- arrows -->
-          <line x1="34"  y1="45" x2="42"  y2="45" stroke="#262320" stroke-width="1" marker-end="url(#aarr)"/>
-          <line x1="78"  y1="45" x2="86"  y2="45" stroke="#262320" stroke-width="1" marker-end="url(#aarr)"/>
-          <line x1="120" y1="45" x2="128" y2="45" stroke="#262320" stroke-width="1" marker-end="url(#aarr)"/>
-          <line x1="166" y1="45" x2="178" y2="45" stroke="#262320" stroke-width="1" marker-end="url(#aarr)"/>
+          <line x1="34"  y1="45" x2="42"  y2="45" stroke="#0f2238" stroke-width="1" marker-end="url(#aarr)"/>
+          <line x1="78"  y1="45" x2="86"  y2="45" stroke="#0f2238" stroke-width="1" marker-end="url(#aarr)"/>
+          <line x1="120" y1="45" x2="128" y2="45" stroke="#0f2238" stroke-width="1" marker-end="url(#aarr)"/>
+          <line x1="166" y1="45" x2="178" y2="45" stroke="#0f2238" stroke-width="1" marker-end="url(#aarr)"/>
           <defs>
             <marker id="aarr" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
-              <path d="M0,0 L10,5 L0,10 z" fill="#262320"/>
+              <path d="M0,0 L10,5 L0,10 z" fill="#0f2238"/>
             </marker>
           </defs>
         </svg>
@@ -146,15 +143,15 @@
         <div class="ml-margin-rule thin"></div>
         <div class="ml-margin-h sm">Legend</div>
         <div style="display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:11px; color:var(--ml-ink-fade); margin-bottom:4px">
-          <span style="width:14px; height:2px; background:#7a1f24; display:inline-block"></span>
+          <span style="width:14px; height:2px; background:#1f5fcc; display:inline-block"></span>
           <span>positive weight</span>
         </div>
         <div style="display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:11px; color:var(--ml-ink-fade); margin-bottom:4px">
-          <span style="width:14px; height:2px; background:#262320; display:inline-block"></span>
+          <span style="width:14px; height:2px; background:#0f2238; display:inline-block"></span>
           <span>negative weight</span>
         </div>
         <div style="display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:11px; color:var(--ml-ink-fade)">
-          <span style="width:10px; height:10px; background:rgba(122,31,36,0.85); display:inline-block; border-radius:50%"></span>
+          <span style="width:10px; height:10px; background:rgba(31,95,204,0.85); display:inline-block; border-radius:50%"></span>
           <span>fill = activation magnitude</span>
         </div>
         <div class="ml-margin-rule thin"></div>

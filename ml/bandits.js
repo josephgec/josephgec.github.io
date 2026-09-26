@@ -97,8 +97,8 @@
 
   const COLORS = {
     eps:   { name: 'ε-greedy',  color: 'rgba(58,107,74,0.85)',  rgb: '58,107,74' },   // green
-    ucb:   { name: 'UCB',        color: 'rgba(122,31,36,0.85)',  rgb: '122,31,36' },   // accent
-    thomp: { name: 'Thompson',   color: 'rgba(38,35,32,0.85)',   rgb: '38,35,32' },    // ink
+    ucb:   { name: 'UCB',        color: 'rgba(31,95,204,0.85)',  rgb: '31,95,204' },   // accent
+    thomp: { name: 'Thompson',   color: 'rgba(15,34,56,0.85)',   rgb: '15,34,56' },    // ink
   };
 
   const state = {
@@ -205,7 +205,7 @@
 
     // Header
     ctx.fillStyle = INK_FADE;
-    ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+    ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
     ctx.fillText('arms · pull counts (bars), true means (dashed), each agent\'s estimate (color tick)', size.w / 2, 4);
@@ -223,7 +223,7 @@
 
       // Background of column for best arm
       if (i === BEST_ARM) {
-        ctx.fillStyle = 'rgba(122,31,36,0.04)';
+        ctx.fillStyle = 'rgba(31,95,204,0.04)';
         ctx.fillRect(x0 + 2, armPaneY, colW - 4, armPaneH);
       }
 
@@ -252,7 +252,7 @@
       const meanH = upperBotY - upperTopY;
       const trueMean = TRUE_MEANS[i];
       const trueY = upperBotY - trueMean * meanH;
-      ctx.strokeStyle = 'rgba(38,35,32,0.45)';
+      ctx.strokeStyle = 'rgba(15,34,56,0.45)';
       ctx.lineWidth = 1;
       ctx.setLineDash([3, 3]);
       ctx.beginPath();
@@ -289,20 +289,20 @@
 
       // Arm label
       ctx.fillStyle = INK_FADE;
-      ctx.font = '9px "JetBrains Mono", monospace';
+      ctx.font = '9px "IBM Plex Mono", monospace';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'top';
       ctx.fillText(`a${i}`, x + w / 2, armPaneY + armPaneH + 2);
       if (i === BEST_ARM) {
         ctx.fillStyle = ACCENT;
-        ctx.font = 'italic 9px "Source Serif 4", Georgia, serif';
+        ctx.font = '9px "Bricolage Grotesque", system-ui, sans-serif';
         ctx.fillText('best', x + w / 2, armPaneY + armPaneH + 13);
       }
     }
 
     // Y-axis labels (mean reward)
     ctx.fillStyle = INK_FADE;
-    ctx.font = '9px "JetBrains Mono", monospace';
+    ctx.font = '9px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
     [0, 0.5, 1].forEach((m) => {
@@ -314,11 +314,11 @@
     });
 
     // ───── Regret pane ─────
-    ctx.strokeStyle = 'rgba(38,35,32,0.30)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.30)';
     ctx.lineWidth = 1;
     ctx.strokeRect(padX, regretPaneY, size.w - padX * 2, regretPaneH);
     ctx.fillStyle = INK_FADE;
-    ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+    ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
     ctx.fillText('cumulative regret over time · lower = better', padX, regretPaneY - 16);
@@ -341,7 +341,7 @@
     // Legend (top-left of regret pane)
     let lx = padX + 8;
     const ly = regretPaneY + 12;
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textBaseline = 'middle';
     ['eps', 'ucb', 'thomp'].forEach((k) => {
       ctx.fillStyle = COLORS[k].color;
@@ -368,7 +368,7 @@
 
     // Header
     ctx.fillStyle = COLORS[key].color;
-    ctx.font = 'italic 13px "Source Serif 4", Georgia, serif';
+    ctx.font = '13px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
     ctx.fillText(COLORS[key].name + ' — focused view', padX, 6);
@@ -376,9 +376,9 @@
     // ε-greedy: show last action's tag (explore vs exploit)
     if (key === 'eps') {
       const tag = ag.lastExploring ? 'EXPLORE · random arm chosen' : 'EXPLOIT · greedy on max estimate';
-      const tagColor = ag.lastExploring ? 'rgba(38,35,32,0.7)' : COLORS.eps.color;
+      const tagColor = ag.lastExploring ? 'rgba(15,34,56,0.7)' : COLORS.eps.color;
       ctx.fillStyle = tagColor;
-      ctx.font = '10px "JetBrains Mono", monospace';
+      ctx.font = '10px "IBM Plex Mono", monospace';
       ctx.textAlign = 'right';
       ctx.fillText(tag, size.w - padX, 8);
     }
@@ -401,7 +401,7 @@
 
       // best-arm tint
       if (i === BEST_ARM) {
-        ctx.fillStyle = 'rgba(122,31,36,0.04)';
+        ctx.fillStyle = 'rgba(31,95,204,0.04)';
         ctx.fillRect(x0 + 1, armPaneY, colW - 2, armPaneH);
       }
 
@@ -411,14 +411,14 @@
       const p = ag.pulls[i];
       const bh = (p / maxPulls) * subH;
       const isLastPicked = ag.lastArm === i;
-      ctx.fillStyle = isLastPicked ? COLORS[key].color.replace('0.85', '0.50') : 'rgba(38,35,32,0.18)';
+      ctx.fillStyle = isLastPicked ? COLORS[key].color.replace('0.85', '0.50') : 'rgba(15,34,56,0.18)';
       ctx.fillRect(x, subBaseY - bh, w, bh);
-      ctx.strokeStyle = 'rgba(38,35,32,0.30)';
+      ctx.strokeStyle = 'rgba(15,34,56,0.30)';
       ctx.lineWidth = 1;
       ctx.strokeRect(x, subBaseY - bh, w, bh);
 
       // True mean dashed line
-      ctx.strokeStyle = 'rgba(38,35,32,0.45)';
+      ctx.strokeStyle = 'rgba(15,34,56,0.45)';
       ctx.lineWidth = 1;
       ctx.setLineDash([3, 3]);
       ctx.beginPath();
@@ -442,14 +442,14 @@
         const bonus = Math.sqrt(2 * Math.log(state.t + 1) / p);
         const ucbY = upperBotY - Math.min(1, estMean + bonus) * meanH;
         // vertical segment from estY (down) up to ucbY
-        ctx.strokeStyle = 'rgba(122,31,36,0.45)';
+        ctx.strokeStyle = 'rgba(31,95,204,0.45)';
         ctx.lineWidth = 4;
         ctx.beginPath();
         ctx.moveTo(cx, estY);
         ctx.lineTo(cx, ucbY);
         ctx.stroke();
         // small cap at top
-        ctx.strokeStyle = 'rgba(122,31,36,0.85)';
+        ctx.strokeStyle = 'rgba(31,95,204,0.85)';
         ctx.lineWidth = 1.5;
         ctx.beginPath();
         ctx.moveTo(cx - 5, ucbY); ctx.lineTo(cx + 5, ucbY);
@@ -457,7 +457,7 @@
         // bonus value annotation for the picked arm
         if (isLastPicked) {
           ctx.fillStyle = ACCENT;
-          ctx.font = '9px "JetBrains Mono", monospace';
+          ctx.font = '9px "IBM Plex Mono", monospace';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'bottom';
           ctx.fillText(`+${bonus.toFixed(2)}`, cx, ucbY - 2);
@@ -507,7 +507,7 @@
 
       // Arm label
       ctx.fillStyle = INK_FADE;
-      ctx.font = '9px "JetBrains Mono", monospace';
+      ctx.font = '9px "IBM Plex Mono", monospace';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'top';
       ctx.fillText(`a${i} · ${p}p`, cx, subBaseY + 4);
@@ -515,7 +515,7 @@
 
     // Y-axis labels
     ctx.fillStyle = INK_FADE;
-    ctx.font = '9px "JetBrains Mono", monospace';
+    ctx.font = '9px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
     [0, 0.5, 1].forEach((m) => {
@@ -525,17 +525,17 @@
 
     // Sub-pane label
     ctx.fillStyle = INK_FADE;
-    ctx.font = '9px "JetBrains Mono", monospace';
+    ctx.font = '9px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
     ctx.fillText('PULLS', 4, (subTopY + subBaseY) / 2);
 
     // Regret pane
-    ctx.strokeStyle = 'rgba(38,35,32,0.30)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.30)';
     ctx.lineWidth = 1;
     ctx.strokeRect(padX, regretPaneY, size.w - padX * 2, regretPaneH);
     ctx.fillStyle = INK_FADE;
-    ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+    ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
     ctx.fillText('cumulative regret', padX, regretPaneY - 16);
@@ -556,7 +556,7 @@
       // last value
       const last = reg[reg.length - 1];
       ctx.fillStyle = COLORS[key].color;
-      ctx.font = '10px "JetBrains Mono", monospace';
+      ctx.font = '10px "IBM Plex Mono", monospace';
       ctx.textAlign = 'right';
       ctx.textBaseline = 'top';
       ctx.fillText(`R = ${last.toFixed(2)}`, size.w - padX - 6, regretPaneY + 4);
@@ -565,13 +565,13 @@
     // For UCB / Thompson: explanatory annotation
     if (key === 'ucb') {
       ctx.fillStyle = ACCENT;
-      ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+      ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'right';
       ctx.textBaseline = 'top';
       ctx.fillText('vertical segment above each tick = confidence bonus · shrinks with samples', size.w - padX, 8);
     } else if (key === 'thomp') {
       ctx.fillStyle = INK_FADE;
-      ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+      ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'right';
       ctx.textBaseline = 'top';
       ctx.fillText('bell curve above each arm = Beta posterior · narrows with evidence', size.w - padX, 8);

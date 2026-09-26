@@ -208,7 +208,7 @@
 
     const txt = a.text;
     ctx.save();
-    ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+    ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     const w = ctx.measureText(txt).width;
     const padX = 12, padY = 7;
@@ -217,7 +217,7 @@
     const x = (size.w - boxW) / 2;
     const y = 8;
     ctx.globalAlpha = alpha;
-    ctx.fillStyle = 'rgba(255,253,246,0.96)';
+    ctx.fillStyle = 'rgba(252,254,255,0.96)';
     ctx.fillRect(x, y, boxW, boxH);
     ctx.strokeStyle = ACCENT;
     ctx.lineWidth = 1;
@@ -265,15 +265,15 @@
     const ll4 = { x: l2x, y: yNotA + size.h * 0.13 };    // ¬A & ¬B
 
     function branch(from, to, label, prob, weight, hot) {
-      ctx.strokeStyle = hot ? ACCENT : 'rgba(38,35,32,0.40)';
+      ctx.strokeStyle = hot ? ACCENT : 'rgba(15,34,56,0.40)';
       ctx.lineWidth = hot ? Math.max(2, weight * 10) : Math.max(1, weight * 8);
       ctx.beginPath();
       ctx.moveTo(from.x, from.y);
       ctx.lineTo(to.x, to.y);
       ctx.stroke();
       const mx = (from.x + to.x) / 2, my = (from.y + to.y) / 2;
-      ctx.fillStyle = hot ? ACCENT : 'rgba(38,35,32,0.65)';
-      ctx.font = '11px "JetBrains Mono", monospace';
+      ctx.fillStyle = hot ? ACCENT : 'rgba(15,34,56,0.65)';
+      ctx.font = '11px "IBM Plex Mono", monospace';
       ctx.textAlign = 'center';
       ctx.fillText(label, mx, my - 6);
       ctx.font = SERIF_LABEL_SM;
@@ -281,8 +281,8 @@
     }
 
     function node(n, label, fill) {
-      ctx.fillStyle = fill || '#fffdf6';
-      ctx.strokeStyle = 'rgba(38,35,32,0.50)';
+      ctx.fillStyle = fill || '#FCFEFF';
+      ctx.strokeStyle = 'rgba(15,34,56,0.50)';
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.arc(n.x, n.y, 7, 0, Math.PI * 2);
@@ -324,7 +324,7 @@
 
     // Title above the fraction
     ctx.fillStyle = INK_FADE;
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'center';
     ctx.fillText('POSTERIOR  =', fx + fw / 2, padY + 4);
 
@@ -337,7 +337,7 @@
 
     // Numerator
     drawPill(ctx, pillX, numY, pillW, pillH,
-      `P(${A} ∩ ${B})`, j_AB, ACCENT, '#fffdf6');
+      `P(${A} ∩ ${B})`, j_AB, ACCENT, '#FCFEFF');
     // Numerator pull-line from leaf ll1 → numerator
     drawCurvePull(ctx, ll1.x + 8, ll1.y, pillX, numY + pillH / 2, ACCENT, 0.55);
 
@@ -352,30 +352,30 @@
     // Denominator: P(A∩B) + P(¬A∩B)
     const subPillW = (pillW - 16) / 2;
     drawPill(ctx, pillX, denY, subPillW, pillH,
-      `P(${A} ∩ ${B})`, j_AB, ACCENT, '#fffdf6');
+      `P(${A} ∩ ${B})`, j_AB, ACCENT, '#FCFEFF');
     ctx.fillStyle = INK;
-    ctx.font = 'italic 18px "Source Serif 4", Georgia, serif';
+    ctx.font = '18px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('+', pillX + subPillW + 8, denY + pillH / 2 + 6);
     drawPill(ctx, pillX + subPillW + 16, denY, subPillW, pillH,
-      `P(¬${A} ∩ ${B})`, j_notAB, 'rgba(122,31,36,0.55)', '#fffdf6');
+      `P(¬${A} ∩ ${B})`, j_notAB, 'rgba(31,95,204,0.55)', '#FCFEFF');
 
     // Denominator pull-lines from ll1 + ll3 → denominator
     drawCurvePull(ctx, ll1.x + 8, ll1.y, pillX, denY + pillH / 2, ACCENT, 0.30);
-    drawCurvePull(ctx, ll3.x + 8, ll3.y, pillX + subPillW + 16, denY + pillH / 2, 'rgba(122,31,36,0.55)', 0.30);
+    drawCurvePull(ctx, ll3.x + 8, ll3.y, pillX + subPillW + 16, denY + pillH / 2, 'rgba(31,95,204,0.55)', 0.30);
 
     // Equals + posterior result
     const posterior = j_AB / (j_AB + j_notAB + 1e-12);
     const resY = denY + pillH + 30;
     ctx.fillStyle = INK;
-    ctx.font = 'italic 16px "Source Serif 4", Georgia, serif';
+    ctx.font = '16px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('=', fx + fw / 2, resY);
     ctx.fillStyle = ACCENT;
-    ctx.font = 'italic 28px "Source Serif 4", Georgia, serif';
+    ctx.font = '28px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.fillText(`${(posterior * 100).toFixed(2)}%`, fx + fw / 2, resY + 32);
     ctx.fillStyle = INK_FADE;
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.fillText(`P(${A} | ${B})`, fx + fw / 2, resY + 50);
   }
 
@@ -383,9 +383,9 @@
     const w = 88, h = 30;
     const x = n.x - 2, y = n.y - h / 2;
     // Numerator-and-denominator leaf gets full accent fill; denominator-only gets soft.
-    let fill = '#fffdf6', stroke = 'rgba(38,35,32,0.45)';
+    let fill = '#FCFEFF', stroke = 'rgba(15,34,56,0.45)';
     if (isNum) { fill = ACCENT_SOFT; stroke = ACCENT; }
-    else if (isDen) { fill = 'rgba(122,31,36,0.06)'; stroke = ACCENT_FAINT; }
+    else if (isDen) { fill = 'rgba(31,95,204,0.06)'; stroke = ACCENT_FAINT; }
     ctx.fillStyle = fill;
     ctx.strokeStyle = stroke;
     ctx.lineWidth = 1;
@@ -395,7 +395,7 @@
     ctx.font = SERIF_LABEL_SM;
     ctx.textAlign = 'left';
     ctx.fillText(eventLabel, x + 6, y + 12);
-    ctx.font = '11px "JetBrains Mono", monospace';
+    ctx.font = '11px "IBM Plex Mono", monospace';
     ctx.fillStyle = isNum || isDen ? ACCENT : INK_FADE;
     ctx.fillText(formatNum(joint), x + 6, y + 24);
   }
@@ -422,10 +422,10 @@
     ctx.fill();
     ctx.stroke();
     ctx.fillStyle = stroke;
-    ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+    ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'left';
     ctx.fillText(label, x + 10, y + h / 2 - 1);
-    ctx.font = '11px "JetBrains Mono", monospace';
+    ctx.font = '11px "IBM Plex Mono", monospace';
     ctx.textAlign = 'right';
     ctx.fillText(formatNum(value), x + w - 10, y + h / 2 + 11);
   }
@@ -486,9 +486,9 @@
     //   NN — pale ink (healthy / negative)
     const COLOR = {
       TP: ACCENT,
-      AN: 'rgba(122,31,36,0.30)',
-      FP: 'rgba(122,31,36,0.55)',
-      NN: 'rgba(38,35,32,0.10)',
+      AN: 'rgba(31,95,204,0.30)',
+      FP: 'rgba(31,95,204,0.55)',
+      NN: 'rgba(15,34,56,0.10)',
     };
 
     // Draw all dots
@@ -507,15 +507,15 @@
     const peoFP = Math.round((1 - prior) * fpr * totalPop);
     const peoPos = peoTP + peoFP;
     ctx.fillStyle = INK_FADE;
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left';
     ctx.fillText(`POPULATION ${formatBig(totalPop)} ${sc.population.toUpperCase()}`, x0, y0 - 18);
-    ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+    ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.fillStyle = INK;
     ctx.fillText(`each square = ${(totalPop / TOTAL).toFixed(0)} ${sc.population}`, x0 + 230, y0 - 18);
 
     // Frame around the grid
-    ctx.strokeStyle = 'rgba(38,35,32,0.32)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.32)';
     ctx.lineWidth = 1;
     ctx.strokeRect(x0 - 0.5, y0 - 0.5, gridW + 1, gridH + 1);
 
@@ -526,21 +526,21 @@
     if (cardX + 220 < size.w) {
       const cardW = Math.min(220, size.w - cardX - 8);
       const cardY = y0 + 6;
-      ctx.fillStyle = 'rgba(255,253,246,0.94)';
+      ctx.fillStyle = 'rgba(252,254,255,0.94)';
       ctx.fillRect(cardX, cardY, cardW, 132);
-      ctx.strokeStyle = 'rgba(122,31,36,0.35)';
+      ctx.strokeStyle = 'rgba(31,95,204,0.35)';
       ctx.lineWidth = 1;
       ctx.strokeRect(cardX, cardY, cardW, 132);
       ctx.fillStyle = ACCENT;
       ctx.fillRect(cardX, cardY, 3, 132);
 
       ctx.fillStyle = INK_FADE;
-      ctx.font = '10px "JetBrains Mono", monospace';
+      ctx.font = '10px "IBM Plex Mono", monospace';
       ctx.textAlign = 'left';
       ctx.fillText('BAYES, ANCHORED', cardX + 12, cardY + 16);
 
       ctx.fillStyle = INK;
-      ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+      ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.fillText(`P(${A} | ${B})  =`, cardX + 12, cardY + 38);
 
       // Numerator: bright dots
@@ -549,7 +549,7 @@
       ctx.fillStyle = INK;
       ctx.fillText('bright dots',  cardX + 26, cardY + 59);
       ctx.fillStyle = INK_FADE;
-      ctx.font = '11px "JetBrains Mono", monospace';
+      ctx.font = '11px "IBM Plex Mono", monospace';
       ctx.fillText(formatBig(peoTP), cardX + cardW - 12 - ctx.measureText(formatBig(peoTP)).width, cardY + 59);
 
       // Fraction bar
@@ -563,18 +563,18 @@
       // Denominator: bright + faint
       ctx.fillStyle = ACCENT;
       ctx.fillRect(cardX + 12, cardY + 76, 9, 9);
-      ctx.fillStyle = 'rgba(122,31,36,0.55)';
+      ctx.fillStyle = 'rgba(31,95,204,0.55)';
       ctx.fillRect(cardX + 24, cardY + 76, 9, 9);
       ctx.fillStyle = INK;
-      ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+      ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.fillText('all positives',  cardX + 38, cardY + 85);
       ctx.fillStyle = INK_FADE;
-      ctx.font = '11px "JetBrains Mono", monospace';
+      ctx.font = '11px "IBM Plex Mono", monospace';
       ctx.fillText(formatBig(peoPos), cardX + cardW - 12 - ctx.measureText(formatBig(peoPos)).width, cardY + 85);
 
       // Result
       ctx.fillStyle = ACCENT;
-      ctx.font = 'italic 22px "Source Serif 4", Georgia, serif';
+      ctx.font = '22px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'center';
       const postPct = ((peoTP) / Math.max(1, peoTP + peoFP) * 100).toFixed(1) + '%';
       ctx.fillText(`= ${postPct}`, cardX + cardW / 2, cardY + 118);
@@ -593,12 +593,12 @@
     const posterior = (peoTP) / Math.max(1, (peoTP + peoFP));
     const fy = legY + 50;
     ctx.fillStyle = INK;
-    ctx.font = 'italic 14px "Source Serif 4", Georgia, serif';
+    ctx.font = '14px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'left';
     ctx.fillText(`Of ${formatBig(peoPos)} ${sc.population} where "${B}", ${formatBig(peoTP)} are actually "${A}".`, x0, fy);
 
     ctx.fillStyle = ACCENT;
-    ctx.font = 'italic 14px "Source Serif 4", Georgia, serif';
+    ctx.font = '14px "Bricolage Grotesque", system-ui, sans-serif';
     const r2 = `P(${A} | ${B}) = ${formatBig(peoTP)} / ${formatBig(peoPos)} = ${(posterior * 100).toFixed(2)}%`;
     ctx.fillText(r2, x0, fy + 18);
 
@@ -608,7 +608,7 @@
     // Split across two lines so it fits the canvas at every reasonable width.
     if (posterior < 0.5 && sens > 0.8) {
       ctx.fillStyle = INK_FADE;
-      ctx.font = 'italic 13px "Source Serif 4", Georgia, serif';
+      ctx.font = '13px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'left';
       ctx.fillText(
         `Wait, really? P(${B} | ${A}) = ${(sens * 100).toFixed(0)}%, yet P(${A} | ${B}) = ${(posterior * 100).toFixed(0)}%?`,
@@ -624,15 +624,15 @@
   function drawLegendChip(ctx, x, y, label, color, count) {
     ctx.fillStyle = color;
     ctx.fillRect(x, y - 9, 12, 12);
-    ctx.strokeStyle = 'rgba(38,35,32,0.25)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.25)';
     ctx.lineWidth = 1;
     ctx.strokeRect(x + 0.5, y - 8.5, 11, 11);
     ctx.fillStyle = INK;
-    ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+    ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'left';
     ctx.fillText(label, x + 18, y);
     ctx.fillStyle = INK_FADE;
-    ctx.font = '11px "JetBrains Mono", monospace';
+    ctx.font = '11px "IBM Plex Mono", monospace';
     ctx.fillText(count, x + 18, y + 14);
   }
 
@@ -656,31 +656,31 @@
     const hBA   = H * sens;
     const hBNotA = H * fpr;
 
-    ctx.fillStyle = 'rgba(255,253,246,0.5)';
+    ctx.fillStyle = 'rgba(252,254,255,0.5)';
     ctx.fillRect(pad, pad, W, H);
-    ctx.fillStyle = 'rgba(38,35,32,0.10)';
+    ctx.fillStyle = 'rgba(15,34,56,0.10)';
     ctx.fillRect(pad, pad, wA, H);
-    ctx.fillStyle = 'rgba(38,35,32,0.05)';
+    ctx.fillStyle = 'rgba(15,34,56,0.05)';
     ctx.fillRect(pad + wA, pad, wNotA, H);
     ctx.fillStyle = ACCENT;
     ctx.fillRect(pad, pad, wA, hBA);
-    ctx.fillStyle = 'rgba(122,31,36,0.55)';
+    ctx.fillStyle = 'rgba(31,95,204,0.55)';
     ctx.fillRect(pad + wA, pad, wNotA, hBNotA);
 
-    ctx.strokeStyle = 'rgba(38,35,32,0.50)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.50)';
     ctx.lineWidth = 1;
     ctx.strokeRect(pad, pad, W, H);
-    ctx.strokeStyle = 'rgba(38,35,32,0.40)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.40)';
     ctx.beginPath();
     ctx.moveTo(pad + wA, pad); ctx.lineTo(pad + wA, pad + H);
     ctx.stroke();
 
-    ctx.fillStyle = 'rgba(38,35,32,0.75)';
+    ctx.fillStyle = 'rgba(15,34,56,0.75)';
     ctx.font = SERIF_LABEL_SM;
     ctx.textAlign = 'center';
     ctx.fillText(A,        pad + wA / 2,        pad + H + 18);
     ctx.fillText('¬' + A,  pad + wA + wNotA / 2, pad + H + 18);
-    ctx.font = '11px "JetBrains Mono", monospace';
+    ctx.font = '11px "IBM Plex Mono", monospace';
     ctx.fillStyle = INK_FADE;
     ctx.fillText(formatNum(prior),     pad + wA / 2,        pad + H + 32);
     ctx.fillText(formatNum(1 - prior), pad + wA + wNotA / 2, pad + H + 32);
@@ -694,7 +694,7 @@
     const j_notAB = (1 - prior) * fpr;
     const posterior = j_AB / (j_AB + j_notAB + 1e-12);
     ctx.fillStyle = ACCENT;
-    ctx.font = 'italic 16px "Source Serif 4", Georgia, serif';
+    ctx.font = '16px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText(`P(${A} | ${B}) = ${(posterior * 100).toFixed(2)}%`,
       size.w / 2, size.h - 8);
@@ -727,11 +727,11 @@
         <span style="color:var(--ml-ink-fade)"> = </span>
         <span style="color:var(--accent)">P(${sc.A.name} ∩ ${sc.B})</span>
         <span style="color:var(--ml-ink-fade)"> / </span>
-        <span style="color:rgba(122,31,36,0.65)">P(${sc.B})</span>
+        <span style="color:rgba(31,95,204,0.65)">P(${sc.B})</span>
       </div>`;
 
     readoutEl.innerHTML = `
-      <div class="row"><span style="color:rgba(122,31,36,0.65)">P(${sc.B})</span><b>${formatNum(pB)}</b></div>
+      <div class="row"><span style="color:rgba(31,95,204,0.65)">P(${sc.B})</span><b>${formatNum(pB)}</b></div>
       <div class="row"><span style="color:var(--accent)">P(${sc.A.name}, ${sc.B})</span><b>${formatNum(j_AB)}</b></div>
       <div class="row"><span>P(¬${sc.A.name}, ${sc.B})</span><b>${formatNum(j_notAB)}</b></div>
       <div class="row" style="border-top:1px solid var(--rule); margin-top:6px; padding-top:8px">
@@ -746,7 +746,7 @@
     if (state.mode === 'tree') {
       cap = `<span class="ml-cap-num">I.</span> The thicker the branch, the more likely that path. The two highlighted leaves get pulled into a literal fraction on the right — the posterior is <em>that ratio</em>, no more.`;
     } else if (state.mode === 'population') {
-      cap = `<span class="ml-cap-num">II.</span> 100,000 ${sc.population} as a 100×100 grid. <span class="ml-ink-orange">Bright oxblood</span> = true positives; <span style="color:rgba(122,31,36,0.55); font-style:italic">faint oxblood</span> = false positives. The posterior is the literal ratio of bright to all-positive squares — the visceral base-rate-fallacy view.`;
+      cap = `<span class="ml-cap-num">II.</span> 100,000 ${sc.population} as a 100×100 grid. <span class="ml-ink-orange">Bright oxblood</span> = true positives; <span style="color:rgba(31,95,204,0.55); font-style:italic">faint oxblood</span> = false positives. The posterior is the literal ratio of bright to all-positive squares — the visceral base-rate-fallacy view.`;
     } else {
       cap = `<span class="ml-cap-num">III.</span> The whole square is the world. Width = prior; height = test rate. The accent area is "${sc.B}" everywhere it occurs. The posterior is the bright-accent slice divided by all accent.`;
     }

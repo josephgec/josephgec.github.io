@@ -224,7 +224,7 @@
 
     // Title left
     ctx.fillStyle = INK_FADE;
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left';
     ctx.fillText('LOSS', padL, padT - 2);
 
@@ -240,7 +240,7 @@
     const ty = (l) => padT + H - (l / yMax) * H;
 
     // Grid
-    ctx.strokeStyle = 'rgba(38,35,32,0.08)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.08)';
     ctx.lineWidth = 1;
     for (let g = 0; g <= 4; g++) {
       const y = padT + H - (g / 4) * H;
@@ -250,13 +250,13 @@
     }
     // Y-axis labels
     ctx.fillStyle = INK_FADE;
-    ctx.font = '9px "JetBrains Mono", monospace';
+    ctx.font = '9px "IBM Plex Mono", monospace';
     ctx.textAlign = 'right';
     ctx.fillText('0', padL - 4, padT + H + 2);
     ctx.fillText(yMax.toFixed(1), padL - 4, padT + 8);
 
     if (hist.length < 2) {
-      ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+      ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.fillStyle = INK_FADE;
       ctx.textAlign = 'center';
       ctx.fillText('press ▷ Train to start the game — losses will plot here', padL + W / 2, padT + H / 2);
@@ -289,7 +289,7 @@
     ctx.fillStyle = ACCENT;
     ctx.fillRect(legX, legY + 4, 14, 2);
     ctx.fillStyle = INK_FADE;
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left';
     ctx.fillText('G-LOSS', legX + 18, legY + 8);
     ctx.fillStyle = INK;
@@ -299,7 +299,7 @@
 
     // step axis
     ctx.fillStyle = INK_FADE;
-    ctx.font = '9px "JetBrains Mono", monospace';
+    ctx.font = '9px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left';
     ctx.fillText(`step ${xMin}`, padL, padT + H + 14);
     ctx.textAlign = 'right';
@@ -329,14 +329,14 @@
       const d = grid[i][j];
       const t = Math.max(0, Math.min(1, Math.abs(d) / Math.max(0.001, dMax)));
       const color = d > 0
-        ? `rgba(122,31,36,${0.05 + t * 0.30})`
-        : `rgba(38,35,32,${0.04 + t * 0.20})`;
+        ? `rgba(31,95,204,${0.05 + t * 0.30})`
+        : `rgba(15,34,56,${0.04 + t * 0.20})`;
       ctx.fillStyle = color;
       ctx.fillRect(j * size.w / cells, i * size.h / cells, size.w / cells + 1, size.h / cells + 1);
     }
 
     // Grid
-    ctx.strokeStyle = 'rgba(38,35,32,0.08)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.08)';
     ctx.lineWidth = 1;
     for (let i = -3; i <= 3; i++) {
       ctx.beginPath(); ctx.moveTo(tx(i), 0); ctx.lineTo(tx(i), size.h); ctx.stroke();
@@ -345,7 +345,7 @@
 
     // Real points
     for (const [x, y] of state.real) {
-      ctx.fillStyle = '#262320';
+      ctx.fillStyle = '#0f2238';
       ctx.beginPath();
       ctx.arc(tx(x), ty(y), 3.5, 0, Math.PI * 2);
       ctx.fill();
@@ -370,7 +370,7 @@
     if (state.step > 8) {
       for (const m of uncovered) {
         const px = tx(m[0]), py = ty(m[1]);
-        ctx.strokeStyle = 'rgba(122,31,36,0.55)';
+        ctx.strokeStyle = 'rgba(31,95,204,0.55)';
         ctx.lineWidth = 1.5;
         const pulse = 0.5 + 0.5 * Math.sin(state.step * 0.4);
         ctx.beginPath();
@@ -382,7 +382,7 @@
     // First-load storytelling: small annotation explaining the scene before user hits Train
     if (!state.training && state.step <= 25 && state.modesCovered < state.totalModes) {
       ctx.fillStyle = INK_FADE;
-      ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+      ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'right';
       ctx.fillText(`step ${state.step} · mid-training — press ▷ Train to continue`, size.w - 10, size.h - 10);
     }
@@ -396,14 +396,14 @@
       const bw = 320, bh = 36;
       const bx = (size.w - bw) / 2;
       const by = 14;
-      ctx.fillStyle = 'rgba(122,31,36,0.92)';
+      ctx.fillStyle = 'rgba(31,95,204,0.92)';
       ctx.fillRect(bx, by, bw, bh);
-      ctx.fillStyle = '#fffdf6';
-      ctx.font = '10px "JetBrains Mono", monospace';
+      ctx.fillStyle = '#FCFEFF';
+      ctx.font = '10px "IBM Plex Mono", monospace';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText('MODE COLLAPSE', size.w / 2, by + 12);
-      ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+      ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.fillText(`G covers ${state.modesCovered} of ${state.totalModes} modes`, size.w / 2, by + 26);
       ctx.restore();
     }

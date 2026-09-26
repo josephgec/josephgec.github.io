@@ -212,14 +212,14 @@
     for (let i = 0; i < map.length; i++) {
       for (let j = 0; j < map[0].length; j++) {
         const t = Math.max(0, Math.min(1, map[i][j] / Math.max(0.01, max)));
-        const r = Math.round(247 - t * 130);
-        const g = Math.round(244 - t * 195);
-        const b = Math.round(236 - t * 195);
+        const r = Math.round(252 - t * 221);
+        const g = Math.round(254 - t * 159);
+        const b = Math.round(255 - t * 51);
         ctx.fillStyle = `rgb(${r},${g},${b})`;
         ctx.fillRect(x0 + j * cell, y0 + i * cell, cell + 0.5, cell + 0.5);
       }
     }
-    ctx.strokeStyle = 'rgba(38,35,32,0.30)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.30)';
     ctx.lineWidth = 0.8;
     ctx.strokeRect(x0, y0, map[0].length * cell, map.length * cell);
   }
@@ -240,7 +240,7 @@
 
     function label(text, x, y) {
       ctx.fillStyle = INK_FADE;
-      ctx.font = '11px "Source Serif 4", Georgia, serif';
+      ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText(text, x, y);
     }
@@ -267,7 +267,7 @@
         for (let i = 0; i < FH; i++) {
           for (let j = 0; j < FW; j++) {
             const t = Math.max(0, Math.min(1, fmap[i][j] / Math.max(0.01, mx)));
-            ctx.fillStyle = `rgba(122,31,36,${t * 0.55})`;
+            ctx.fillStyle = `rgba(31,95,204,${t * 0.55})`;
             ctx.fillRect(x0 + j * sx * c, y0 + i * sy * c, sx * c + 0.5, sy * c + 0.5);
           }
         }
@@ -285,7 +285,7 @@
         ctx.arc(hx, hy, 6, 0, Math.PI * 2);
         ctx.stroke();
         ctx.fillStyle = ACCENT;
-        ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+        ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
         ctx.textAlign = 'left';
         ctx.fillText(`hot regions · L${state.selectedFeature.layer}#${state.selectedFeature.idx}`, x0, y0 - 6);
         // Storytelling annotation under the input
@@ -295,7 +295,7 @@
           : `deep #${state.selectedFeature.idx}`;
         const region = (hotI < FH / 2 ? 'upper' : 'lower') + '-' + (hotJ < FW / 2 ? 'left' : 'right');
         ctx.fillStyle = ACCENT;
-        ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+        ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
         ctx.textAlign = 'left';
         ctx.fillText(`Filter ${state.selectedFeature.idx} (${fname}) fires strongest in the ${region}.`, x0, y0 + c * 32 + 22);
       }
@@ -359,13 +359,13 @@
       ctx.globalAlpha = a;
       for (let i = 0; i < N; i++) {
         const t = Math.max(0, Math.min(1, flat[i] / max));
-        const r = Math.round(247 - t * 130);
-        const g = Math.round(244 - t * 195);
-        const b = Math.round(236 - t * 195);
+        const r = Math.round(252 - t * 221);
+        const g = Math.round(254 - t * 159);
+        const b = Math.round(255 - t * 51);
         ctx.fillStyle = `rgb(${r},${g},${b})`;
         ctx.fillRect(x0, y0 + i * cellH, w, cellH + 0.5);
       }
-      ctx.strokeStyle = 'rgba(38,35,32,0.30)';
+      ctx.strokeStyle = 'rgba(15,34,56,0.30)';
       ctx.strokeRect(x0, y0, w, h);
       ctx.globalAlpha = 1;
 
@@ -389,7 +389,7 @@
         const ty = y0 + idx * cellH + cellH / 2;
         const px = sx + (tx - sx) * a;
         const py = sy + (ty - sy) * a;
-        ctx.fillStyle = `rgba(122,31,36,${0.6 * (1 - a) + 0.1})`;
+        ctx.fillStyle = `rgba(31,95,204,${0.6 * (1 - a) + 0.1})`;
         ctx.beginPath();
         ctx.arc(px, py, 1.6, 0, Math.PI * 2);
         ctx.fill();
@@ -408,23 +408,23 @@
       // Scale for display
       const maxAbs = Math.max(0.01, ...logits.map(Math.abs));
       ctx.fillStyle = INK_FADE;
-      ctx.font = '10px "JetBrains Mono", monospace';
+      ctx.font = '10px "IBM Plex Mono", monospace';
       ctx.textAlign = 'center';
       ctx.fillText('logits', x0 + w / 2, y0 - 8);
       labels.forEach((lbl, i) => {
         const yi = y0 + (h / 3) * i;
-        ctx.fillStyle = '#fffdf6';
-        ctx.strokeStyle = 'rgba(38,35,32,0.20)';
+        ctx.fillStyle = '#FCFEFF';
+        ctx.strokeStyle = 'rgba(15,34,56,0.20)';
         ctx.lineWidth = 1;
         ctx.fillRect(x0, yi + 4, w, h / 3 - 8);
         ctx.strokeRect(x0, yi + 4, w, h / 3 - 8);
         const v = logits[i];
         const fillW = (w / 2) * Math.min(1, Math.abs(v) / maxAbs);
-        ctx.fillStyle = v >= 0 ? `rgba(122,31,36,0.65)` : `rgba(38,35,32,0.55)`;
+        ctx.fillStyle = v >= 0 ? `rgba(31,95,204,0.65)` : `rgba(15,34,56,0.55)`;
         if (v >= 0) ctx.fillRect(x0 + w / 2, yi + 6, fillW, h / 3 - 12);
         else ctx.fillRect(x0 + w / 2 - fillW, yi + 6, fillW, h / 3 - 12);
         ctx.fillStyle = INK;
-        ctx.font = '10px "JetBrains Mono", monospace';
+        ctx.font = '10px "IBM Plex Mono", monospace';
         ctx.textAlign = 'left';
         ctx.fillText(lbl, x0, yi + 2);
         ctx.textAlign = 'right';
@@ -445,16 +445,16 @@
       labels.forEach((lbl, i) => {
         const p = probs[i];
         const bw = w * p;
-        ctx.fillStyle = i === winner ? ACCENT : 'rgba(38,35,32,0.35)';
+        ctx.fillStyle = i === winner ? ACCENT : 'rgba(15,34,56,0.35)';
         ctx.fillRect(x0, y0 + i * barH + 4, bw, barH - 12);
         ctx.fillStyle = INK_FADE;
-        ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+        ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
         ctx.textAlign = 'left';
         ctx.fillText(`${lbl} · ${(p * 100).toFixed(0)}%`, x0, y0 + i * barH + barH - 4);
       });
       // Storytelling: name the winner explicitly with confidence.
       ctx.fillStyle = ACCENT;
-      ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+      ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'left';
       ctx.fillText(`predicted: ${labels[winner]} (${(probs[winner] * 100).toFixed(0)}%)`, x0, y0 - 8);
       label('softmax · 3 classes', x0 + w / 2, size.h - 8);
@@ -463,7 +463,7 @@
     // Hint
     if (state.step >= 1 && !state.selectedFeature) {
       ctx.fillStyle = INK_FADE;
-      ctx.font = 'italic 10px "Source Serif 4", Georgia, serif';
+      ctx.font = '10px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'left';
       ctx.fillText('click any feature map to overlay its hot regions on the input', 0, 14);
     }
@@ -486,7 +486,7 @@
     const colH = yEnd - y0;
 
     ctx.fillStyle = INK_FADE;
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left';
     ctx.fillText('FROM SCORES TO PROBABILITIES', margin, 22);
 
@@ -503,11 +503,11 @@
     cols.forEach((col, ci) => {
       const x0 = margin + ci * (colW + margin);
       ctx.fillStyle = INK;
-      ctx.font = 'italic 14px "Source Serif 4", Georgia, serif';
+      ctx.font = '14px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText(col.title, x0 + colW / 2, y0 - 26);
       ctx.fillStyle = INK_FADE;
-      ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+      ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.fillText(col.note, x0 + colW / 2, y0 - 10);
 
       const barH = (colH - 16) / 3;
@@ -515,8 +515,8 @@
       labels.forEach((lbl, i) => {
         const v = col.values[i];
         const yi = y0 + i * barH;
-        ctx.fillStyle = '#fffdf6';
-        ctx.strokeStyle = 'rgba(38,35,32,0.20)';
+        ctx.fillStyle = '#FCFEFF';
+        ctx.strokeStyle = 'rgba(15,34,56,0.20)';
         ctx.lineWidth = 1;
         ctx.fillRect(x0, yi + 4, colW, barH - 12);
         ctx.strokeRect(x0, yi + 4, colW, barH - 12);
@@ -525,7 +525,7 @@
         if (col.title.startsWith('logits')) {
           // bipolar fill from center
           const fw = (colW / 2) * t;
-          ctx.fillStyle = v >= 0 ? `rgba(122,31,36,${0.25 + t * 0.55})` : `rgba(38,35,32,${0.25 + t * 0.55})`;
+          ctx.fillStyle = v >= 0 ? `rgba(31,95,204,${0.25 + t * 0.55})` : `rgba(15,34,56,${0.25 + t * 0.55})`;
           if (v >= 0) ctx.fillRect(x0 + colW / 2, yi + 6, fw, barH - 16);
           else ctx.fillRect(x0 + colW / 2 - fw, yi + 6, fw, barH - 16);
         } else {
@@ -533,12 +533,12 @@
           const fw = colW * t;
           ctx.fillStyle = (col.title.startsWith('p') && i === winner)
             ? ACCENT
-            : `rgba(122,31,36,${0.25 + t * 0.55})`;
+            : `rgba(31,95,204,${0.25 + t * 0.55})`;
           ctx.fillRect(x0 + 1, yi + 6, fw, barH - 16);
         }
         // Label and value
         ctx.fillStyle = INK;
-        ctx.font = '10px "JetBrains Mono", monospace';
+        ctx.font = '10px "IBM Plex Mono", monospace';
         ctx.textAlign = 'left';
         ctx.fillText(lbl, x0 + 4, yi + 2);
         ctx.textAlign = 'right';
@@ -566,7 +566,7 @@
         ctx.lineTo(bx - 6, ay + 4);
         ctx.closePath(); ctx.fill();
         ctx.fillStyle = INK_FADE;
-        ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+        ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText(ci === 0 ? 'eˣ' : '÷ Σ', (ax + bx) / 2, ay - 6);
       }
@@ -574,7 +574,7 @@
 
     // Bottom: sum-check
     ctx.fillStyle = INK_FADE;
-    ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+    ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText(`sum of probabilities = ${probs.reduce((a,b)=>a+b,0).toFixed(2)}  ·  largest input wins`, size.w / 2, size.h - 14);
   }
@@ -610,19 +610,19 @@
       const boxW = Math.min(stepW - 6, 84);
       const boxH = 30;
       const isOutput = i === stages.length - 1;
-      ctx.fillStyle = isOutput ? 'rgba(122,31,36,0.10)' : '#fffdf6';
+      ctx.fillStyle = isOutput ? 'rgba(31,95,204,0.10)' : '#FCFEFF';
       ctx.strokeStyle = INK;
       ctx.lineWidth = 1.2;
       ctx.fillRect(cx - boxW / 2, baseY - boxH / 2, boxW, boxH);
       ctx.strokeRect(cx - boxW / 2, baseY - boxH / 2, boxW, boxH);
       ctx.fillStyle = INK;
-      ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+      ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(s.lbl, cx, baseY);
       ctx.textBaseline = 'alphabetic';
       ctx.fillStyle = INK_FADE;
-      ctx.font = '9px "JetBrains Mono", monospace';
+      ctx.font = '9px "IBM Plex Mono", monospace';
       ctx.fillText(s.shape, cx, baseY + boxH / 2 + 12);
 
       if (i < stages.length - 1) {
@@ -656,7 +656,7 @@
     });
 
     ctx.fillStyle = INK_FADE;
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left';
     ctx.fillText('PIPELINE', margin, 14);
   }
