@@ -63,8 +63,8 @@ Palette “Sky”:
 Type:
 - **Bricolage Grotesque** (variable, wght 400–700, opsz) for everything
   except metadata.
-- **IBM Plex Mono** 400/500 for kickers (`§ label`), dates, tags, citation
-  counts and the figure caption.
+- **IBM Plex Mono** 400/500 for kickers (`§ label`), dates, tags and citation
+  counts.
 - Both are self-hosted in `/fonts/` (Latin subsets, OFL licences alongside).
   Bricolage is preloaded, with a metric-adjusted Arial fallback.
 

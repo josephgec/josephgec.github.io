@@ -17,9 +17,8 @@
   var FONT = '"Bricolage Grotesque", sans-serif', WEIGHT = 700;
 
   var W, H, dpr = Math.min(window.devicePixelRatio || 1, 2), N = 0, ag = [];
-  var shapeName = '', filled = 0, iter = 0, running = false, t0 = 0;
+  var shapeName = '', filled = 0, running = false, t0 = 0;
   var mouse = { x: -1e4, y: -1e4 };
-  var fc = document.getElementById('fc'), cap = document.querySelector('.figcap');
 
   function rgb(h) { return [1, 3, 5].map(function (i) { return parseInt(h.slice(i, i + 2), 16); }); }
   var trail = 'rgba(' + rgb(BG).join(',') + ',0.42)';
@@ -118,7 +117,6 @@
     shapeName = name;
     var ambient = name === 'ambient';
     cv.classList.toggle('ambient', ambient);
-    if (cap) cap.classList.toggle('hide', ambient);
     var now = performance.now(), sh = ambient ? null : targetsFor(name), byX = name === 'hero';
     filled = sh ? sh.filled : 0;
     for (var i = 0; i < N; i++) {
@@ -131,7 +129,6 @@
       a.vx += (Math.random() - 0.5) * 6; a.vy += (Math.random() - 0.5) * 6;
       a.at = now + 350 + (byX ? (t[0] / W) * 1400 + Math.random() * 300 : Math.random() * 900);
     }
-    iter = 0;
     if (reduce) drawStatic();
   }
 
@@ -161,7 +158,6 @@
       }
       a.vx *= 0.86; a.vy *= 0.86; a.x += a.vx; a.y += a.vy;
     }
-    iter++;
   }
 
   function paint(now, fillBg) {
@@ -186,7 +182,6 @@
       }
     }
     cx.globalAlpha = 1;
-    if (fc) fc.textContent = N + ' agents · t = ' + String(iter).padStart(4, '0');
   }
   function drawStatic() { paint(performance.now(), BG); }
 
