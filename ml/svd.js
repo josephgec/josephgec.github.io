@@ -173,11 +173,11 @@
       const u1 = [U[0][0], U[1][0]];
       const u2 = [U[0][1], U[1][1]];
       drawRulerSemiAxis(ctx, toPx, u1, S[0], 'σ₁', ACCENT);
-      drawRulerSemiAxis(ctx, toPx, u2, S[1], 'σ₂', 'rgba(122,31,36,0.7)');
+      drawRulerSemiAxis(ctx, toPx, u2, S[1], 'σ₂', 'rgba(31,95,204,0.7)');
     }
 
     arrow(ctx, toPx([0,0]), toPx(Mv1), INK, 2.5, 10);
-    arrow(ctx, toPx([0,0]), toPx(Mv2), 'rgba(38,35,32,0.55)', 2, 8);
+    arrow(ctx, toPx([0,0]), toPx(Mv2), 'rgba(15,34,56,0.55)', 2, 8);
 
     // Stage-aware labels
     ctx.font = SERIF_LABEL_SM;
@@ -192,7 +192,7 @@
     const [lab1, lab2] = labelsByStage[stage];
     ctx.fillStyle = INK;
     ctx.fillText(lab1, ...toPx([Mv1[0]*1.18, Mv1[1]*1.18]));
-    ctx.fillStyle = 'rgba(38,35,32,0.6)';
+    ctx.fillStyle = 'rgba(15,34,56,0.6)';
     ctx.fillText(lab2, ...toPx([Mv2[0]*1.22, Mv2[1]*1.22]));
 
     // Footer
@@ -281,7 +281,7 @@
     drawGrids(ctx, size, toPx, Ak);
 
     // Faint outline of true A's image (so the residual is visible as a gap).
-    ctx.strokeStyle = 'rgba(38,35,32,0.32)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.32)';
     ctx.lineWidth = 1;
     ctx.setLineDash([3, 4]);
     ctx.beginPath();
@@ -299,7 +299,7 @@
     //    thin line from A·x to A_k·x — these are exactly the columns of (A − A_k)
     //    times each direction, the lost information made visible. ──
     const N = 24;
-    ctx.strokeStyle = 'rgba(38,35,32,0.25)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.25)';
     ctx.lineWidth = 1;
     for (let i = 0; i < N; i++) {
       const t = (i / N) * Math.PI * 2;
@@ -332,7 +332,7 @@
     }
     if (k === 2) {
       // Show σ₂ u₂ as the minor semi-axis when full rank.
-      ctx.strokeStyle = 'rgba(122,31,36,0.55)';
+      ctx.strokeStyle = 'rgba(31,95,204,0.55)';
       ctx.lineWidth = 1.2;
       ctx.setLineDash([5, 4]);
       ctx.beginPath();
@@ -341,24 +341,24 @@
       ctx.stroke();
       ctx.setLineDash([]);
       const perp2 = [-u2[1], u2[0]];
-      ctx.fillStyle = 'rgba(122,31,36,0.7)';
+      ctx.fillStyle = 'rgba(31,95,204,0.7)';
       ctx.fillText(`σ₂ u₂ = ${formatNum(S[1])}`,
         ...toPx([u2[0]*S[1]*0.55 + perp2[0]*0.28, u2[1]*S[1]*0.55 + perp2[1]*0.28]));
     }
 
     // Equation banner.
     ctx.fillStyle = INK;
-    ctx.font = 'italic 15px "Source Serif 4", Georgia, serif';
+    ctx.font = '15px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
     if (k === 1) {
       ctx.fillText('A₁ = σ₁ u₁ v₁ᵀ', size.w/2, 14);
-      ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+      ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.fillStyle = INK_FADE;
       ctx.fillText('rank 1 — the ellipse degenerates to a line segment', size.w/2, 36);
     } else {
       ctx.fillText('A₂ = σ₁ u₁ v₁ᵀ + σ₂ u₂ v₂ᵀ = A', size.w/2, 14);
-      ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+      ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.fillStyle = INK_FADE;
       ctx.fillText('full rank — the approximation is exact', size.w/2, 36);
     }
@@ -378,13 +378,13 @@
     const legY = 60;
     const legW = 196;
     const legH = 76;
-    ctx.fillStyle = 'rgba(255,253,246,0.92)';
-    ctx.strokeStyle = 'rgba(38,35,32,0.30)';
+    ctx.fillStyle = 'rgba(252,254,255,0.92)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.30)';
     ctx.lineWidth = 1;
     ctx.fillRect(legX, legY, legW, legH);
     ctx.strokeRect(legX, legY, legW, legH);
     ctx.fillStyle = INK_FADE;
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'alphabetic';
     ctx.fillText('LEGEND', legX + 8, legY + 14);
@@ -394,10 +394,10 @@
     ctx.lineWidth = 2;
     ctx.beginPath(); ctx.ellipse(legX + 24, legY + 30, 14, 5, 0, 0, Math.PI*2); ctx.fill(); ctx.stroke();
     ctx.fillStyle = ACCENT;
-    ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+    ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.fillText(`A${sub(k)}  approximation`, legX + 48, legY + 33);
     // dashed dark = true A image
-    ctx.strokeStyle = 'rgba(38,35,32,0.55)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.55)';
     ctx.lineWidth = 1;
     ctx.setLineDash([3, 4]);
     ctx.beginPath(); ctx.ellipse(legX + 24, legY + 50, 14, 7, 0, 0, Math.PI*2); ctx.stroke();
@@ -405,7 +405,7 @@
     ctx.fillStyle = INK_FADE;
     ctx.fillText('A   true image (target)', legX + 48, legY + 53);
     // residual swatch
-    ctx.strokeStyle = 'rgba(38,35,32,0.45)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.45)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(legX + 14, legY + 68); ctx.lineTo(legX + 36, legY + 68);

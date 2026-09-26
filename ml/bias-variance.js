@@ -162,12 +162,12 @@
     const ty = (y) => topH - 16 + 16 - (y + 1.5) * (topH - 32) / 3;
 
     // Frame
-    ctx.strokeStyle = 'rgba(38,35,32,0.30)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.30)';
     ctx.lineWidth = 1;
     ctx.strokeRect(padX, 16, size.w - padX * 2, topH - 32);
 
     // True function
-    ctx.strokeStyle = 'rgba(38,35,32,0.45)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.45)';
     ctx.lineWidth = 1.5;
     ctx.setLineDash([4, 4]);
     ctx.beginPath();
@@ -199,7 +199,7 @@
       bandXs.push(x); bandLo.push(lo); bandHi.push(hi);
     }
     // Fill the band
-    ctx.fillStyle = 'rgba(122,31,36,0.10)';
+    ctx.fillStyle = 'rgba(31,95,204,0.10)';
     ctx.beginPath();
     for (let i = 0; i < bandXs.length; i++) {
       const px = tx(bandXs[i]), py = ty(bandHi[i]);
@@ -213,7 +213,7 @@
     ctx.fill();
 
     fits.forEach((fit, idx) => {
-      ctx.strokeStyle = idx === 0 ? ACCENT : `rgba(122,31,36,0.18)`;
+      ctx.strokeStyle = idx === 0 ? ACCENT : `rgba(31,95,204,0.18)`;
       ctx.lineWidth = idx === 0 ? 2 : 1;
       ctx.beginPath();
       for (let i = 0; i <= 100; i++) {
@@ -230,26 +230,26 @@
     fits[0].pts.forEach(({ x, y, noise }) => {
       if (state.showNoise) {
         const yTrue = trueF(x);
-        ctx.strokeStyle = 'rgba(38,35,32,0.45)';
+        ctx.strokeStyle = 'rgba(15,34,56,0.45)';
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.moveTo(tx(x), ty(yTrue));
         ctx.lineTo(tx(x), ty(y));
         ctx.stroke();
         // small open dot at the true point
-        ctx.fillStyle = 'rgba(38,35,32,0.45)';
+        ctx.fillStyle = 'rgba(15,34,56,0.45)';
         ctx.beginPath();
         ctx.arc(tx(x), ty(yTrue), 1.6, 0, Math.PI * 2);
         ctx.fill();
       }
-      ctx.fillStyle = '#262320';
+      ctx.fillStyle = '#0f2238';
       ctx.beginPath();
       ctx.arc(tx(x), ty(y), 3, 0, Math.PI * 2);
       ctx.fill();
     });
 
     ctx.fillStyle = INK_FADE;
-    ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+    ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'left';
     const headerSuffix = state.showNoise
       ? `· dashed = true sin(πx); sticks = noise (σ = ${state.sigma.toFixed(2)}, σ² = ${formatNum(state.sigma*state.sigma)})`
@@ -261,15 +261,15 @@
       const legX0 = size.w - padX - 168;
       const legY0 = 16 + 4;
       const items = [
-        { label: 'true f(x) = sin(πx)', dash: true,  color: 'rgba(38,35,32,0.55)' },
+        { label: 'true f(x) = sin(πx)', dash: true,  color: 'rgba(15,34,56,0.55)' },
         { label: 'one fit (this sample)', dash: false, color: ACCENT },
-        { label: 'spread over 10 fits',   dash: false, color: 'rgba(122,31,36,0.30)', band: true },
+        { label: 'spread over 10 fits',   dash: false, color: 'rgba(31,95,204,0.30)', band: true },
       ];
-      ctx.font = 'italic 10px "Source Serif 4", Georgia, serif';
+      ctx.font = '10px "Bricolage Grotesque", system-ui, sans-serif';
       items.forEach((it, i) => {
         const yy = legY0 + i * 13;
         if (it.band) {
-          ctx.fillStyle = 'rgba(122,31,36,0.18)';
+          ctx.fillStyle = 'rgba(31,95,204,0.18)';
           ctx.fillRect(legX0, yy - 4, 22, 8);
         } else {
           ctx.strokeStyle = it.color;
@@ -294,7 +294,7 @@
     const yMap = (e) => botY + botH - (e / maxErr) * botH;
 
     // Frame
-    ctx.strokeStyle = 'rgba(38,35,32,0.30)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.30)';
     ctx.beginPath();
     ctx.moveTo(plotX0, botY); ctx.lineTo(plotX0, botY + botH);
     ctx.lineTo(plotX0 + plotW, botY + botH);
@@ -302,7 +302,7 @@
 
     // Y labels
     ctx.fillStyle = INK_FADE;
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'right';
     [0, maxErr / 2, maxErr].forEach((y) => {
       ctx.fillText(formatNum(y), plotX0 - 6, yMap(y) + 3);
@@ -319,21 +319,21 @@
     const sigma2 = state.sigma * state.sigma;
     if (sigma2 < maxErr) {
       const yS2 = yMap(sigma2);
-      ctx.strokeStyle = 'rgba(38,35,32,0.30)';
+      ctx.strokeStyle = 'rgba(15,34,56,0.30)';
       ctx.lineWidth = 1;
       ctx.setLineDash([2, 4]);
       ctx.beginPath();
       ctx.moveTo(plotX0, yS2); ctx.lineTo(plotX0 + plotW, yS2);
       ctx.stroke();
       ctx.setLineDash([]);
-      ctx.fillStyle = 'rgba(38,35,32,0.55)';
-      ctx.font = 'italic 10px "Source Serif 4", Georgia, serif';
+      ctx.fillStyle = 'rgba(15,34,56,0.55)';
+      ctx.font = '10px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'left';
       ctx.fillText(`σ² = ${formatNum(sigma2)}  (label noise — no model beats this floor)`, plotX0 + 6, yS2 - 4);
     }
 
     // bias² (ink)
-    ctx.strokeStyle = '#262320';
+    ctx.strokeStyle = '#0f2238';
     ctx.lineWidth = 1.8;
     ctx.beginPath();
     bv.forEach((d, i) => {
@@ -353,7 +353,7 @@
     ctx.stroke();
 
     // total (dashed)
-    ctx.strokeStyle = 'rgba(38,35,32,0.55)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.55)';
     ctx.lineWidth = 1.5;
     ctx.setLineDash([5, 4]);
     ctx.beginPath();
@@ -368,7 +368,7 @@
     const cx = xMap(state.deg);
     const currentBV = bv.find((d) => d.degree === state.deg);
     const yVar = currentBV ? yMap(currentBV.variance) : (botY + botH);
-    ctx.strokeStyle = 'rgba(122,31,36,0.5)';
+    ctx.strokeStyle = 'rgba(31,95,204,0.5)';
     ctx.lineWidth = 1;
     ctx.setLineDash([2, 4]);
     ctx.beginPath();
@@ -382,7 +382,7 @@
       ctx.beginPath();
       ctx.arc(cx, yVar, 4.5, 0, Math.PI * 2);
       ctx.fill();
-      ctx.strokeStyle = '#fffdf6';
+      ctx.strokeStyle = '#FCFEFF';
       ctx.lineWidth = 1.2;
       ctx.stroke();
     }
@@ -399,7 +399,7 @@
       }
     }
     if (isFinite(lo) && isFinite(hi)) {
-      ctx.strokeStyle = 'rgba(122,31,36,0.35)';
+      ctx.strokeStyle = 'rgba(31,95,204,0.35)';
       ctx.setLineDash([3, 4]);
       ctx.lineWidth = 1;
       // Top of spread → variance dot
@@ -415,20 +415,20 @@
       ctx.setLineDash([]);
 
       // Tiny annotation
-      ctx.fillStyle = 'rgba(122,31,36,0.7)';
-      ctx.font = 'italic 10px "Source Serif 4", Georgia, serif';
+      ctx.fillStyle = 'rgba(31,95,204,0.7)';
+      ctx.font = '10px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'left';
       ctx.fillText('spread → variance', cx + 6, yVar - 6);
     }
 
     // Legend
-    ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+    ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'left';
     let legX = plotX0 + plotW - 220, legY = botY + 14;
     const legend = [
-      ['bias²', '#262320'],
+      ['bias²', '#0f2238'],
       ['variance', ACCENT],
-      ['total', 'rgba(38,35,32,0.55)'],
+      ['total', 'rgba(15,34,56,0.55)'],
     ];
     legend.forEach(([lbl, color], i) => {
       ctx.fillStyle = color;
@@ -438,12 +438,12 @@
     });
 
     ctx.fillStyle = INK_FADE;
-    ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+    ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'left';
     ctx.fillText('error decomposition over polynomial degree', plotX0, botY - 6);
     // The formula, anchored to the picture: bias² + variance + σ² right above the curves.
-    ctx.fillStyle = '#262320';
-    ctx.font = '11px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#0f2238';
+    ctx.font = '11px "IBM Plex Mono", monospace';
     ctx.textAlign = 'right';
     ctx.fillText('Error(x) = bias²(x) + variance(x) + σ²', plotX0 + plotW, botY - 6);
   }

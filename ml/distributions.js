@@ -414,7 +414,7 @@
     const toPx = (x, y) => [pad.l + (x - xMin) / (xMax - xMin) * W, pad.t + (1 - y / yMax) * H];
 
     // Horizontal grid
-    ctx.strokeStyle = 'rgba(38,35,32,0.07)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.07)';
     ctx.lineWidth = 1;
     for (let i = 0; i <= 4; i++) {
       const y = yMax * i / 4;
@@ -423,7 +423,7 @@
     }
 
     // Frame (left + bottom)
-    ctx.strokeStyle = 'rgba(38,35,32,0.30)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.30)';
     ctx.beginPath();
     ctx.moveTo(pad.l, pad.t);
     ctx.lineTo(pad.l, pad.t + H);
@@ -432,7 +432,7 @@
 
     // X-axis ticks + labels
     ctx.fillStyle = INK_FADE;
-    ctx.font = '11px "JetBrains Mono", monospace';
+    ctx.font = '11px "IBM Plex Mono", monospace';
     ctx.textAlign = 'center';
     const nTicks = dist.type === 'discrete' ? Math.min(11, Math.floor(xMax - xMin + 1)) : 6;
     for (let i = 0; i <= nTicks; i++) {
@@ -451,7 +451,7 @@
     ctx.save();
     ctx.translate(pad.l - 36, pad.t + H / 2);
     ctx.rotate(-Math.PI / 2);
-    ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+    ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillStyle = INK_FADE;
     ctx.fillText(dist.type === 'continuous' ? 'density  f(x)' : 'mass  P(k)', 0, 0);
@@ -469,7 +469,7 @@
         if (b > a) {
           const [x0] = toPx(a, 0);
           const [x1] = toPx(b, 0);
-          ctx.fillStyle = 'rgba(122,31,36,0.04)';
+          ctx.fillStyle = 'rgba(31,95,204,0.04)';
           ctx.fillRect(x0, pad.t, x1 - x0, H);
         }
       }
@@ -479,11 +479,11 @@
       if (b > a) {
         const [x0] = toPx(a, 0);
         const [x1] = toPx(b, 0);
-        ctx.fillStyle = 'rgba(122,31,36,0.08)';
+        ctx.fillStyle = 'rgba(31,95,204,0.08)';
         ctx.fillRect(x0, pad.t, x1 - x0, H);
 
         // Top-of-band annotation
-        ctx.strokeStyle = 'rgba(122,31,36,0.45)';
+        ctx.strokeStyle = 'rgba(31,95,204,0.45)';
         ctx.lineWidth = 1;
         ctx.setLineDash([2, 3]);
         ctx.beginPath();
@@ -493,7 +493,7 @@
         ctx.setLineDash([]);
 
         ctx.fillStyle = ACCENT;
-        ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+        ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText('±1σ', (x0 + x1) / 2, pad.t + 12);
       }
@@ -501,7 +501,7 @@
 
     // Sample histogram (grey bars, drawn under the theoretical curve)
     if (samples.length) {
-      ctx.fillStyle = 'rgba(38,35,32,0.20)';
+      ctx.fillStyle = 'rgba(15,34,56,0.20)';
       if (dist.type === 'continuous') {
         const nb = bins.length;
         const binW = (xMax - xMin) / nb;
@@ -570,8 +570,8 @@
         ctx.fill();
       }
       // Discreteness hint under axis
-      ctx.fillStyle = 'rgba(122,31,36,0.55)';
-      ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+      ctx.fillStyle = 'rgba(31,95,204,0.55)';
+      ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'left';
       ctx.fillText('discrete: probability lives only on integer outcomes',
         pad.l + 4, pad.t + H + 32);
@@ -582,7 +582,7 @@
       // μ marker at peak
       const peakY = dist.pdf(mean, params);
       const [mx, my] = toPx(mean, peakY);
-      ctx.strokeStyle = 'rgba(38,35,32,0.45)';
+      ctx.strokeStyle = 'rgba(15,34,56,0.45)';
       ctx.lineWidth = 1;
       ctx.setLineDash([3, 3]);
       ctx.beginPath();
@@ -590,7 +590,7 @@
       ctx.stroke();
       ctx.setLineDash([]);
       ctx.fillStyle = INK;
-      ctx.font = 'italic 13px "Source Serif 4", Georgia, serif';
+      ctx.font = '13px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('μ', mx, my - 6);
 
@@ -610,7 +610,7 @@
       ctx.moveTo(ax1, yArrow); ctx.lineTo(ax1 - ah, yArrow - ah); ctx.moveTo(ax1, yArrow); ctx.lineTo(ax1 - ah, yArrow + ah);
       ctx.stroke();
       ctx.fillStyle = ACCENT;
-      ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+      ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('σ', (ax0 + ax1) / 2, yArrow - 5);
     }
@@ -620,7 +620,7 @@
 
     // ── Mean line + label ──
     if (isFinite(mean) && mean >= xMin && mean <= xMax) {
-      ctx.strokeStyle = 'rgba(38,35,32,0.55)';
+      ctx.strokeStyle = 'rgba(15,34,56,0.55)';
       ctx.lineWidth = 1;
       ctx.setLineDash([4, 4]);
       ctx.beginPath();
@@ -658,14 +658,14 @@
 
     const txt = a.text;
     ctx.save();
-    ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+    ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'left';
     const w = ctx.measureText(txt).width;
     const padX = 10, padY = 7;
     const x = pad.l + 16;
     const y = pad.t + 54;
     ctx.globalAlpha = alpha;
-    ctx.fillStyle = 'rgba(255,253,246,0.95)';
+    ctx.fillStyle = 'rgba(252,254,255,0.95)';
     ctx.fillRect(x - padX, y - padY, w + padX * 2, 16 + padY);
     ctx.strokeStyle = ACCENT;
     ctx.lineWidth = 1;
@@ -690,10 +690,10 @@
   function drawHeaderSchema(ctx, size, headerH, dist) {
     const x0 = 18, y0 = 12;
     ctx.fillStyle = INK_FADE;
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left';
     ctx.fillText('DISTRIBUTION', x0, y0 + 10);
-    ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+    ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.fillStyle = INK;
     ctx.fillText('a function from outcomes to probability', x0, y0 + 26);
 
@@ -701,12 +701,12 @@
     const sx = size.w - 280;
     const sy = y0 + 18;
     if (sx > x0 + 320) {
-      ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+      ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.fillStyle = INK_FADE;
       ctx.textAlign = 'right';
       ctx.fillText('outcomes', sx + 60, sy);
       ctx.fillText('probability', size.w - 18, sy);
-      ctx.strokeStyle = 'rgba(38,35,32,0.45)';
+      ctx.strokeStyle = 'rgba(15,34,56,0.45)';
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(sx + 70, sy - 4); ctx.lineTo(size.w - 80, sy - 4);
@@ -718,7 +718,7 @@
       ctx.moveTo(size.w - 80, sy - 4);
       ctx.lineTo(size.w - 86, sy);
       ctx.stroke();
-      ctx.font = '10px "JetBrains Mono", monospace';
+      ctx.font = '10px "IBM Plex Mono", monospace';
       ctx.textAlign = 'center';
       ctx.fillStyle = INK_FADE;
       ctx.fillText(dist.type === 'continuous' ? 'f(x)' : 'P(k)',
@@ -731,12 +731,12 @@
     const txt = dist.eqInline;
     const x = pad.l + 16;
     const y = pad.t + 30;
-    ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+    ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'left';
     const w = ctx.measureText(txt).width;
-    ctx.fillStyle = 'rgba(255,253,246,0.85)';
+    ctx.fillStyle = 'rgba(252,254,255,0.85)';
     ctx.fillRect(x - 6, y - 12, w + 12, 18);
-    ctx.strokeStyle = 'rgba(122,31,36,0.25)';
+    ctx.strokeStyle = 'rgba(31,95,204,0.25)';
     ctx.lineWidth = 1;
     ctx.strokeRect(x - 6, y - 12, w + 12, 18);
     ctx.fillStyle = ACCENT;
@@ -752,15 +752,15 @@
       y: pad.t + 36,
     };
     // Background card
-    ctx.fillStyle = 'rgba(255,253,246,0.92)';
+    ctx.fillStyle = 'rgba(252,254,255,0.92)';
     ctx.fillRect(ins.x, ins.y, ins.w, ins.h);
-    ctx.strokeStyle = 'rgba(38,35,32,0.32)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.32)';
     ctx.lineWidth = 1;
     ctx.strokeRect(ins.x, ins.y, ins.w, ins.h);
 
     // Title
     ctx.fillStyle = INK_FADE;
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left';
     ctx.fillText('SAMPLE MEAN → μ', ins.x + 8, ins.y + 14);
 
@@ -788,7 +788,7 @@
     ctx.setLineDash([]);
     // Label μ on inset
     ctx.fillStyle = ACCENT;
-    ctx.font = 'italic 10px "Source Serif 4", Georgia, serif';
+    ctx.font = '10px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'left';
     ctx.fillText('μ', plotL + 1, yAt(trueMean) - 2);
 
@@ -808,7 +808,7 @@
 
     // x-axis label
     ctx.fillStyle = INK_FADE;
-    ctx.font = '9px "JetBrains Mono", monospace';
+    ctx.font = '9px "IBM Plex Mono", monospace';
     ctx.textAlign = 'right';
     ctx.fillText(`n=${N}`, plotR, plotB + 8);
   }

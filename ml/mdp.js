@@ -291,22 +291,22 @@
         const x = c * cellW, y = r * cellH;
 
         if (cell === 'W') {
-          ctx.fillStyle = 'rgba(38,35,32,0.20)';
+          ctx.fillStyle = 'rgba(15,34,56,0.20)';
         } else if (cell === 'G') {
-          ctx.fillStyle = 'rgba(122,31,36,0.55)';
+          ctx.fillStyle = 'rgba(31,95,204,0.55)';
         } else if (cell === 'B') {
-          ctx.fillStyle = 'rgba(38,35,32,0.50)';
+          ctx.fillStyle = 'rgba(15,34,56,0.50)';
         } else {
           const v = Vgrid[r][c];
           const t = Math.max(-1, Math.min(1, v));
           if (state.view === 'value') {
             if (t > 0) {
-              ctx.fillStyle = `rgba(122,31,36,${0.05 + t * 0.45})`;
+              ctx.fillStyle = `rgba(31,95,204,${0.05 + t * 0.45})`;
             } else {
-              ctx.fillStyle = `rgba(38,35,32,${0.04 + Math.abs(t) * 0.3})`;
+              ctx.fillStyle = `rgba(15,34,56,${0.04 + Math.abs(t) * 0.3})`;
             }
           } else {
-            ctx.fillStyle = '#fffdf6';
+            ctx.fillStyle = '#FCFEFF';
           }
         }
         ctx.fillRect(x, y, cellW, cellH);
@@ -316,12 +316,12 @@
         if (pulse) {
           const a = pulseAlpha(pulse.t);
           if (a > 0) {
-            ctx.fillStyle = `rgba(122,31,36,${a})`;
+            ctx.fillStyle = `rgba(31,95,204,${a})`;
             ctx.fillRect(x, y, cellW, cellH);
             // Expanding ring
             const dt = (performance.now() - pulse.t) / 900;
             const rad = Math.min(cellW, cellH) * (0.2 + dt * 0.55);
-            ctx.strokeStyle = `rgba(122,31,36,${a * 0.9})`;
+            ctx.strokeStyle = `rgba(31,95,204,${a * 0.9})`;
             ctx.lineWidth = 2;
             ctx.beginPath();
             ctx.arc(x + cellW / 2, y + cellH / 2, rad, 0, Math.PI * 2);
@@ -329,7 +329,7 @@
           }
         }
 
-        ctx.strokeStyle = 'rgba(38,35,32,0.30)';
+        ctx.strokeStyle = 'rgba(15,34,56,0.30)';
         ctx.lineWidth = 1;
         ctx.strokeRect(x, y, cellW, cellH);
       }
@@ -361,8 +361,8 @@
           const ey = ty - uy * cellH * 0.32;
 
           ctx.strokeStyle = isOptimal
-            ? 'rgba(122,31,36,0.85)'
-            : 'rgba(38,35,32,0.35)';
+            ? 'rgba(31,95,204,0.85)'
+            : 'rgba(15,34,56,0.35)';
           ctx.lineWidth = lw;
           ctx.beginPath();
           ctx.moveTo(sx, sy);
@@ -379,8 +379,8 @@
           ctx.fill();
           // Probability tag (only for non-optimal, to avoid clutter on the wide arrow)
           if (!isOptimal && t.p > 0) {
-            ctx.fillStyle = 'rgba(38,35,32,0.55)';
-            ctx.font = '9px "JetBrains Mono", monospace';
+            ctx.fillStyle = 'rgba(15,34,56,0.55)';
+            ctx.font = '9px "IBM Plex Mono", monospace';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(t.p.toFixed(2), (sx + ex) / 2, (sy + ey) / 2 - 8);
@@ -397,8 +397,8 @@
         if (state.view !== 'value') continue;
         const x = c * cellW, y = r * cellH;
         ctx.fillStyle = cell === 'G' || cell === 'B' || Math.abs(Vgrid[r][c]) > 0.5
-          ? '#fffdf6' : '#262320';
-        ctx.font = 'bold 12px "JetBrains Mono", monospace';
+          ? '#FCFEFF' : '#0f2238';
+        ctx.font = 'bold 12px "IBM Plex Mono", monospace';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
         let txt;
@@ -410,8 +410,8 @@
     }
 
     // Sweep counter overlay (bottom-left corner)
-    ctx.fillStyle = 'rgba(38,35,32,0.55)';
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.fillStyle = 'rgba(15,34,56,0.55)';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'bottom';
     ctx.fillText(`SWEEP ${state.sweep}`, 6, size.h - 4);
@@ -424,19 +424,19 @@
       const dt = (performance.now() - state.annotation.ts) / ttl;
       if (dt >= 0 && dt < 1) {
         const a = Math.min(1, (1 - dt) * 1.4);
-        ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+        ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
         const txt = state.annotation.text;
         const tw = ctx.measureText(txt).width;
         const bx = size.w / 2 - tw / 2 - 8;
         const by = 6;
-        ctx.fillStyle = `rgba(255,253,246,${0.92 * a})`;
+        ctx.fillStyle = `rgba(252,254,255,${0.92 * a})`;
         ctx.fillRect(bx, by, tw + 16, 20);
-        ctx.strokeStyle = `rgba(122,31,36,${0.55 * a})`;
+        ctx.strokeStyle = `rgba(31,95,204,${0.55 * a})`;
         ctx.lineWidth = 1;
         ctx.strokeRect(bx, by, tw + 16, 20);
-        ctx.fillStyle = `rgba(122,31,36,${a})`;
+        ctx.fillStyle = `rgba(31,95,204,${a})`;
         ctx.fillText(txt, size.w / 2, by + 3);
       }
     }

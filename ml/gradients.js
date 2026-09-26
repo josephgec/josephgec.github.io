@@ -269,15 +269,15 @@
       if (cx < fn.range[0] || cx > fn.range[1]) return;
       const cy = fn.f(cx);
       const [px, py] = toPx(cx, cy);
-      ctx.strokeStyle = 'rgba(122,31,36,0.55)';
+      ctx.strokeStyle = 'rgba(31,95,204,0.55)';
       ctx.lineWidth = 1.5;
       ctx.setLineDash([3, 3]);
       ctx.beginPath();
       ctx.arc(px, py, 7, 0, Math.PI * 2);
       ctx.stroke();
       ctx.setLineDash([]);
-      ctx.fillStyle = 'rgba(122,31,36,0.55)';
-      ctx.font = '10px "JetBrains Mono", monospace';
+      ctx.fillStyle = 'rgba(31,95,204,0.55)';
+      ctx.font = '10px "IBM Plex Mono", monospace';
       ctx.textAlign = 'center';
       ctx.fillText("f'=0", px, py - 12);
     });
@@ -293,8 +293,8 @@
     ctx.stroke();
 
     // Rise/run triangle (1 unit run, m unit rise) — visualizes "slope = m"
-    ctx.strokeStyle = 'rgba(122,31,36,0.45)';
-    ctx.fillStyle = 'rgba(122,31,36,0.10)';
+    ctx.strokeStyle = 'rgba(31,95,204,0.45)';
+    ctx.fillStyle = 'rgba(31,95,204,0.10)';
     ctx.lineWidth = 1;
     ctx.setLineDash([4, 4]);
     ctx.beginPath();
@@ -311,7 +311,7 @@
     ctx.beginPath();
     ctx.arc(...toPx(x0, y0), 5, 0, Math.PI*2);
     ctx.fill();
-    ctx.fillStyle = '#fffdf6';
+    ctx.fillStyle = '#FCFEFF';
     ctx.beginPath();
     ctx.arc(...toPx(x0, y0), 2.2, 0, Math.PI*2);
     ctx.fill();
@@ -359,10 +359,10 @@
       for (let j = 0; j < cells; j++) {
         const z = grid[i][j];
         const t = (z - zMin) / (zMax - zMin + 1e-9);
-        // Base color: cream → ink
-        let r = 247 - t*210;
-        let g = 244 - t*210;
-        let b = 236 - t*204;
+        // Base color: paper → ink
+        let r = 252 - t*237;
+        let g = 254 - t*220;
+        let b = 255 - t*199;
         // Shading: numerical gradient from neighboring grid cells
         const zR = grid[i][Math.min(cells, j + 1)];
         const zU = grid[Math.min(cells, i + 1)][j];
@@ -386,7 +386,7 @@
 
     // Contour lines (marching squares)
     const levels = 10;
-    ctx.strokeStyle = 'rgba(38,35,32,0.35)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.35)';
     ctx.lineWidth = 0.7;
     const contourSegs = []; // [{lv, p1, p2}] — collected for the perpendicularity demo.
     for (let l = 1; l < levels; l++) {
@@ -440,7 +440,7 @@
         const mag = Math.hypot(gx, gy);
         if (mag < 1e-3) continue;
         const scl = 0.25 / Math.max(0.4, mag*0.4);
-        arrow(ctx, toPx(x, y), toPx(x + gx*scl, y + gy*scl), 'rgba(38,35,32,0.35)', 0.9, 5);
+        arrow(ctx, toPx(x, y), toPx(x + gx*scl, y + gy*scl), 'rgba(15,34,56,0.35)', 0.9, 5);
       }
     }
 
@@ -450,13 +450,13 @@
       ctx.lineWidth = 2;
       for (let i = 0; i < path.length - 1; i++) {
         const a = i / (path.length - 1);
-        ctx.strokeStyle = `rgba(122,31,36,${0.25 + a * 0.55})`;
+        ctx.strokeStyle = `rgba(31,95,204,${0.25 + a * 0.55})`;
         ctx.beginPath();
         ctx.moveTo(...toPx(path[i][0], path[i][1]));
         ctx.lineTo(...toPx(path[i+1][0], path[i+1][1]));
         ctx.stroke();
         // Tiny dots at each step
-        ctx.fillStyle = `rgba(122,31,36,${0.20 + a * 0.5})`;
+        ctx.fillStyle = `rgba(31,95,204,${0.20 + a * 0.5})`;
         const [px, py] = toPx(path[i+1][0], path[i+1][1]);
         ctx.beginPath();
         ctx.arc(px, py, 1.5, 0, Math.PI * 2);
@@ -469,7 +469,7 @@
       ctx.beginPath();
       ctx.arc(hpx, hpy, 6, 0, Math.PI * 2);
       ctx.fill();
-      ctx.fillStyle = '#fffdf6';
+      ctx.fillStyle = '#FCFEFF';
       ctx.beginPath();
       ctx.arc(hpx, hpy, 2.5, 0, Math.PI * 2);
       ctx.fill();
@@ -501,7 +501,7 @@
         if (d < bestDist) { bestDist = d; best = seg; bestProj = [cx, cy]; }
       }
       if (best && bestDist > 0.01 && bestDist < 1.4) {
-        ctx.strokeStyle = 'rgba(38,35,32,0.55)';
+        ctx.strokeStyle = 'rgba(15,34,56,0.55)';
         ctx.lineWidth = 1;
         ctx.setLineDash([3, 3]);
         ctx.beginPath();
@@ -526,7 +526,7 @@
         // Compute pixel directions (canvas y is flipped vs math y)
         const dux = ux * sLen, duy = -uy * sLen;
         const dpx = pxn * sLen, dpy = -pyn * sLen;
-        ctx.strokeStyle = 'rgba(38,35,32,0.7)';
+        ctx.strokeStyle = 'rgba(15,34,56,0.7)';
         ctx.lineWidth = 1.2;
         ctx.beginPath();
         ctx.moveTo(tx + dux, ty + duy);
@@ -536,7 +536,7 @@
 
         // Caption near the contact
         ctx.fillStyle = INK_FADE;
-        ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+        ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
         ctx.textAlign = 'left';
         ctx.fillText('∇f ⊥ contour', tx + 12, ty + 4);
       }
@@ -545,7 +545,7 @@
     ctx.fillStyle = ACCENT;
     const [ppx, ppy] = toPx(state.p[0], state.p[1]);
     ctx.beginPath(); ctx.arc(ppx, ppy, 6, 0, Math.PI*2); ctx.fill();
-    ctx.fillStyle = '#fffdf6';
+    ctx.fillStyle = '#FCFEFF';
     ctx.beginPath(); ctx.arc(ppx, ppy, 2.5, 0, Math.PI*2); ctx.fill();
 
     // ── Readouts ──
@@ -574,7 +574,7 @@
 
     if (state.mode === 'descend' && (!state.descentPath || state.descentPath.length < 2)) {
       ctx.fillStyle = INK_FADE;
-      ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+      ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('drag to place a marble · then press "Drop marble"', size.w / 2, size.h - 18);
     }
@@ -584,27 +584,27 @@
     const legY = size.h - 108;
     const legW = 176;
     const legH = 96;
-    ctx.fillStyle = 'rgba(255,253,246,0.92)';
-    ctx.strokeStyle = 'rgba(38,35,32,0.30)';
+    ctx.fillStyle = 'rgba(252,254,255,0.92)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.30)';
     ctx.lineWidth = 1;
     ctx.fillRect(legX, legY, legW, legH);
     ctx.strokeRect(legX, legY, legW, legH);
     ctx.fillStyle = INK_FADE;
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'alphabetic';
     ctx.fillText('LEGEND', legX + 8, legY + 14);
     // big accent arrow = ∇f at this point
     arrow(ctx, [legX + 12, legY + 30], [legX + 36, legY + 30], ACCENT, 3, 10);
     ctx.fillStyle = ACCENT;
-    ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+    ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.fillText('∇f  here  (uphill)', legX + 44, legY + 33);
     // small grey field arrow = gradient at sampled grid points
-    arrow(ctx, [legX + 12, legY + 48], [legX + 30, legY + 48], 'rgba(38,35,32,0.45)', 1, 5);
+    arrow(ctx, [legX + 12, legY + 48], [legX + 30, legY + 48], 'rgba(15,34,56,0.45)', 1, 5);
     ctx.fillStyle = INK_FADE;
     ctx.fillText('∇f  field  (sampled)', legX + 44, legY + 51);
     // contour lines
-    ctx.strokeStyle = 'rgba(38,35,32,0.55)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.55)';
     ctx.lineWidth = 0.9;
     ctx.beginPath();
     ctx.moveTo(legX + 12, legY + 66); ctx.lineTo(legX + 36, legY + 66);
@@ -615,13 +615,13 @@
     if (state.mode === 'descend') {
       ctx.fillStyle = ACCENT;
       ctx.beginPath(); ctx.arc(legX + 22, legY + 84, 4, 0, Math.PI*2); ctx.fill();
-      ctx.fillStyle = '#fffdf6';
+      ctx.fillStyle = '#FCFEFF';
       ctx.beginPath(); ctx.arc(legX + 22, legY + 84, 1.6, 0, Math.PI*2); ctx.fill();
       ctx.fillStyle = ACCENT;
       ctx.fillText('marble  (descent step)', legX + 44, legY + 87);
     } else {
       // ⊥ marker swatch
-      ctx.strokeStyle = 'rgba(38,35,32,0.7)';
+      ctx.strokeStyle = 'rgba(15,34,56,0.7)';
       ctx.lineWidth = 1.2;
       ctx.beginPath();
       ctx.moveTo(legX + 14, legY + 80); ctx.lineTo(legX + 22, legY + 80);

@@ -12,7 +12,7 @@
   <link rel="canonical" href="https://jthomas.site/blog/claude-agent" />
     <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
   <link rel="apple-touch-icon" href="../photo.jpg" />
-  <meta name="theme-color" content="#7a1f24" />
+  <meta name="theme-color" content="#F4F9FE" />
 
   <meta property="og:type" content="article" />
   <meta property="og:url" content="https://jthomas.site/blog/claude-agent" />
@@ -55,26 +55,24 @@
   }
   </script>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,400;1,8..60,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-
+  <link rel="preload" href="/fonts/bricolage-grotesque.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="/css/fonts.css" />
   <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="/css/site.css" />
   <link rel="alternate" type="application/rss+xml" title="Joseph Thomas — Writing" href="feed.xml" />
 </head>
 <body>
 
-<header class="nb-nav">
-  <div class="brand-block">
-    <a class="brand" href="../index.html">jthomas.site</a><span class="brand-meta">// notebook · v.4.2026</span>
-  </div>
-  <nav>
-    <a href="../blog/index.html" style="color:var(--ink);">writing</a>
-    <a href="../index.html#research">research</a>
-    <a href="../index.html#work">work</a>
-    <a href="../index.html#projects">projects</a>
-    <a href="../consulting.html">consulting</a>
-    <a href="../index.html#contact" class="contact">→ contact</a>
+<header class="site-top">
+  <a class="brand" href="../index.html">Joseph Thomas</a>
+  <nav aria-label="Primary">
+    <a href="../blog/index.html" aria-current="true">Writing</a>
+    <a href="../ml/index.html">Tutorial</a>
+    <a href="../index.html#work">Work</a>
+    <a href="../index.html#research">Research</a>
+    <a href="../index.html#projects">Projects</a>
+    <a href="../consulting.html">Consulting</a>
+    <a class="pill-cta" href="../index.html#contact">Contact</a>
   </nav>
 </header>
 
@@ -126,71 +124,71 @@
             <path d="M0,0 L8,3 L0,6 z" fill="#566068"/>
           </marker>
           <marker id="arrow-cmp-acc" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
-            <path d="M0,0 L8,3 L0,6 z" fill="#7a1f24"/>
+            <path d="M0,0 L8,3 L0,6 z" fill="#1f5fcc"/>
           </marker>
         </defs>
 
-        <text x="170" y="28" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-weight="600" font-size="14" fill="#1a1a1a">Single-agent loop</text>
-        <text x="170" y="46" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068">one Claude · plans &amp; codes &amp; tests</text>
+        <text x="170" y="28" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-weight="600" font-size="14" fill="#1a1a1a">Single-agent loop</text>
+        <text x="170" y="46" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#566068">one Claude · plans &amp; codes &amp; tests</text>
 
-        <rect x="40" y="62" width="260" height="220" rx="10" fill="#f7f3ec" stroke="#d4c9b3" stroke-width="1.2"/>
-        <text x="170" y="84" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#8a8270" letter-spacing="1">CONTEXT WINDOW</text>
+        <rect x="40" y="62" width="260" height="220" rx="10" fill="#F4F9FE" stroke="#c9d6e3" stroke-width="1.2"/>
+        <text x="170" y="84" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#8a8270" letter-spacing="1">CONTEXT WINDOW</text>
 
         <rect x="56" y="96" width="228" height="22" rx="4" fill="#ecfeff" stroke="#67e8f9" stroke-width="1"/>
-        <text x="170" y="111" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#0e7490">user goal</text>
+        <text x="170" y="111" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#0e7490">user goal</text>
 
         <rect x="56" y="122" width="228" height="22" rx="4" fill="#fffbeb" stroke="#fcd34d" stroke-width="1"/>
-        <text x="170" y="137" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#92400e">tool: ls / read / grep ... ×40</text>
+        <text x="170" y="137" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#92400e">tool: ls / read / grep ... ×40</text>
 
         <rect x="56" y="148" width="228" height="22" rx="4" fill="#fffbeb" stroke="#fcd34d" stroke-width="1"/>
-        <text x="170" y="163" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#92400e">raw file contents · 12k tokens</text>
+        <text x="170" y="163" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#92400e">raw file contents · 12k tokens</text>
 
         <rect x="56" y="174" width="228" height="22" rx="4" fill="#fffbeb" stroke="#fcd34d" stroke-width="1"/>
-        <text x="170" y="189" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#92400e">stack traces · diffs · stdout</text>
+        <text x="170" y="189" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#92400e">stack traces · diffs · stdout</text>
 
         <rect x="56" y="200" width="228" height="22" rx="4" fill="#fdf2f8" stroke="#f9a8d4" stroke-width="1"/>
-        <text x="170" y="215" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#9d174d">"wait — what was the goal again?"</text>
+        <text x="170" y="215" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#9d174d">"wait — what was the goal again?"</text>
 
         <rect x="56" y="226" width="228" height="22" rx="4" fill="#fdf2f8" stroke="#f9a8d4" stroke-width="1"/>
-        <text x="170" y="241" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#9d174d">middle of context · 30%+ accuracy drop</text>
+        <text x="170" y="241" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#9d174d">middle of context · 30%+ accuracy drop</text>
 
-        <text x="170" y="270" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="11" fill="#7a1f24">context bloats · planning gets buried</text>
+        <text x="170" y="270" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="11" fill="#1f5fcc">context bloats · planning gets buried</text>
 
-        <text x="170" y="305" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#566068" font-weight="600">FAILURE MODE</text>
-        <text x="170" y="322" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="11" fill="#1a1a1a">jumps to code · loses the plot · loops forever</text>
+        <text x="170" y="305" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="#566068" font-weight="600">FAILURE MODE</text>
+        <text x="170" y="322" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="11" fill="#1a1a1a">jumps to code · loses the plot · loops forever</text>
 
-        <text x="540" y="28" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-weight="600" font-size="14" fill="#1a1a1a">Two-agent split</text>
-        <text x="540" y="46" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068">planner ↔ implementer · separate windows</text>
+        <text x="540" y="28" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-weight="600" font-size="14" fill="#1a1a1a">Two-agent split</text>
+        <text x="540" y="46" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#566068">planner ↔ implementer · separate windows</text>
 
-        <rect x="380" y="62" width="150" height="100" rx="10" fill="#f7f3ec" stroke="#d4c9b3" stroke-width="1.2"/>
-        <text x="455" y="82" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#8a8270" letter-spacing="1">PLANNER CTX</text>
+        <rect x="380" y="62" width="150" height="100" rx="10" fill="#F4F9FE" stroke="#c9d6e3" stroke-width="1.2"/>
+        <text x="455" y="82" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#8a8270" letter-spacing="1">PLANNER CTX</text>
         <rect x="392" y="92" width="126" height="18" rx="3" fill="#ecfeff" stroke="#67e8f9" stroke-width="1"/>
-        <text x="455" y="105" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#0e7490">goal · tree · README</text>
+        <text x="455" y="105" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#0e7490">goal · tree · README</text>
         <rect x="392" y="114" width="126" height="18" rx="3" fill="#ecfeff" stroke="#67e8f9" stroke-width="1"/>
-        <text x="455" y="127" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#0e7490">last diff + test result</text>
-        <text x="455" y="152" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="10" fill="#566068">small · stable · re-built each turn</text>
+        <text x="455" y="127" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#0e7490">last diff + test result</text>
+        <text x="455" y="152" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="10" fill="#566068">small · stable · re-built each turn</text>
 
-        <rect x="550" y="62" width="150" height="100" rx="10" fill="#f7f3ec" stroke="#d4c9b3" stroke-width="1.2"/>
-        <text x="625" y="82" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#8a8270" letter-spacing="1">IMPL CTX</text>
+        <rect x="550" y="62" width="150" height="100" rx="10" fill="#F4F9FE" stroke="#c9d6e3" stroke-width="1.2"/>
+        <text x="625" y="82" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#8a8270" letter-spacing="1">IMPL CTX</text>
         <rect x="562" y="92" width="126" height="18" rx="3" fill="#fffbeb" stroke="#fcd34d" stroke-width="1"/>
-        <text x="625" y="105" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#92400e">one directive</text>
+        <text x="625" y="105" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#92400e">one directive</text>
         <rect x="562" y="114" width="126" height="18" rx="3" fill="#fffbeb" stroke="#fcd34d" stroke-width="1"/>
-        <text x="625" y="127" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#92400e">tool calls × N (this task only)</text>
-        <text x="625" y="152" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="10" fill="#566068">deep · narrow · disposable</text>
+        <text x="625" y="127" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#92400e">tool calls × N (this task only)</text>
+        <text x="625" y="152" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="10" fill="#566068">deep · narrow · disposable</text>
 
-        <line x1="530" y1="112" x2="550" y2="112" stroke="#7a1f24" stroke-width="1.5" marker-end="url(#arrow-cmp-acc)"/>
-        <path d="M550,132 L530,132" stroke="#7a1f24" stroke-width="1.5" marker-end="url(#arrow-cmp-acc)" fill="none"/>
-        <text x="540" y="100" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="#7a1f24">plan</text>
-        <text x="540" y="146" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="#7a1f24">diff</text>
+        <line x1="530" y1="112" x2="550" y2="112" stroke="#1f5fcc" stroke-width="1.5" marker-end="url(#arrow-cmp-acc)"/>
+        <path d="M550,132 L530,132" stroke="#1f5fcc" stroke-width="1.5" marker-end="url(#arrow-cmp-acc)" fill="none"/>
+        <text x="540" y="100" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="8" fill="#1f5fcc">plan</text>
+        <text x="540" y="146" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="8" fill="#1f5fcc">diff</text>
 
-        <text x="540" y="195" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="11" fill="#7a1f24">what to do · vs · how to do it</text>
+        <text x="540" y="195" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="11" fill="#1f5fcc">what to do · vs · how to do it</text>
 
-        <rect x="380" y="215" width="320" height="50" rx="8" fill="#fffaf0" stroke="#d4c9b3" stroke-width="1"/>
-        <text x="540" y="235" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="11" fill="#1a1a1a">planner holds the project in its head ·</text>
-        <text x="540" y="252" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="11" fill="#1a1a1a">implementer holds only the next step</text>
+        <rect x="380" y="215" width="320" height="50" rx="8" fill="#fffaf0" stroke="#c9d6e3" stroke-width="1"/>
+        <text x="540" y="235" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="11" fill="#1a1a1a">planner holds the project in its head ·</text>
+        <text x="540" y="252" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="11" fill="#1a1a1a">implementer holds only the next step</text>
 
-        <text x="540" y="295" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#566068" font-weight="600">RESULT</text>
-        <text x="540" y="312" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="11" fill="#1a1a1a">each model specialises · neither overloads</text>
+        <text x="540" y="295" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="#566068" font-weight="600">RESULT</text>
+        <text x="540" y="312" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="11" fill="#1a1a1a">each model specialises · neither overloads</text>
       </svg>
       <figcaption>Single-agent loops are remarkable until the context fills up; the two-agent split keeps each window small and on-topic by separating <em>what to do</em> from <em>how to do it</em>.</figcaption>
     </figure>
@@ -231,7 +229,7 @@
       <svg viewBox="0 0 720 500" width="100%" role="img" aria-label="Architecture diagram showing the Planner and Implementer exchanging plans and diffs, with a git repo and test runner underneath">
         <defs>
           <marker id="arrow-down" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
-            <path d="M0,0 L8,3 L0,6 z" fill="#7a1f24"/>
+            <path d="M0,0 L8,3 L0,6 z" fill="#1f5fcc"/>
           </marker>
           <marker id="arrow-up" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
             <path d="M0,0 L8,3 L0,6 z" fill="#566068"/>
@@ -241,60 +239,60 @@
           </marker>
         </defs>
 
-        <rect x="290" y="22" width="140" height="44" rx="22" fill="#fffaf0" stroke="#d4c9b3" stroke-width="1.5"/>
-        <text x="360" y="42" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-weight="600" font-size="13" fill="#1a1a1a">user goal</text>
-        <text x="360" y="58" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#566068">"add JWT auth"</text>
+        <rect x="290" y="22" width="140" height="44" rx="22" fill="#fffaf0" stroke="#c9d6e3" stroke-width="1.5"/>
+        <text x="360" y="42" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-weight="600" font-size="13" fill="#1a1a1a">user goal</text>
+        <text x="360" y="58" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#566068">"add JWT auth"</text>
 
         <line x1="360" y1="66" x2="360" y2="92" stroke="#1a1a1a" stroke-width="1.2" marker-end="url(#arrow-tool)"/>
 
-        <rect x="60" y="98" width="600" height="52" rx="10" fill="#f7f3ec" stroke="#d4c9b3" stroke-width="1.5" stroke-dasharray="4 3"/>
-        <text x="360" y="120" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-weight="600" font-size="13" fill="#1a1a1a">orchestrator</text>
-        <text x="360" y="138" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068">~200 lines of Python · routes messages · runs subprocess · no reasoning</text>
+        <rect x="60" y="98" width="600" height="52" rx="10" fill="#F4F9FE" stroke="#c9d6e3" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <text x="360" y="120" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-weight="600" font-size="13" fill="#1a1a1a">orchestrator</text>
+        <text x="360" y="138" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#566068">~200 lines of Python · routes messages · runs subprocess · no reasoning</text>
 
-        <text x="360" y="178" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#8a8270" letter-spacing="1.2">— THE TWO AGENTS —</text>
+        <text x="360" y="178" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#8a8270" letter-spacing="1.2">— THE TWO AGENTS —</text>
 
         <rect x="60" y="194" width="270" height="110" rx="10" fill="#ecfeff" stroke="#67e8f9" stroke-width="1.5"/>
-        <text x="195" y="220" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-weight="700" font-size="16" fill="#0e7490">Planner</text>
-        <text x="195" y="238" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#0891b2">decides what to do next</text>
+        <text x="195" y="220" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-weight="700" font-size="16" fill="#0e7490">Planner</text>
+        <text x="195" y="238" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#0891b2">decides what to do next</text>
         <line x1="80" y1="252" x2="310" y2="252" stroke="#67e8f9" stroke-width="1" stroke-dasharray="2 2"/>
-        <text x="195" y="270" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="11" fill="#1a1a1a">full project context</text>
-        <text x="195" y="287" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="11" fill="#1a1a1a">no tool calls</text>
+        <text x="195" y="270" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="11" fill="#1a1a1a">full project context</text>
+        <text x="195" y="287" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="11" fill="#1a1a1a">no tool calls</text>
 
-        <path d="M335,232 L390,232" stroke="#7a1f24" stroke-width="1.6" marker-end="url(#arrow-down)"/>
-        <text x="362" y="225" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#7a1f24" font-weight="600">plan</text>
-        <text x="362" y="248" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="9" fill="#7a1f24">flows down</text>
+        <path d="M335,232 L390,232" stroke="#1f5fcc" stroke-width="1.6" marker-end="url(#arrow-down)"/>
+        <text x="362" y="225" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#1f5fcc" font-weight="600">plan</text>
+        <text x="362" y="248" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="9" fill="#1f5fcc">flows down</text>
 
         <path d="M390,272 L335,272" stroke="#566068" stroke-width="1.6" marker-end="url(#arrow-up)"/>
-        <text x="362" y="290" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#566068" font-weight="600">diff</text>
-        <text x="362" y="265" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="9" fill="#566068">flows up</text>
+        <text x="362" y="290" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#566068" font-weight="600">diff</text>
+        <text x="362" y="265" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="9" fill="#566068">flows up</text>
 
         <rect x="390" y="194" width="270" height="110" rx="10" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.5"/>
-        <text x="525" y="220" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-weight="700" font-size="16" fill="#92400e">Implementer</text>
-        <text x="525" y="238" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#d97706">makes the change</text>
+        <text x="525" y="220" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-weight="700" font-size="16" fill="#92400e">Implementer</text>
+        <text x="525" y="238" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#d97706">makes the change</text>
         <line x1="410" y1="252" x2="640" y2="252" stroke="#fcd34d" stroke-width="1" stroke-dasharray="2 2"/>
-        <text x="525" y="270" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="11" fill="#1a1a1a">narrow scope · this task only</text>
-        <text x="525" y="287" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="11" fill="#1a1a1a">all tool calls</text>
+        <text x="525" y="270" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="11" fill="#1a1a1a">narrow scope · this task only</text>
+        <text x="525" y="287" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="11" fill="#1a1a1a">all tool calls</text>
 
         <path d="M525,304 L525,348" stroke="#1a1a1a" stroke-width="1.4" marker-end="url(#arrow-tool)"/>
         <path d="M525,348 L525,304" stroke="#1a1a1a" stroke-width="1.4" marker-end="url(#arrow-tool)"/>
-        <text x="540" y="328" font-family="JetBrains Mono, monospace" font-size="9" fill="#1a1a1a">tool calls</text>
+        <text x="540" y="328" font-family="IBM Plex Mono, monospace" font-size="9" fill="#1a1a1a">tool calls</text>
 
-        <text x="360" y="378" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#8a8270" letter-spacing="1.2">— THE WORLD UNDER TEST —</text>
+        <text x="360" y="378" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#8a8270" letter-spacing="1.2">— THE WORLD UNDER TEST —</text>
 
-        <rect x="60" y="394" width="270" height="80" rx="10" fill="#f9f5ee" stroke="#d4c9b3" stroke-width="1.5"/>
-        <text x="195" y="418" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-weight="700" font-size="14" fill="#1a1a1a">git repository</text>
-        <text x="195" y="436" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068">files · history · diffs</text>
-        <text x="195" y="454" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="10" fill="#566068">source of truth for "what changed"</text>
+        <rect x="60" y="394" width="270" height="80" rx="10" fill="#f9f5ee" stroke="#c9d6e3" stroke-width="1.5"/>
+        <text x="195" y="418" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-weight="700" font-size="14" fill="#1a1a1a">git repository</text>
+        <text x="195" y="436" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#566068">files · history · diffs</text>
+        <text x="195" y="454" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="10" fill="#566068">source of truth for "what changed"</text>
 
-        <rect x="390" y="394" width="270" height="80" rx="10" fill="#f9f5ee" stroke="#d4c9b3" stroke-width="1.5"/>
-        <text x="525" y="418" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-weight="700" font-size="14" fill="#1a1a1a">test runner</text>
-        <text x="525" y="436" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068">pytest · npm test · cargo test</text>
-        <text x="525" y="454" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="10" fill="#566068">source of truth for "did it work"</text>
+        <rect x="390" y="394" width="270" height="80" rx="10" fill="#f9f5ee" stroke="#c9d6e3" stroke-width="1.5"/>
+        <text x="525" y="418" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-weight="700" font-size="14" fill="#1a1a1a">test runner</text>
+        <text x="525" y="436" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#566068">pytest · npm test · cargo test</text>
+        <text x="525" y="454" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="10" fill="#566068">source of truth for "did it work"</text>
 
         <path d="M195,394 C 195,360 195,330 200,310" stroke="#566068" stroke-width="1" stroke-dasharray="3 3" fill="none" marker-end="url(#arrow-up)"/>
         <path d="M525,394 C 525,360 525,330 520,310" stroke="#566068" stroke-width="1" stroke-dasharray="3 3" fill="none" marker-end="url(#arrow-up)"/>
-        <text x="60" y="358" font-family="JetBrains Mono, monospace" font-size="9" fill="#566068">git diff</text>
-        <text x="615" y="358" font-family="JetBrains Mono, monospace" font-size="9" fill="#566068">test results</text>
+        <text x="60" y="358" font-family="IBM Plex Mono, monospace" font-size="9" fill="#566068">git diff</text>
+        <text x="615" y="358" font-family="IBM Plex Mono, monospace" font-size="9" fill="#566068">test results</text>
       </svg>
       <figcaption>The full architecture. Plans flow down (oxblood), diffs flow back up (grey). The Implementer is the only side allowed to touch the world; the Planner only ever reads the trail it leaves behind.</figcaption>
     </figure>
@@ -311,53 +309,53 @@
             <path d="M0,0 L8,3 L0,6 z" fill="#1a1a1a"/>
           </marker>
           <marker id="arrow-seq-acc" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
-            <path d="M0,0 L8,3 L0,6 z" fill="#7a1f24"/>
+            <path d="M0,0 L8,3 L0,6 z" fill="#1f5fcc"/>
           </marker>
         </defs>
 
-        <text x="80" y="36" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068" letter-spacing="1">USER</text>
-        <text x="220" y="36" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#0e7490" letter-spacing="1">PLANNER</text>
-        <text x="380" y="36" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#92400e" letter-spacing="1">IMPLEMENTER</text>
-        <text x="540" y="36" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#1a1a1a" letter-spacing="1">TOOLS / REPO</text>
-        <text x="660" y="36" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068" letter-spacing="1">ORCHESTRATOR</text>
+        <text x="80" y="36" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#566068" letter-spacing="1">USER</text>
+        <text x="220" y="36" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#0e7490" letter-spacing="1">PLANNER</text>
+        <text x="380" y="36" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#92400e" letter-spacing="1">IMPLEMENTER</text>
+        <text x="540" y="36" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#1a1a1a" letter-spacing="1">TOOLS / REPO</text>
+        <text x="660" y="36" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#566068" letter-spacing="1">ORCHESTRATOR</text>
 
-        <line x1="80"  y1="46" x2="80"  y2="430" stroke="#d4c9b3" stroke-width="1" stroke-dasharray="3 3"/>
+        <line x1="80"  y1="46" x2="80"  y2="430" stroke="#c9d6e3" stroke-width="1" stroke-dasharray="3 3"/>
         <line x1="220" y1="46" x2="220" y2="430" stroke="#67e8f9" stroke-width="1" stroke-dasharray="3 3"/>
         <line x1="380" y1="46" x2="380" y2="430" stroke="#fcd34d" stroke-width="1" stroke-dasharray="3 3"/>
-        <line x1="540" y1="46" x2="540" y2="430" stroke="#d4c9b3" stroke-width="1" stroke-dasharray="3 3"/>
-        <line x1="660" y1="46" x2="660" y2="430" stroke="#d4c9b3" stroke-width="1" stroke-dasharray="3 3"/>
+        <line x1="540" y1="46" x2="540" y2="430" stroke="#c9d6e3" stroke-width="1" stroke-dasharray="3 3"/>
+        <line x1="660" y1="46" x2="660" y2="430" stroke="#c9d6e3" stroke-width="1" stroke-dasharray="3 3"/>
 
         <line x1="80" y1="74" x2="216" y2="74" stroke="#1a1a1a" stroke-width="1.2" marker-end="url(#arrow-seq)"/>
-        <text x="148" y="68" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#1a1a1a">"add JWT auth"</text>
+        <text x="148" y="68" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#1a1a1a">"add JWT auth"</text>
 
         <rect x="200" y="86" width="40" height="34" fill="#ecfeff" stroke="#67e8f9" stroke-width="1"/>
-        <text x="220" y="106" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="10" fill="#0e7490">read</text>
+        <text x="220" y="106" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="10" fill="#0e7490">read</text>
 
-        <line x1="220" y1="138" x2="376" y2="138" stroke="#7a1f24" stroke-width="1.4" marker-end="url(#arrow-seq-acc)"/>
-        <text x="298" y="132" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="10" fill="#7a1f24">directive: scaffold middleware at src/auth/jwt.ts</text>
+        <line x1="220" y1="138" x2="376" y2="138" stroke="#1f5fcc" stroke-width="1.4" marker-end="url(#arrow-seq-acc)"/>
+        <text x="298" y="132" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="10" fill="#1f5fcc">directive: scaffold middleware at src/auth/jwt.ts</text>
 
         <line x1="380" y1="170" x2="536" y2="170" stroke="#1a1a1a" stroke-width="1.2" marker-end="url(#arrow-seq)"/>
-        <text x="458" y="164" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#1a1a1a">read · edit · run</text>
+        <text x="458" y="164" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#1a1a1a">read · edit · run</text>
 
-        <rect x="520" y="180" width="40" height="80" fill="#f7f3ec" stroke="#d4c9b3" stroke-width="1"/>
-        <text x="540" y="206" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="10" fill="#1a1a1a">tool</text>
-        <text x="540" y="222" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="10" fill="#1a1a1a">calls</text>
-        <text x="540" y="240" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="10" fill="#1a1a1a">× N</text>
+        <rect x="520" y="180" width="40" height="80" fill="#F4F9FE" stroke="#c9d6e3" stroke-width="1"/>
+        <text x="540" y="206" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="10" fill="#1a1a1a">tool</text>
+        <text x="540" y="222" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="10" fill="#1a1a1a">calls</text>
+        <text x="540" y="240" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="10" fill="#1a1a1a">× N</text>
 
         <line x1="540" y1="278" x2="384" y2="278" stroke="#1a1a1a" stroke-width="1.2" marker-end="url(#arrow-seq)"/>
-        <text x="462" y="272" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#1a1a1a">file contents · stdout · errors</text>
+        <text x="462" y="272" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#1a1a1a">file contents · stdout · errors</text>
 
         <line x1="380" y1="306" x2="664" y2="306" stroke="#1a1a1a" stroke-width="1.2" marker-end="url(#arrow-seq)"/>
-        <text x="522" y="300" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#1a1a1a">"done — see diff"</text>
+        <text x="522" y="300" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#1a1a1a">"done — see diff"</text>
 
-        <rect x="640" y="316" width="40" height="40" fill="#f7f3ec" stroke="#d4c9b3" stroke-width="1"/>
-        <text x="660" y="332" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="9" fill="#1a1a1a">git diff</text>
-        <text x="660" y="346" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="9" fill="#1a1a1a">+ pytest</text>
+        <rect x="640" y="316" width="40" height="40" fill="#F4F9FE" stroke="#c9d6e3" stroke-width="1"/>
+        <text x="660" y="332" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="9" fill="#1a1a1a">git diff</text>
+        <text x="660" y="346" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="9" fill="#1a1a1a">+ pytest</text>
 
         <line x1="660" y1="378" x2="224" y2="378" stroke="#566068" stroke-width="1.4" marker-end="url(#arrow-seq)"/>
-        <text x="442" y="372" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="10" fill="#566068">next packet · diff + test result</text>
+        <text x="442" y="372" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="10" fill="#566068">next packet · diff + test result</text>
 
-        <text x="360" y="416" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="11" fill="#566068">— loop, until Planner emits GOAL COMPLETE —</text>
+        <text x="360" y="416" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="11" fill="#566068">— loop, until Planner emits GOAL COMPLETE —</text>
       </svg>
       <figcaption>One task, five lanes. Plans flow right; tool calls and diffs flow back. The orchestrator is the only entity that talks to both agents.</figcaption>
     </figure>
@@ -384,27 +382,27 @@
 
         <rect x="20" y="20" width="640" height="280" rx="12" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.5"/>
         <text x="40" y="50" font-family="Syne, sans-serif" font-weight="700" font-size="14" fill="#5b21b6">Context packet</text>
-        <text x="146" y="50" font-family="JetBrains Mono, monospace" font-size="11" fill="#7c3aed">built fresh each iteration</text>
+        <text x="146" y="50" font-family="IBM Plex Mono, monospace" font-size="11" fill="#7c3aed">built fresh each iteration</text>
 
-        <text x="40" y="84" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068" letter-spacing="1.2">STATIC CONTEXT — changes slowly</text>
+        <text x="40" y="84" font-family="IBM Plex Mono, monospace" font-size="10" fill="#566068" letter-spacing="1.2">STATIC CONTEXT — changes slowly</text>
 
         <rect x="40" y="96" width="195" height="58" rx="8" fill="#ecfeff" stroke="#67e8f9" stroke-width="1.2"/>
         <text x="137" y="122" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="13" fill="#0e7490">File tree</text>
-        <text x="137" y="140" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#0891b2">repo structure</text>
+        <text x="137" y="140" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#0891b2">repo structure</text>
 
         <rect x="245" y="96" width="190" height="58" rx="8" fill="#ecfeff" stroke="#67e8f9" stroke-width="1.2"/>
         <text x="340" y="122" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="13" fill="#0e7490">Git log</text>
-        <text x="340" y="140" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#0891b2">last 15 commits</text>
+        <text x="340" y="140" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#0891b2">last 15 commits</text>
 
         <rect x="445" y="96" width="195" height="58" rx="8" fill="#ecfeff" stroke="#67e8f9" stroke-width="1.2"/>
         <text x="542" y="122" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="13" fill="#0e7490">README</text>
-        <text x="542" y="140" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#0891b2">project intent</text>
+        <text x="542" y="140" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#0891b2">project intent</text>
 
-        <text x="40" y="190" font-family="JetBrains Mono, monospace" font-size="10" fill="#92400e" letter-spacing="1.2">FEEDBACK SIGNAL — plan vs. reality</text>
+        <text x="40" y="190" font-family="IBM Plex Mono, monospace" font-size="10" fill="#92400e" letter-spacing="1.2">FEEDBACK SIGNAL — plan vs. reality</text>
 
         <rect x="40" y="202" width="600" height="74" rx="8" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.5"/>
         <text x="340" y="232" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="14" fill="#92400e">Previous diff + test output</text>
-        <text x="340" y="252" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#d97706">what changed last round · what passed · what failed</text>
+        <text x="340" y="252" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="#d97706">what changed last round · what passed · what failed</text>
 
         <line x1="340" y1="304" x2="340" y2="332" stroke="#566068" stroke-width="1.5" marker-end="url(#arrow-ctx)"/>
 
@@ -441,35 +439,35 @@
           </marker>
         </defs>
 
-        <text x="100" y="32" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="600" fill="#566068" letter-spacing="1.2">ITERATION 1</text>
+        <text x="100" y="32" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="600" fill="#566068" letter-spacing="1.2">ITERATION 1</text>
         <rect x="30" y="48" width="140" height="46" rx="8" fill="#ecfeff" stroke="#67e8f9" stroke-width="1.2"/>
         <text x="100" y="70" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="12" fill="#0e7490">Plan: scaffold</text>
-        <text x="100" y="86" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#0891b2">routes + middleware</text>
+        <text x="100" y="86" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#0891b2">routes + middleware</text>
         <line x1="100" y1="100" x2="100" y2="118" stroke="#566068" stroke-width="1.2" marker-end="url(#arrow-iter)"/>
         <rect x="20" y="124" width="160" height="86" rx="8" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.5"/>
         <text x="100" y="152" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="12" fill="#92400e">Implement</text>
-        <text x="100" y="172" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#d97706">+4 files</text>
-        <text x="100" y="188" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#d97706">+180 lines</text>
+        <text x="100" y="172" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#d97706">+4 files</text>
+        <text x="100" y="188" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#d97706">+180 lines</text>
 
-        <text x="340" y="32" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="600" fill="#566068" letter-spacing="1.2">ITERATION 2</text>
+        <text x="340" y="32" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="600" fill="#566068" letter-spacing="1.2">ITERATION 2</text>
         <rect x="270" y="48" width="140" height="46" rx="8" fill="#ecfeff" stroke="#67e8f9" stroke-width="1.2"/>
         <text x="340" y="70" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="12" fill="#0e7490">Plan: fix gaps</text>
-        <text x="340" y="86" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#0891b2">wire router + tests</text>
+        <text x="340" y="86" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#0891b2">wire router + tests</text>
         <line x1="340" y1="100" x2="340" y2="118" stroke="#566068" stroke-width="1.2" marker-end="url(#arrow-iter)"/>
         <rect x="280" y="138" width="120" height="60" rx="8" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.5"/>
         <text x="340" y="162" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="12" fill="#92400e">Implement</text>
-        <text x="340" y="180" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#d97706">+2 files, +60 lines</text>
+        <text x="340" y="180" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#d97706">+2 files, +60 lines</text>
 
-        <text x="580" y="32" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="600" fill="#566068" letter-spacing="1.2">ITERATION 3</text>
+        <text x="580" y="32" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="600" fill="#566068" letter-spacing="1.2">ITERATION 3</text>
         <rect x="510" y="48" width="140" height="46" rx="8" fill="#ecfeff" stroke="#67e8f9" stroke-width="1.2"/>
         <text x="580" y="70" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="12" fill="#0e7490">Plan: polish</text>
-        <text x="580" y="86" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#0891b2">edge case + cleanup</text>
+        <text x="580" y="86" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#0891b2">edge case + cleanup</text>
         <line x1="580" y1="100" x2="580" y2="118" stroke="#566068" stroke-width="1.2" marker-end="url(#arrow-iter)"/>
         <rect x="535" y="148" width="90" height="40" rx="8" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.5"/>
         <text x="580" y="166" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="12" fill="#92400e">Implement</text>
-        <text x="580" y="180" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#d97706">~20 lines</text>
+        <text x="580" y="180" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#d97706">~20 lines</text>
 
-        <text x="340" y="244" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#0891b2" font-style="italic">scope of changes narrows each round</text>
+        <text x="340" y="244" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="#0891b2" font-style="italic">scope of changes narrows each round</text>
         <path d="M30,260 Q340,288 650,260" stroke="#0891b2" stroke-width="1.5" stroke-dasharray="4 3" fill="none"/>
 
         <rect x="280" y="295" width="120" height="32" rx="16" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
@@ -566,46 +564,46 @@
       <svg viewBox="0 0 720 360" width="100%" role="img" aria-label="Cluster diagram grouping the cited references into four research areas around the two-agent loop">
         <defs>
           <marker id="arrow-ref" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
-            <path d="M0,0 L8,3 L0,6 z" fill="#7a1f24"/>
+            <path d="M0,0 L8,3 L0,6 z" fill="#1f5fcc"/>
           </marker>
         </defs>
 
-        <circle cx="360" cy="180" r="62" fill="#fffaf0" stroke="#7a1f24" stroke-width="1.6"/>
-        <text x="360" y="174" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-weight="700" font-size="13" fill="#7a1f24">Two-agent</text>
-        <text x="360" y="190" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-weight="700" font-size="13" fill="#7a1f24">loop</text>
-        <text x="360" y="208" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#7a1f24">this essay</text>
+        <circle cx="360" cy="180" r="62" fill="#fffaf0" stroke="#1f5fcc" stroke-width="1.6"/>
+        <text x="360" y="174" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-weight="700" font-size="13" fill="#1f5fcc">Two-agent</text>
+        <text x="360" y="190" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-weight="700" font-size="13" fill="#1f5fcc">loop</text>
+        <text x="360" y="208" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#1f5fcc">this essay</text>
 
         <rect x="20" y="40" width="200" height="100" rx="10" fill="#ecfeff" stroke="#67e8f9" stroke-width="1.4"/>
-        <text x="120" y="62" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-weight="700" font-size="13" fill="#0e7490">Multi-agent systems</text>
-        <text x="120" y="82" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#0e7490">role-based · pipelined</text>
-        <text x="120" y="100" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="10" fill="#1a1a1a">MetaGPT · ChatDev · AutoGen</text>
-        <text x="120" y="118" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="10" fill="#1a1a1a">Magentic-One · SWE-Agent</text>
-        <text x="120" y="134" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="10" fill="#1a1a1a">Aider Architect/Editor</text>
-        <line x1="220" y1="124" x2="305" y2="168" stroke="#7a1f24" stroke-width="1.2" marker-end="url(#arrow-ref)" opacity="0.6"/>
+        <text x="120" y="62" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-weight="700" font-size="13" fill="#0e7490">Multi-agent systems</text>
+        <text x="120" y="82" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#0e7490">role-based · pipelined</text>
+        <text x="120" y="100" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="10" fill="#1a1a1a">MetaGPT · ChatDev · AutoGen</text>
+        <text x="120" y="118" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="10" fill="#1a1a1a">Magentic-One · SWE-Agent</text>
+        <text x="120" y="134" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="10" fill="#1a1a1a">Aider Architect/Editor</text>
+        <line x1="220" y1="124" x2="305" y2="168" stroke="#1f5fcc" stroke-width="1.2" marker-end="url(#arrow-ref)" opacity="0.6"/>
 
         <rect x="500" y="40" width="200" height="100" rx="10" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.4"/>
-        <text x="600" y="62" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-weight="700" font-size="13" fill="#92400e">Iterative self-refinement</text>
-        <text x="600" y="82" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#92400e">feedback · debug · reflect</text>
-        <text x="600" y="100" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="10" fill="#1a1a1a">Self-Refine · Self-Debug</text>
-        <text x="600" y="118" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="10" fill="#1a1a1a">Reflexion · LATS · AlphaCodium</text>
-        <text x="600" y="134" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="10" fill="#1a1a1a">Cannot-Self-Correct · RLEF</text>
-        <line x1="500" y1="124" x2="416" y2="168" stroke="#7a1f24" stroke-width="1.2" marker-end="url(#arrow-ref)" opacity="0.6"/>
+        <text x="600" y="62" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-weight="700" font-size="13" fill="#92400e">Iterative self-refinement</text>
+        <text x="600" y="82" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#92400e">feedback · debug · reflect</text>
+        <text x="600" y="100" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="10" fill="#1a1a1a">Self-Refine · Self-Debug</text>
+        <text x="600" y="118" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="10" fill="#1a1a1a">Reflexion · LATS · AlphaCodium</text>
+        <text x="600" y="134" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="10" fill="#1a1a1a">Cannot-Self-Correct · RLEF</text>
+        <line x1="500" y1="124" x2="416" y2="168" stroke="#1f5fcc" stroke-width="1.2" marker-end="url(#arrow-ref)" opacity="0.6"/>
 
         <rect x="20" y="220" width="200" height="100" rx="10" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.4"/>
-        <text x="120" y="242" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-weight="700" font-size="13" fill="#5b21b6">Planning &amp; execution</text>
-        <text x="120" y="262" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#5b21b6">decompose · then act</text>
-        <text x="120" y="280" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="10" fill="#1a1a1a">Plan-and-Solve · ADaPT</text>
-        <text x="120" y="298" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="10" fill="#1a1a1a">ReWOO · LLMCompiler</text>
-        <text x="120" y="314" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="10" fill="#1a1a1a">GoalAct · Plan-and-Act</text>
-        <line x1="220" y1="240" x2="305" y2="196" stroke="#7a1f24" stroke-width="1.2" marker-end="url(#arrow-ref)" opacity="0.6"/>
+        <text x="120" y="242" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-weight="700" font-size="13" fill="#5b21b6">Planning &amp; execution</text>
+        <text x="120" y="262" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#5b21b6">decompose · then act</text>
+        <text x="120" y="280" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="10" fill="#1a1a1a">Plan-and-Solve · ADaPT</text>
+        <text x="120" y="298" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="10" fill="#1a1a1a">ReWOO · LLMCompiler</text>
+        <text x="120" y="314" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="10" fill="#1a1a1a">GoalAct · Plan-and-Act</text>
+        <line x1="220" y1="240" x2="305" y2="196" stroke="#1f5fcc" stroke-width="1.2" marker-end="url(#arrow-ref)" opacity="0.6"/>
 
         <rect x="500" y="220" width="200" height="100" rx="10" fill="#ecfdf5" stroke="#86efac" stroke-width="1.4"/>
-        <text x="600" y="242" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-weight="700" font-size="13" fill="#065f46">Context · termination · evals</text>
-        <text x="600" y="262" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#065f46">what to keep · what to cut</text>
-        <text x="600" y="280" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="10" fill="#1a1a1a">Lost in the Middle · JetBrains</text>
-        <text x="600" y="298" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="10" fill="#1a1a1a">SWE-bench · LiveCodeBench</text>
-        <text x="600" y="314" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="10" fill="#1a1a1a">FeatureBench · Failure Taxonomy</text>
-        <line x1="500" y1="240" x2="416" y2="196" stroke="#7a1f24" stroke-width="1.2" marker-end="url(#arrow-ref)" opacity="0.6"/>
+        <text x="600" y="242" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-weight="700" font-size="13" fill="#065f46">Context · termination · evals</text>
+        <text x="600" y="262" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#065f46">what to keep · what to cut</text>
+        <text x="600" y="280" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="10" fill="#1a1a1a">Lost in the Middle · JetBrains</text>
+        <text x="600" y="298" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="10" fill="#1a1a1a">SWE-bench · LiveCodeBench</text>
+        <text x="600" y="314" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="10" fill="#1a1a1a">FeatureBench · Failure Taxonomy</text>
+        <line x1="500" y1="240" x2="416" y2="196" stroke="#1f5fcc" stroke-width="1.2" marker-end="url(#arrow-ref)" opacity="0.6"/>
       </svg>
       <figcaption>Fifty-plus papers, four conversations. The two-agent loop sits at the intersection: it borrows the role split from multi-agent work, the iteration discipline from self-refinement, the decomposition habit from planning research, and the don't-bloat-the-context lesson from the long-context literature.</figcaption>
     </figure>

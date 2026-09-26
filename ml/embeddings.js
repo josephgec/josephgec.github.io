@@ -227,8 +227,8 @@
         if (i === 0) ctx.moveTo(pt[0], pt[1]); else ctx.lineTo(pt[0], pt[1]);
       });
       ctx.closePath();
-      ctx.fillStyle = 'rgba(122,31,36,0.04)';
-      ctx.strokeStyle = 'rgba(122,31,36,0.25)';
+      ctx.fillStyle = 'rgba(31,95,204,0.04)';
+      ctx.strokeStyle = 'rgba(31,95,204,0.25)';
       ctx.lineWidth = 1;
       ctx.setLineDash([3, 3]);
       ctx.fill();
@@ -237,20 +237,20 @@
       // Cluster label near top of hull
       const top = hull.reduce((a, b) => (b[1] < a[1] ? b : a));
       ctx.fillStyle = INK_FADE;
-      ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+      ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText(cl.name, top[0], top[1] - 4);
     });
   }
 
   function drawAxesAndGrid(ctx, size, p) {
-    ctx.strokeStyle = 'rgba(38,35,32,0.06)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.06)';
     ctx.lineWidth = 1;
     for (let i = -3; i <= 3; i++) {
       ctx.beginPath(); ctx.moveTo(p.tx(i), 0); ctx.lineTo(p.tx(i), size.h); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(0, p.ty(i)); ctx.lineTo(size.w, p.ty(i)); ctx.stroke();
     }
-    ctx.strokeStyle = 'rgba(38,35,32,0.18)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.18)';
     ctx.beginPath(); ctx.moveTo(0, p.ty(0)); ctx.lineTo(size.w, p.ty(0)); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(p.tx(0), 0); ctx.lineTo(p.tx(0), size.h); ctx.stroke();
   }
@@ -264,13 +264,13 @@
       const isBuilder = state.view === 'builder' && (w === state.builder.a || w === state.builder.b || w === state.builder.c);
       const isSelected = w === state.selected;
       const accent = isAnalogy || isBuilder || isSelected;
-      ctx.fillStyle = accent ? ACCENT : '#262320';
+      ctx.fillStyle = accent ? ACCENT : '#0f2238';
       ctx.beginPath();
       ctx.arc(px, py, accent ? 4 : 2.5, 0, Math.PI * 2);
       ctx.fill();
       const fontSize = accent ? 14 : 12;
-      ctx.font = `italic ${fontSize}px "Source Serif 4", Georgia, serif`;
-      ctx.fillStyle = accent ? ACCENT : '#262320';
+      ctx.font = `${fontSize}px "Bricolage Grotesque", system-ui, sans-serif`;
+      ctx.fillStyle = accent ? ACCENT : '#0f2238';
       const m = ctx.measureText(w);
       ctx.textAlign = 'left';
       ctx.fillText(w, px + 6, py + 4);
@@ -287,7 +287,7 @@
       const an = ANALOGIES[state.analogyKey];
       if (an && EMB[an.a] && EMB[an.b] && EMB[an.c] && EMB[an.expect]) {
         drawArrow(ctx, p.tx(EMB[an.b][0]), p.ty(EMB[an.b][1]),
-                  p.tx(EMB[an.a][0]), p.ty(EMB[an.a][1]), 'rgba(122,31,36,0.5)');
+                  p.tx(EMB[an.a][0]), p.ty(EMB[an.a][1]), 'rgba(31,95,204,0.5)');
         drawArrow(ctx, p.tx(EMB[an.c][0]), p.ty(EMB[an.c][1]),
                   p.tx(EMB[an.expect][0]), p.ty(EMB[an.expect][1]), ACCENT);
       }
@@ -305,12 +305,12 @@
     if (!a || !b || !c) {
       // hint
       ctx.fillStyle = INK_FADE;
-      ctx.font = 'italic 13px "Source Serif 4", Georgia, serif';
+      ctx.font = '13px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'center';
       const slot = !a ? 'A' : (!b ? 'B' : 'C');
       ctx.fillText(`click any word on the canvas to set ${slot}`, size.w / 2, size.h - 14);
       // Show what's picked
-      ctx.font = '11px "JetBrains Mono", monospace';
+      ctx.font = '11px "IBM Plex Mono", monospace';
       ctx.fillText(`A = ${a || '—'}     B = ${b || '—'}     C = ${c || '—'}`, size.w / 2, 22);
       return;
     }
@@ -322,7 +322,7 @@
     // Draw vector construction:
     //   start at C, add (A − B) → end at result
     //   visualize as: arrow from C to (C + (A − B))
-    ctx.strokeStyle = 'rgba(38,35,32,0.55)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.55)';
     ctx.lineWidth = 1.4;
     // (A − B) shown at origin → small dotted helper arrow on top of the canvas
     // Then the same delta moved from C
@@ -332,19 +332,19 @@
 
     // Faint arrow B → A as the "direction" being added
     drawArrow(ctx, p.tx(vb[0]), p.ty(vb[1]),
-              p.tx(va[0]), p.ty(va[1]), 'rgba(122,31,36,0.45)', 1.5);
+              p.tx(va[0]), p.ty(va[1]), 'rgba(31,95,204,0.45)', 1.5);
 
     // Result point
     ctx.fillStyle = INK;
     ctx.beginPath();
     ctx.arc(px1, py1, 6, 0, Math.PI * 2);
     ctx.fill();
-    ctx.strokeStyle = '#fffdf6';
+    ctx.strokeStyle = '#FCFEFF';
     ctx.lineWidth = 1.6;
     ctx.stroke();
     // Label
     ctx.fillStyle = INK;
-    ctx.font = 'italic 13px "Source Serif 4", Georgia, serif';
+    ctx.font = '13px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'left';
     ctx.fillText(`= ${a} − ${b} + ${c}`, px1 + 10, py1 - 6);
     ctx.fillStyle = ACCENT;
@@ -368,7 +368,7 @@
     const refWord = 'king';
     if (!state.hovered || !EMB[state.hovered] || state.hovered === refWord) {
       ctx.fillStyle = INK_FADE;
-      ctx.font = 'italic 13px "Source Serif 4", Georgia, serif';
+      ctx.font = '13px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText(`reference word: ${refWord} — hover any other word to see the angle`, size.w / 2, size.h - 14);
       return;
@@ -381,7 +381,7 @@
     ctx.beginPath(); ctx.arc(ox, oy, 3, 0, Math.PI * 2); ctx.fill();
 
     // draw two vectors as arrows from origin
-    drawArrow(ctx, ox, oy, p.tx(v1[0]), p.ty(v1[1]), 'rgba(38,35,32,0.65)', 1.5);
+    drawArrow(ctx, ox, oy, p.tx(v1[0]), p.ty(v1[1]), 'rgba(15,34,56,0.65)', 1.5);
     drawArrow(ctx, ox, oy, p.tx(v2[0]), p.ty(v2[1]), ACCENT, 1.8);
 
     // arc between them
@@ -405,14 +405,14 @@
     const labelY = oy + Math.sin(aMid) * (r + 18);
     const c = cosine(v1, v2);
     ctx.fillStyle = INK;
-    ctx.font = 'italic 13px "Source Serif 4", Georgia, serif';
+    ctx.font = '13px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText(`cos = ${c.toFixed(2)}`, labelX, labelY);
     // Math anchored to the picture: cosine equation next to the arc
-    ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+    ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.fillStyle = INK_FADE;
     ctx.fillText('cos θ = (a · b) / (‖a‖ ‖b‖)', labelX, labelY + 16);
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.fillStyle = INK_FADE;
     ctx.textAlign = 'center';
     ctx.fillText('1 = same dir, 0 = ⊥, −1 = opposite', size.w / 2, size.h - 14);

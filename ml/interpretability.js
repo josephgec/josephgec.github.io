@@ -171,15 +171,15 @@
 
     // Title
     ctx.fillStyle = INK_FADE;
-    ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+    ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'left';
     const sub = isWhatIf ? ' · what-if · toggles in left rail' : ' · sorted by |φᵢ|';
     ctx.fillText(`SHAP waterfall · ${c.label}${sub}`, padX, 18);
 
     // Math anchored to the picture: f(x) = E[f(x)] + Σ φᵢ — the accounting identity
     // that the waterfall is literally drawing, sitting right above the bars.
-    ctx.fillStyle = '#262320';
-    ctx.font = '11px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#0f2238';
+    ctx.font = '11px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left';
     ctx.fillText('f(x) = E[f(x)] + Σ φᵢ', padX, 34);
 
@@ -189,10 +189,10 @@
       const legX0 = size.w - padX - 200;
       const legY0 = 12;
       const items = [
-        { color: 'rgba(122,31,36,0.7)', label: '+ φᵢ pushes up' },
-        { color: 'rgba(38,35,32,0.55)', label: '− φᵢ pushes down' },
+        { color: 'rgba(31,95,204,0.7)', label: '+ φᵢ pushes up' },
+        { color: 'rgba(15,34,56,0.55)', label: '− φᵢ pushes down' },
       ];
-      ctx.font = 'italic 10px "Source Serif 4", Georgia, serif';
+      ctx.font = '10px "Bricolage Grotesque", system-ui, sans-serif';
       items.forEach((it, i) => {
         const xx = legX0 + i * 100;
         ctx.fillStyle = it.color;
@@ -211,8 +211,8 @@
       c.features.forEach((f, i) => { if (en[i]) toggledPred += f.shap; });
       const delta = toggledPred - fullPred;
       const onCount = en.filter(Boolean).length;
-      ctx.fillStyle = 'rgba(38,35,32,0.65)';
-      ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+      ctx.fillStyle = 'rgba(15,34,56,0.65)';
+      ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'left';
       const sign = delta > 0 ? '+' : '';
       ctx.fillText(
@@ -222,12 +222,12 @@
     }
 
     // X axis ticks (vertical guidelines)
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.fillStyle = INK_FADE;
     [0, 0.25, 0.5, 0.75, 1].forEach((v) => {
       ctx.textAlign = 'center';
       ctx.fillText(v.toFixed(2), tx(v), size.h - padBot + 16);
-      ctx.strokeStyle = 'rgba(38,35,32,0.10)';
+      ctx.strokeStyle = 'rgba(15,34,56,0.10)';
       ctx.beginPath();
       ctx.moveTo(tx(v), padTop); ctx.lineTo(tx(v), size.h - padBot);
       ctx.stroke();
@@ -239,34 +239,34 @@
     function drawRow(label, value, prevAcc, contribution, rowIdx, kind, isOff) {
       const y = padTop + rowIdx * rowH + rowH / 2;
       // Feature label
-      ctx.fillStyle = isOff ? 'rgba(38,35,32,0.40)' : '#262320';
-      ctx.font = 'italic 13px "Source Serif 4", Georgia, serif';
+      ctx.fillStyle = isOff ? 'rgba(15,34,56,0.40)' : '#0f2238';
+      ctx.font = '13px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'left';
       ctx.fillText((isOff ? '∅ ' : '') + label, padX, y - 4);
       if (value) {
         ctx.fillStyle = INK_FADE;
-        ctx.font = '11px "JetBrains Mono", monospace';
+        ctx.font = '11px "IBM Plex Mono", monospace';
         ctx.fillText(value, padX, y + 12);
       }
       // Bar
       if (kind === 'baseline' || kind === 'final') {
-        ctx.fillStyle = kind === 'final' ? 'rgba(122,31,36,0.5)' : 'rgba(38,35,32,0.45)';
+        ctx.fillStyle = kind === 'final' ? 'rgba(31,95,204,0.5)' : 'rgba(15,34,56,0.45)';
         const h = 6;
         const endX = tx(prevAcc + (contribution || 0));
         ctx.fillRect(plotX0, y - h / 2, endX - plotX0, h);
         // Marker
-        ctx.fillStyle = kind === 'final' ? '#7a1f24' : '#262320';
+        ctx.fillStyle = kind === 'final' ? '#1f5fcc' : '#0f2238';
         ctx.beginPath();
         ctx.arc(endX, y, 4, 0, Math.PI * 2);
         ctx.fill();
         // Numeric label at end
-        ctx.fillStyle = '#262320';
-        ctx.font = '11px "JetBrains Mono", monospace';
+        ctx.fillStyle = '#0f2238';
+        ctx.font = '11px "IBM Plex Mono", monospace';
         ctx.textAlign = 'left';
         ctx.fillText(formatNum(prevAcc + (contribution || 0)), endX + 6, y + 4);
       } else if (isOff) {
         // Faded skipped row — show what would have been pushed, but don't accumulate.
-        ctx.strokeStyle = 'rgba(38,35,32,0.25)';
+        ctx.strokeStyle = 'rgba(15,34,56,0.25)';
         ctx.lineWidth = 1;
         ctx.setLineDash([2, 3]);
         const fromX = tx(prevAcc);
@@ -276,20 +276,20 @@
         ctx.lineTo(toX, y);
         ctx.stroke();
         ctx.setLineDash([]);
-        ctx.fillStyle = 'rgba(38,35,32,0.40)';
-        ctx.font = '10px "JetBrains Mono", monospace';
+        ctx.fillStyle = 'rgba(15,34,56,0.40)';
+        ctx.font = '10px "IBM Plex Mono", monospace';
         ctx.textAlign = 'center';
         ctx.fillText(`(off · ${contribution > 0 ? '+' : ''}${formatNum(contribution)})`, (fromX + toX) / 2, y + 4);
       } else {
         const fromX = tx(prevAcc);
         const toX = tx(prevAcc + contribution);
-        ctx.fillStyle = contribution > 0 ? 'rgba(122,31,36,0.7)' : 'rgba(38,35,32,0.55)';
+        ctx.fillStyle = contribution > 0 ? 'rgba(31,95,204,0.7)' : 'rgba(15,34,56,0.55)';
         const h = 18;
         const x = Math.min(fromX, toX);
         const w = Math.abs(toX - fromX);
         ctx.fillRect(x, y - h / 2, w, h);
         // Light arrow indicating direction
-        ctx.strokeStyle = '#fffdf6';
+        ctx.strokeStyle = '#FCFEFF';
         ctx.lineWidth = 1.2;
         ctx.beginPath();
         if (contribution > 0) {
@@ -299,13 +299,13 @@
         }
         ctx.stroke();
         // Value label
-        ctx.fillStyle = '#fffdf6';
-        ctx.font = '10px "JetBrains Mono", monospace';
+        ctx.fillStyle = '#FCFEFF';
+        ctx.font = '10px "IBM Plex Mono", monospace';
         ctx.textAlign = 'center';
         if (w > 32) {
           ctx.fillText(`${contribution > 0 ? '+' : ''}${formatNum(contribution)}`, (fromX + toX) / 2, y + 4);
         } else {
-          ctx.fillStyle = '#262320';
+          ctx.fillStyle = '#0f2238';
           ctx.fillText(`${contribution > 0 ? '+' : ''}${formatNum(contribution)}`,
             contribution > 0 ? toX + 18 : toX - 18, y + 4);
         }
@@ -341,19 +341,19 @@
     const cx = plotX0 + plotW / 2;
 
     ctx.fillStyle = INK_FADE;
-    ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+    ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'left';
     ctx.fillText(`LIME local coefficients · ${c.label} · sorted by |coefficient|`, padX, 18);
 
     // Center axis
-    ctx.strokeStyle = 'rgba(38,35,32,0.30)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.30)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(cx, padTop); ctx.lineTo(cx, size.h - padBot);
     ctx.stroke();
 
     // Center axis label
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.fillStyle = INK_FADE;
     ctx.textAlign = 'center';
     ctx.fillText('0', cx, size.h - padBot + 14);
@@ -364,21 +364,21 @@
 
     sorted.forEach((f, i) => {
       const y = padTop + i * rowH + rowH / 2;
-      ctx.fillStyle = '#262320';
-      ctx.font = 'italic 13px "Source Serif 4", Georgia, serif';
+      ctx.fillStyle = '#0f2238';
+      ctx.font = '13px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'left';
       ctx.fillText(f.name, padX, y - 4);
       ctx.fillStyle = INK_FADE;
-      ctx.font = '11px "JetBrains Mono", monospace';
+      ctx.font = '11px "IBM Plex Mono", monospace';
       ctx.fillText(f.value, padX, y + 12);
 
       const w = (Math.abs(f.shap) / maxAbs) * (plotW / 2 - 8);
       const x = f.shap >= 0 ? cx : cx - w;
-      ctx.fillStyle = f.shap >= 0 ? 'rgba(122,31,36,0.7)' : 'rgba(38,35,32,0.55)';
+      ctx.fillStyle = f.shap >= 0 ? 'rgba(31,95,204,0.7)' : 'rgba(15,34,56,0.55)';
       ctx.fillRect(x, y - 8, w, 16);
 
-      ctx.fillStyle = '#262320';
-      ctx.font = '11px "JetBrains Mono", monospace';
+      ctx.fillStyle = '#0f2238';
+      ctx.font = '11px "IBM Plex Mono", monospace';
       ctx.textAlign = f.shap >= 0 ? 'left' : 'right';
       ctx.fillText(`${f.shap > 0 ? '+' : ''}${formatNum(f.shap)}`,
         f.shap >= 0 ? x + w + 4 : x - 4, y + 4);

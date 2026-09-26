@@ -257,7 +257,7 @@
 
     // Phase header
     ctx.fillStyle = INK_FADE;
-    ctx.font = '11px "JetBrains Mono", monospace';
+    ctx.font = '11px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left';
     const phaseDescription = {
       idle:      state.distribution === 'non-iid'
@@ -277,7 +277,7 @@
       const keyY = 34;               // own line, below the phase header
       const keyX0 = padX;            // left-aligned so it clears the loss panel on the right
       // White packet swatch
-      ctx.fillStyle = '#fffdf6';
+      ctx.fillStyle = '#FCFEFF';
       ctx.strokeStyle = ACCENT;
       ctx.lineWidth = 1.2;
       ctx.beginPath();
@@ -285,7 +285,7 @@
       ctx.fill();
       ctx.stroke();
       ctx.fillStyle = INK_FADE;
-      ctx.font = 'italic 10px "Source Serif 4", Georgia, serif';
+      ctx.font = '10px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'left';
       ctx.fillText('w (down)', keyX0 + 8, keyY + 3);
       // Orange packet swatch
@@ -296,8 +296,8 @@
       ctx.fillStyle = INK_FADE;
       ctx.fillText('Δw (up)', keyX0 + 78, keyY + 3);
       // Note: data stays local
-      ctx.fillStyle = 'rgba(122,31,36,0.65)';
-      ctx.font = 'italic 10px "Source Serif 4", Georgia, serif';
+      ctx.fillStyle = 'rgba(31,95,204,0.65)';
+      ctx.font = '10px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.fillText('(raw data never leaves the client)', keyX0 + 130, keyY + 3);
     }
 
@@ -307,15 +307,15 @@
     ctx.beginPath();
     ctx.arc(serverCx, serverY, 28, 0, Math.PI * 2);
     ctx.fill();
-    ctx.strokeStyle = '#fffdf6';
+    ctx.strokeStyle = '#FCFEFF';
     ctx.lineWidth = 2;
     ctx.stroke();
-    ctx.fillStyle = '#fffdf6';
-    ctx.font = '11px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#FCFEFF';
+    ctx.font = '11px "IBM Plex Mono", monospace';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText('server', serverCx, serverY - 4);
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.fillText(`w=${formatNum(state.serverW)}`, serverCx, serverY + 8);
     ctx.textBaseline = 'alphabetic';
 
@@ -336,7 +336,7 @@
     // Background connection lines — always drawn very faint
     state.clients.forEach((c, i) => {
       const { cx, cy } = clientPositions[i];
-      ctx.strokeStyle = 'rgba(38,35,32,0.10)';
+      ctx.strokeStyle = 'rgba(15,34,56,0.10)';
       ctx.lineWidth = 0.5;
       ctx.beginPath();
       ctx.moveTo(serverCx, serverY + 28);
@@ -354,7 +354,7 @@
         const px = lerp(sx, ex, phaseTE);
         const py = lerp(sy, ey, phaseTE);
         // Packet
-        ctx.fillStyle = '#fffdf6';
+        ctx.fillStyle = '#FCFEFF';
         ctx.strokeStyle = ACCENT;
         ctx.lineWidth = 1.4;
         ctx.beginPath();
@@ -362,7 +362,7 @@
         ctx.fill();
         ctx.stroke();
         // Trailing dim line
-        ctx.strokeStyle = 'rgba(122,31,36,0.30)';
+        ctx.strokeStyle = 'rgba(31,95,204,0.30)';
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.moveTo(sx, sy);
@@ -377,7 +377,7 @@
         if (state.roundDropped[i]) return;
         const { cx, cy } = clientPositions[i];
         const pulse = 0.5 + 0.5 * Math.sin(state.phaseFrame * 0.6);
-        ctx.strokeStyle = `rgba(122,31,36,${0.25 + 0.5 * pulse})`;
+        ctx.strokeStyle = `rgba(31,95,204,${0.25 + 0.5 * pulse})`;
         ctx.lineWidth = 1.5;
         ctx.beginPath();
         ctx.arc(cx, cy, 22 + pulse * 4, 0, Math.PI * 2);
@@ -409,7 +409,7 @@
         ctx.arc(px + jx, py + jy, 4, 0, Math.PI * 2);
         ctx.fill();
         // Trail
-        ctx.strokeStyle = 'rgba(122,31,36,0.50)';
+        ctx.strokeStyle = 'rgba(31,95,204,0.50)';
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.moveTo(sx, sy);
@@ -417,7 +417,7 @@
         ctx.stroke();
         // If DP enabled, draw a tiny "+noise" wisp around the source
         if (state.dpSigma > 0 && phaseT < 0.3) {
-          ctx.strokeStyle = 'rgba(38,35,32,0.40)';
+          ctx.strokeStyle = 'rgba(15,34,56,0.40)';
           ctx.lineWidth = 0.6;
           ctx.beginPath();
           ctx.arc(sx, sy, 6 + Math.sin(state.phaseFrame * 0.8) * 2, 0, Math.PI * 2);
@@ -444,7 +444,7 @@
         // Single white packet emerging
         const t = (phaseT - 0.5) * 2;
         const r = t * 36;
-        ctx.fillStyle = '#fffdf6';
+        ctx.fillStyle = '#FCFEFF';
         ctx.strokeStyle = ACCENT;
         ctx.lineWidth = 1.4;
         ctx.beginPath();
@@ -452,21 +452,21 @@
         ctx.fill();
         ctx.stroke();
         // Outward ring
-        ctx.strokeStyle = `rgba(122,31,36,${1 - t})`;
+        ctx.strokeStyle = `rgba(31,95,204,${1 - t})`;
         ctx.lineWidth = 1.5;
         ctx.beginPath();
         ctx.arc(serverCx, serverY, r, 0, Math.PI * 2);
         ctx.stroke();
       }
       // Label
-      ctx.fillStyle = 'rgba(38,35,32,0.55)';
-      ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+      ctx.fillStyle = 'rgba(15,34,56,0.55)';
+      ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('weighted average', serverCx, serverY - 44);
       // FedAvg formula anchored to the picture: at the moment of aggregation,
       // show the equation the server is literally executing.
-      ctx.fillStyle = '#262320';
-      ctx.font = '11px "JetBrains Mono", monospace';
+      ctx.fillStyle = '#0f2238';
+      ctx.font = '11px "IBM Plex Mono", monospace';
       ctx.fillText('w ← Σₖ (nₖ / n) · wₖ', serverCx, serverY - 56);
     }
 
@@ -482,7 +482,7 @@
       const peakBin = c.hist.indexOf(Math.max(...c.hist));
       const cloudColor = state.distribution === 'non-iid'
         ? `hsla(${(peakBin / 5) * 300 + 10}, 38%, 35%, ${dropped ? 0.18 : 0.55})`
-        : `rgba(38,35,32,${dropped ? 0.18 : 0.45})`;
+        : `rgba(15,34,56,${dropped ? 0.18 : 0.45})`;
       ctx.fillStyle = cloudColor;
       c.dots.forEach((d) => {
         ctx.beginPath();
@@ -493,16 +493,16 @@
       // Client circle (drawn ON TOP of dots so the circle visually "owns" them).
       ctx.save();
       ctx.globalAlpha = dropped ? 0.35 : 1;
-      ctx.fillStyle = 'rgba(38,35,32,0.20)';
+      ctx.fillStyle = 'rgba(15,34,56,0.20)';
       ctx.beginPath();
       ctx.arc(cx, cy, 18, 0, Math.PI * 2);
       ctx.fill();
-      ctx.strokeStyle = 'rgba(38,35,32,0.50)';
+      ctx.strokeStyle = 'rgba(15,34,56,0.50)';
       ctx.lineWidth = 1;
       ctx.stroke();
       // ID
-      ctx.fillStyle = '#262320';
-      ctx.font = '10px "JetBrains Mono", monospace';
+      ctx.fillStyle = '#0f2238';
+      ctx.font = '10px "IBM Plex Mono", monospace';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(`C${i + 1}`, cx, cy);
@@ -510,20 +510,20 @@
 
       // Dropped X mark + label
       if (dropped) {
-        ctx.strokeStyle = 'rgba(38,35,32,0.65)';
+        ctx.strokeStyle = 'rgba(15,34,56,0.65)';
         ctx.lineWidth = 1.5;
         ctx.beginPath();
         ctx.moveTo(cx - 14, cy - 14); ctx.lineTo(cx + 14, cy + 14);
         ctx.moveTo(cx + 14, cy - 14); ctx.lineTo(cx - 14, cy + 14);
         ctx.stroke();
-        ctx.fillStyle = 'rgba(38,35,32,0.65)';
-        ctx.font = '9px "JetBrains Mono", monospace';
+        ctx.fillStyle = 'rgba(15,34,56,0.65)';
+        ctx.font = '9px "IBM Plex Mono", monospace';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'alphabetic';
         ctx.fillText('offline', cx, cy + 32);
       } else {
         ctx.fillStyle = INK_FADE;
-        ctx.font = '9px "JetBrains Mono", monospace';
+        ctx.font = '9px "IBM Plex Mono", monospace';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'alphabetic';
         ctx.fillText(`n_k=${c.dataSize}`, cx, cy + 32);
@@ -536,7 +536,7 @@
       const binW = histW / 5;
       const histX = cx - histW / 2;
       // Frame
-      ctx.strokeStyle = 'rgba(38,35,32,0.20)';
+      ctx.strokeStyle = 'rgba(15,34,56,0.20)';
       ctx.lineWidth = 0.6;
       ctx.strokeRect(histX, histY, histW, histH);
       // Bars
@@ -544,13 +544,13 @@
       for (let b = 0; b < 5; b++) {
         const bh = (c.hist[b] / maxBin) * (histH - 2);
         ctx.fillStyle = dropped
-          ? 'rgba(38,35,32,0.20)'
-          : (state.distribution === 'non-iid' ? 'rgba(122,31,36,0.50)' : 'rgba(38,35,32,0.55)');
+          ? 'rgba(15,34,56,0.20)'
+          : (state.distribution === 'non-iid' ? 'rgba(31,95,204,0.50)' : 'rgba(15,34,56,0.55)');
         ctx.fillRect(histX + b * binW + 1, histY + (histH - bh) - 1, binW - 2, bh);
       }
       // Histogram label
       ctx.fillStyle = INK_FADE;
-      ctx.font = '8px "JetBrains Mono", monospace';
+      ctx.font = '8px "IBM Plex Mono", monospace';
       ctx.textAlign = 'center';
       ctx.fillText('local data', cx, histY + histH + 10);
 
@@ -562,8 +562,8 @@
           (s, cc, ii) => s + (state.roundDropped[ii] ? 0 : cc.dataSize), 0
         );
         const w_i = liveTotal > 0 ? c.dataSize / liveTotal : 0;
-        ctx.fillStyle = 'rgba(122,31,36,0.85)';
-        ctx.font = 'italic 10px "Source Serif 4", Georgia, serif';
+        ctx.fillStyle = 'rgba(31,95,204,0.85)';
+        ctx.font = '10px "Bricolage Grotesque", system-ui, sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText(`weight ${(w_i * 100).toFixed(0)}%`, cx, histY + histH + 22);
       }
@@ -572,11 +572,11 @@
     // ─── Loss curve (right pane) ────────────────────────────────────
     const lossPaneY = 50;
     const lossPaneH = size.h - lossPaneY - 30;
-    ctx.strokeStyle = 'rgba(38,35,32,0.30)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.30)';
     ctx.lineWidth = 1;
     ctx.strokeRect(lossPaneX, lossPaneY, lossPaneW, lossPaneH);
     ctx.fillStyle = INK_FADE;
-    ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+    ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'left';
     ctx.fillText('global loss / round', lossPaneX, lossPaneY - 6);
 
@@ -593,7 +593,7 @@
       ctx.stroke();
       // Y/X axis labels
       ctx.fillStyle = INK_FADE;
-      ctx.font = '10px "JetBrains Mono", monospace';
+      ctx.font = '10px "IBM Plex Mono", monospace';
       ctx.textAlign = 'right';
       ctx.fillText(formatNum(maxL), lossPaneX - 4, lossPaneY + 10);
       ctx.fillText('0', lossPaneX - 4, lossPaneY + lossPaneH);
@@ -602,21 +602,21 @@
       ctx.fillText(`round = ${state.round}`, lossPaneX + 6, lossPaneY + lossPaneH - 22);
     } else {
       ctx.fillStyle = INK_FADE;
-      ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+      ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('no rounds yet', lossPaneX + lossPaneW / 2, lossPaneY + lossPaneH / 2);
     }
 
     // DP / non-IID banner under loss pane (small status indicators)
     let yBan = lossPaneY + lossPaneH + 14;
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left';
     if (state.dpSigma > 0) {
-      ctx.fillStyle = 'rgba(122,31,36,0.85)';
+      ctx.fillStyle = 'rgba(31,95,204,0.85)';
       ctx.fillText(`DP σ = ${state.dpSigma.toFixed(2)}`, lossPaneX, yBan);
     }
     if (state.distribution === 'non-iid') {
-      ctx.fillStyle = 'rgba(122,31,36,0.85)';
+      ctx.fillStyle = 'rgba(31,95,204,0.85)';
       ctx.fillText('non-IID', lossPaneX + 80, yBan);
     }
   }

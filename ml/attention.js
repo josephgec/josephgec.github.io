@@ -127,7 +127,7 @@
     const barBottom = size.h - 30;
     const barH = barBottom - barTop;
 
-    ctx.font = 'italic 22px "Source Serif 4", Georgia, serif';
+    ctx.font = '22px "Bricolage Grotesque", system-ui, sans-serif';
     const widths = words.map((w) => ctx.measureText(w).width);
     const gap = 18;
     const totalW = widths.reduce((a, b) => a + b, 0) + gap * (words.length - 1);
@@ -143,10 +143,10 @@
       const colW = wr.w + gap - 8;
       const barX = wr.x + (wr.w - colW) / 2 + 4;
       const h = wt * barH;
-      ctx.fillStyle = i === state.qIdx ? ACCENT : `rgba(122,31,36,${0.12 + wt * 0.6})`;
+      ctx.fillStyle = i === state.qIdx ? ACCENT : `rgba(31,95,204,${0.12 + wt * 0.6})`;
       ctx.fillRect(barX, barBottom - h, colW, h);
       ctx.fillStyle = INK_FADE;
-      ctx.font = '11px "JetBrains Mono", monospace';
+      ctx.font = '11px "IBM Plex Mono", monospace';
       ctx.textAlign = 'center';
       ctx.fillText((wt * 100).toFixed(0) + '%', barX + colW / 2, barBottom + 14);
       // Hit rect = full column (word label + bar) so users can click anywhere
@@ -156,14 +156,14 @@
     words.forEach((w, i) => {
       const wr = wordRects[i];
       const isQuery = i === state.qIdx;
-      ctx.font = `${isQuery ? 'italic ' : ''}22px "Source Serif 4", Georgia, serif`;
+      ctx.font = `${isQuery ? 'italic ' : ''}22px "Bricolage Grotesque", system-ui, sans-serif`;
       ctx.fillStyle = isQuery ? ACCENT : INK;
       ctx.textAlign = 'left';
       ctx.fillText(w, wr.x + 4, wordY);
     });
 
     ctx.fillStyle = INK_FADE;
-    ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+    ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('attention from "' + words[state.qIdx] + '" → others (softmax of dot products)', size.w / 2, 22);
   }
@@ -175,7 +175,7 @@
 
     // Title
     ctx.fillStyle = INK_FADE;
-    ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+    ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('softmax(Q·Kᵀ/√d) — every query (row) attending to every key (col)', size.w / 2, 22);
 
@@ -193,20 +193,20 @@
     const y0 = padTop;
 
     // Faint grid background
-    ctx.fillStyle = 'rgba(38,35,32,0.03)';
+    ctx.fillStyle = 'rgba(15,34,56,0.03)';
     ctx.fillRect(x0, y0, matW, matH);
 
     // Cells
     for (let r = 0; r < N; r++) {
       for (let c = 0; c < N; c++) {
         const wt = allWeights[r][c];
-        ctx.fillStyle = `rgba(122,31,36,${0.06 + wt * 0.9})`;
+        ctx.fillStyle = `rgba(31,95,204,${0.06 + wt * 0.9})`;
         ctx.fillRect(x0 + c * cell + 1, y0 + r * cell + 1, cell - 2, cell - 2);
       }
     }
 
     // Row labels (italic, right-aligned), and capture row hit rects
-    ctx.font = 'italic 13px "Source Serif 4", Georgia, serif';
+    ctx.font = '13px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textBaseline = 'middle';
     words.forEach((w, r) => {
       const cy = y0 + r * cell + cell / 2;
@@ -217,7 +217,7 @@
     });
 
     // Column labels (rotated -45° above the matrix)
-    ctx.font = 'italic 13px "Source Serif 4", Georgia, serif';
+    ctx.font = '13px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textBaseline = 'alphabetic';
     words.forEach((w, c) => {
       const cx = x0 + c * cell + cell / 2;
@@ -237,7 +237,7 @@
 
     // Tiny axis labels
     ctx.fillStyle = INK_FADE;
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'alphabetic';
     ctx.save();
@@ -255,14 +255,14 @@
     const legY = y0 + matH + 18;
     for (let i = 0; i < legW; i++) {
       const t = i / legW;
-      ctx.fillStyle = `rgba(122,31,36,${0.06 + t * 0.9})`;
+      ctx.fillStyle = `rgba(31,95,204,${0.06 + t * 0.9})`;
       ctx.fillRect(legX + i, legY, 1, legH);
     }
-    ctx.strokeStyle = 'rgba(38,35,32,0.25)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.25)';
     ctx.lineWidth = 1;
     ctx.strokeRect(legX, legY, legW, legH);
     ctx.fillStyle = INK_FADE;
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left';
     ctx.fillText('0', legX, legY + legH + 12);
     ctx.textAlign = 'right';
@@ -270,7 +270,7 @@
     ctx.textAlign = 'center';
     ctx.fillText('weight', legX + legW / 2, legY + legH + 12);
 
-    ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+    ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'left';
     ctx.fillStyle = INK_FADE;
     ctx.fillText('click any row to make that word the query', x0, legY + legH + 12);
@@ -280,17 +280,17 @@
   function drawBlend(ctx, size, words, weights) {
     // Title
     ctx.fillStyle = INK_FADE;
-    ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+    ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('output = Σᵢ weightᵢ · valueᵢ — what the query becomes after attention', size.w / 2, 22);
 
     // Query header
     ctx.fillStyle = INK_FADE;
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'center';
     ctx.fillText('QUERY', size.w / 2, 52);
     ctx.fillStyle = ACCENT;
-    ctx.font = 'italic 30px "Source Serif 4", Georgia, serif';
+    ctx.font = '30px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.fillText('"' + words[state.qIdx] + '"', size.w / 2, 86);
 
     // Stacked bar — each segment = one key's contribution
@@ -313,26 +313,26 @@
     segLayout.forEach((seg) => {
       const isQ = seg.i === state.qIdx;
       ctx.fillStyle = isQ
-        ? 'rgba(122,31,36,0.85)'
-        : `rgba(122,31,36,${0.18 + seg.wt * 0.55})`;
+        ? 'rgba(31,95,204,0.85)'
+        : `rgba(31,95,204,${0.18 + seg.wt * 0.55})`;
       ctx.fillRect(seg.x, barTop, seg.w, barH);
 
       hitRects.push({ x: seg.x, y: barTop, w: seg.w, h: barH, qIdx: seg.i });
 
       // Inline label if there's room
       if (seg.w > 42) {
-        ctx.fillStyle = (seg.wt > 0.25 || isQ) ? '#fffdf6' : INK;
-        ctx.font = 'italic 14px "Source Serif 4", Georgia, serif';
+        ctx.fillStyle = (seg.wt > 0.25 || isQ) ? '#FCFEFF' : INK;
+        ctx.font = '14px "Bricolage Grotesque", system-ui, sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(seg.word, seg.x + seg.w / 2, barTop + barH / 2 - 8);
-        ctx.font = '11px "JetBrains Mono", monospace';
+        ctx.font = '11px "IBM Plex Mono", monospace';
         ctx.fillText((seg.wt * 100).toFixed(0) + '%', seg.x + seg.w / 2, barTop + barH / 2 + 10);
       }
     });
 
     // Outer border
-    ctx.strokeStyle = 'rgba(38,35,32,0.35)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.35)';
     ctx.lineWidth = 1;
     ctx.strokeRect(barLeft, barTop, barW, barH);
 
@@ -348,7 +348,7 @@
       ctx.lineTo(cx, barTop + barH + 10);
       ctx.stroke();
       ctx.fillStyle = INK_FADE;
-      ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+      ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText(seg.word, cx, barTop + barH + 12);
     });
@@ -362,12 +362,12 @@
     const remainder = 1 - top3.reduce((s, p) => s + p.w, 0);
 
     ctx.fillStyle = INK_FADE;
-    ctx.font = '11px "JetBrains Mono", monospace';
+    ctx.font = '11px "IBM Plex Mono", monospace';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'alphabetic';
     ctx.fillText('READING THE BAR', size.w / 2, eqY - 22);
 
-    ctx.font = 'italic 16px "Source Serif 4", Georgia, serif';
+    ctx.font = '16px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.fillStyle = INK;
     let parts = top3.map((p) => `${(p.w * 100).toFixed(0)}% × ${p.word}`);
     if (remainder > 0.01) parts.push(`${(remainder * 100).toFixed(0)}% × rest`);
@@ -375,7 +375,7 @@
     ctx.fillText(eqText, size.w / 2, eqY);
 
     // Hint
-    ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+    ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.fillStyle = INK_FADE;
     ctx.fillText('click any segment to make that word the query', size.w / 2, size.h - 14);
   }

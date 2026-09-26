@@ -179,7 +179,7 @@
     // ── Unit circle: where every input direction lives ──
     const [cx, cy] = toPx([0, 0]);
     const scl = toPx([1, 0])[0] - cx;
-    ctx.strokeStyle = 'rgba(38,35,32,0.30)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.30)';
     ctx.lineWidth = 1;
     ctx.setLineDash([2, 4]);
     ctx.beginPath();
@@ -188,7 +188,7 @@
     ctx.setLineDash([]);
 
     // ── Image of the unit circle under M (always an ellipse, possibly degenerate) ──
-    ctx.strokeStyle = 'rgba(38,35,32,0.55)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.55)';
     ctx.lineWidth = 1.5;
     ctx.beginPath();
     for (let t = 0; t <= Math.PI * 2 + 0.01; t += 0.02) {
@@ -205,20 +205,20 @@
       const a = (k / N) * Math.PI * 2;
       const v = [Math.cos(a), Math.sin(a)];
       const Mv = mul(M, v);
-      ctx.strokeStyle = 'rgba(38,35,32,0.22)';
+      ctx.strokeStyle = 'rgba(15,34,56,0.22)';
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(...toPx(v));
       ctx.lineTo(...toPx(Mv));
       ctx.stroke();
 
-      ctx.fillStyle = 'rgba(38,35,32,0.40)';
+      ctx.fillStyle = 'rgba(15,34,56,0.40)';
       const [pvx, pvy] = toPx(v);
       ctx.beginPath();
       ctx.arc(pvx, pvy, 2, 0, Math.PI * 2);
       ctx.fill();
 
-      ctx.fillStyle = 'rgba(38,35,32,0.70)';
+      ctx.fillStyle = 'rgba(15,34,56,0.70)';
       const [pmx, pmy] = toPx(Mv);
       ctx.beginPath();
       ctx.arc(pmx, pmy, 2.6, 0, Math.PI * 2);
@@ -269,12 +269,12 @@
       ctx.translate(eqPx, eqPy);
       ctx.rotate(ang);
       ctx.fillStyle = ACCENT;
-      ctx.font = 'italic 15px "Source Serif 4", Georgia, serif';
+      ctx.font = '15px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText('A v = λ v', 0, 0);
-      ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
-      ctx.fillStyle = 'rgba(122,31,36,0.7)';
+      ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
+      ctx.fillStyle = 'rgba(31,95,204,0.7)';
       ctx.fillText('no rotation — only stretch', 0, 18);
       ctx.restore();
     } else {
@@ -285,7 +285,7 @@
       for (let k = 0; k < N2; k++) {
         const a = (k / N2) * Math.PI * 2;
         let v = [Math.cos(a) * 0.7, Math.sin(a) * 0.7];
-        ctx.strokeStyle = 'rgba(122,31,36,0.45)';
+        ctx.strokeStyle = 'rgba(31,95,204,0.45)';
         ctx.lineWidth = 1.2;
         ctx.beginPath();
         ctx.moveTo(...toPx(v));
@@ -302,10 +302,10 @@
         ctx.fill();
       }
       ctx.fillStyle = ACCENT;
-      ctx.font = 'italic 14px "Source Serif 4", Georgia, serif';
+      ctx.font = '14px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('every direction rotates — no real eigenvector', size.w / 2, 28);
-      ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+      ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.fillStyle = INK_FADE;
       ctx.fillText('λ is complex; vectors trace spirals instead of staying on a line', size.w / 2, 46);
     }
@@ -322,24 +322,24 @@
     const legY = 14;
     const legW = 178;
     const legH = eigs.length ? 78 : 60;
-    ctx.fillStyle = 'rgba(255,253,246,0.92)';
-    ctx.strokeStyle = 'rgba(38,35,32,0.30)';
+    ctx.fillStyle = 'rgba(252,254,255,0.92)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.30)';
     ctx.lineWidth = 1;
     ctx.fillRect(legX, legY, legW, legH);
     ctx.strokeRect(legX, legY, legW, legH);
     ctx.fillStyle = INK_FADE;
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'alphabetic';
     ctx.fillText('LEGEND', legX + 8, legY + 14);
     // small dot = input direction v
-    ctx.fillStyle = 'rgba(38,35,32,0.40)';
+    ctx.fillStyle = 'rgba(15,34,56,0.40)';
     ctx.beginPath(); ctx.arc(legX + 18, legY + 30, 2, 0, Math.PI*2); ctx.fill();
     ctx.fillStyle = INK_FADE;
-    ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+    ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.fillText('input  v  on unit circle', legX + 30, legY + 33);
     // bigger dot = Mv
-    ctx.fillStyle = 'rgba(38,35,32,0.70)';
+    ctx.fillStyle = 'rgba(15,34,56,0.70)';
     ctx.beginPath(); ctx.arc(legX + 18, legY + 47, 2.6, 0, Math.PI*2); ctx.fill();
     ctx.fillStyle = INK_FADE;
     ctx.fillText('output  Mv  (after matrix)', legX + 30, legY + 50);
@@ -361,7 +361,7 @@
     // Unit circle
     const [cx, cy] = toPx([0,0]);
     const scl = toPx([1,0])[0] - cx;
-    ctx.strokeStyle = 'rgba(38,35,32,0.25)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.25)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.arc(cx, cy, scl, 0, Math.PI*2);
@@ -370,7 +370,7 @@
     if (eigs.length) {
       eigs.forEach(({ vector }) => {
         const [vx, vy] = vector;
-        ctx.strokeStyle = 'rgba(122,31,36,0.55)';
+        ctx.strokeStyle = 'rgba(31,95,204,0.55)';
         ctx.lineWidth = 1.5;
         ctx.setLineDash([5, 5]);
         ctx.beginPath();
@@ -397,20 +397,20 @@
     }
     const onEigen = nearestAngle !== null && nearestAngle < 4.0;
 
-    arrow(ctx, toPx([0,0]), toPx(v), 'rgba(38,35,32,0.85)', 2.5);
+    arrow(ctx, toPx([0,0]), toPx(v), 'rgba(15,34,56,0.85)', 2.5);
     arrow(ctx, toPx([0,0]), toPx(Mv), ACCENT, 3, 11);
 
     // ── Discoverability hint: gently telegraph that the dark arrow is draggable.
     //    Sits as faint text near the unit circle's edge so the user can't miss it. ──
-    ctx.fillStyle = 'rgba(38,35,32,0.45)';
-    ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+    ctx.fillStyle = 'rgba(15,34,56,0.45)';
+    ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText('drag anywhere to rotate v', size.w / 2, 18);
 
     const a1 = Math.atan2(v[1], v[0]);
     const a2 = Math.atan2(Mv[1], Mv[0]);
-    ctx.strokeStyle = 'rgba(38,35,32,0.4)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.4)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.arc(cx, cy, scl * 0.45, -a1, -a2, a2 < a1);
@@ -431,17 +431,17 @@
       const boxY = 16;
       const boxW = 200;
       const boxH = 60;
-      ctx.fillStyle = 'rgba(122,31,36,0.10)';
+      ctx.fillStyle = 'rgba(31,95,204,0.10)';
       ctx.strokeStyle = ACCENT;
       ctx.lineWidth = 1.5;
       ctx.fillRect(boxX, boxY, boxW, boxH);
       ctx.strokeRect(boxX, boxY, boxW, boxH);
       ctx.fillStyle = ACCENT;
-      ctx.font = '11px "JetBrains Mono", monospace';
+      ctx.font = '11px "IBM Plex Mono", monospace';
       ctx.textAlign = 'left';
       ctx.textBaseline = 'alphabetic';
       ctx.fillText('AT EIGENVECTOR', boxX + 12, boxY + 22);
-      ctx.font = 'italic 16px "Source Serif 4", Georgia, serif';
+      ctx.font = '16px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.fillText(`Av = ${formatNum(nearestEig.value)} · v`, boxX + 12, boxY + 46);
     }
 
@@ -476,7 +476,7 @@
           // Don't normalize — the spiral is the point.
           trail.push(v.slice());
         }
-        ctx.strokeStyle = 'rgba(122,31,36,0.25)';
+        ctx.strokeStyle = 'rgba(31,95,204,0.25)';
         ctx.lineWidth = 1;
         ctx.beginPath();
         trail.forEach(([x, y], idx) => {
@@ -484,10 +484,10 @@
           if (idx === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
         });
         ctx.stroke();
-        arrow(ctx, toPx([0,0]), toPx(v), 'rgba(122,31,36,0.6)', 1.4, 6);
+        arrow(ctx, toPx([0,0]), toPx(v), 'rgba(31,95,204,0.6)', 1.4, 6);
       }
       ctx.fillStyle = ACCENT;
-      ctx.font = 'italic 14px "Source Serif 4", Georgia, serif';
+      ctx.font = '14px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('complex λ — vectors spiral instead of converging', size.w / 2, 28);
       ctx.font = SERIF_LABEL_SM;
@@ -516,7 +516,7 @@
         if (n > 1e-9) v = [v[0]/n, v[1]/n];
         trail.push(v.slice());
       }
-      ctx.strokeStyle = 'rgba(38,35,32,0.12)';
+      ctx.strokeStyle = 'rgba(15,34,56,0.12)';
       ctx.lineWidth = 1;
       ctx.beginPath();
       trail.forEach(([x, y], idx) => {
@@ -524,7 +524,7 @@
         if (idx === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
       });
       ctx.stroke();
-      arrow(ctx, toPx([0,0]), toPx(v), 'rgba(38,35,32,0.6)', 1.5, 7);
+      arrow(ctx, toPx([0,0]), toPx(v), 'rgba(15,34,56,0.6)', 1.5, 7);
     }
 
     // Build the FULL 30-step convergence curve once for the inset (not capped to state.iter).
@@ -558,15 +558,15 @@
     const insetH = 92;
     const insetX = size.w - insetW - 16;
     const insetY = 16;
-    ctx.fillStyle = 'rgba(255,253,246,0.92)';
-    ctx.strokeStyle = 'rgba(38,35,32,0.30)';
+    ctx.fillStyle = 'rgba(252,254,255,0.92)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.30)';
     ctx.lineWidth = 1;
     ctx.fillRect(insetX, insetY, insetW, insetH);
     ctx.strokeRect(insetX, insetY, insetW, insetH);
 
     // Title
     ctx.fillStyle = INK_FADE;
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'alphabetic';
     ctx.fillText('CONVERGENCE', insetX + 8, insetY + 14);
@@ -577,14 +577,14 @@
     const plotW = insetW - 20;
     const plotH = insetH - 36;
     // Axis: y goes 0 → 1
-    ctx.strokeStyle = 'rgba(38,35,32,0.20)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.20)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(plotX, plotY); ctx.lineTo(plotX, plotY + plotH);
     ctx.lineTo(plotX + plotW, plotY + plotH);
     ctx.stroke();
     // 1.0 reference line
-    ctx.strokeStyle = 'rgba(38,35,32,0.20)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.20)';
     ctx.setLineDash([2, 3]);
     ctx.beginPath();
     ctx.moveTo(plotX, plotY); ctx.lineTo(plotX + plotW, plotY);
@@ -614,7 +614,7 @@
 
     // Decay-rate annotation
     ctx.fillStyle = INK_FADE;
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left';
     ctx.fillText('|vₜ·v₁|', plotX, plotY - 2);
     ctx.textAlign = 'right';
@@ -622,7 +622,7 @@
 
     // Rate label below the inset (rate ≈ |λ₂/λ₁|)
     const rate = Math.abs(sub2.value) / Math.max(1e-9, Math.abs(dom.value));
-    ctx.font = 'italic 10px "Source Serif 4", Georgia, serif';
+    ctx.font = '10px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.fillStyle = INK_FADE;
     ctx.textAlign = 'left';
     ctx.fillText(`rate ≈ |λ₂/λ₁| = ${rate.toFixed(2)}`, insetX + 8, insetY + insetH - 4);

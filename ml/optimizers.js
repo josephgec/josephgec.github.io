@@ -48,7 +48,7 @@
   // Each returns up to two pairs (label, magnitude) — one per axis or one per slot.
   const OPTIMIZERS = {
     sgd: {
-      name: 'SGD', color: '#262320',
+      name: 'SGD', color: '#0f2238',
       defaultLr: 0.08,
       lrMin: 0.005, lrMax: 0.4,
       blurb: 'Plain steepest descent.',
@@ -60,7 +60,7 @@
       step: (s, g, lr) => ({ pos: [s.pos[0] - lr * g[0], s.pos[1] - lr * g[1]] }),
     },
     momentum: {
-      name: 'Momentum', color: '#7a1f24',
+      name: 'Momentum', color: '#1f5fcc',
       defaultLr: 0.04,
       lrMin: 0.002, lrMax: 0.2,
       blurb: 'Accumulates a velocity in consistent gradient directions.',
@@ -69,8 +69,8 @@
       use:  "Anywhere SGD oscillates. Standard for training computer-vision networks (often with Nesterov's tweak).",
       // Show |v_x|, |v_y| as two side-by-side bars.
       stateBars: (st) => [
-        { label: 'vₓ', val: st.v ? st.v[0] : 0, color: '#7a1f24' },
-        { label: 'vᵧ', val: st.v ? st.v[1] : 0, color: '#7a1f24' },
+        { label: 'vₓ', val: st.v ? st.v[0] : 0, color: '#1f5fcc' },
+        { label: 'vᵧ', val: st.v ? st.v[1] : 0, color: '#1f5fcc' },
       ],
       init: (pos) => ({ pos: pos.slice(), v: [0, 0] }),
       step: (s, g, lr) => {
@@ -310,7 +310,7 @@
     for (let i = 0; i < cells; i++) for (let j = 0; j < cells; j++) {
       const tRaw = (grid[i][j] - lmin) / (lmax - lmin + 1e-9);
       const t = Math.pow(tRaw, 0.55);
-      const r = Math.round(247 - t * 200), g = Math.round(244 - t * 200), b = Math.round(236 - t * 210);
+      const r = Math.round(252 - t * 237), g = Math.round(254 - t * 220), b = Math.round(255 - t * 199);
       ctx.fillStyle = `rgb(${r},${g},${b})`;
       ctx.fillRect(j * size.w / cells, i * size.h / cells, size.w / cells + 1, size.h / cells + 1);
     }
@@ -318,7 +318,7 @@
     for (let k = 0; k < levels; k++) {
       const tLevel = Math.pow((k + 0.5) / levels, 1.7);
       const lvl = lmin + tLevel * (lmax - lmin);
-      ctx.strokeStyle = 'rgba(38,35,32,0.18)';
+      ctx.strokeStyle = 'rgba(15,34,56,0.18)';
       ctx.lineWidth = 0.6;
       for (let i = 0; i < cells - 1; i++) for (let j = 0; j < cells - 1; j++) {
         const a = grid[i][j], b2 = grid[i][j+1], c2 = grid[i+1][j], d2 = grid[i+1][j+1];
@@ -370,7 +370,7 @@
       ctx.beginPath();
       ctx.arc(px, py, 6, 0, Math.PI * 2);
       ctx.fill();
-      ctx.strokeStyle = '#fffdf6';
+      ctx.strokeStyle = '#FCFEFF';
       ctx.lineWidth = 1.5;
       ctx.beginPath();
       ctx.arc(px, py, 6, 0, Math.PI * 2);
@@ -391,14 +391,14 @@
         ctx.closePath();
         ctx.fill();
         ctx.fillStyle = o.color;
-        ctx.font = '9px "JetBrains Mono", monospace';
+        ctx.font = '9px "IBM Plex Mono", monospace';
         ctx.textAlign = 'left';
         ctx.textBaseline = 'middle';
         ctx.fillText(`@${state.nearMinStep[k]}`, px + 12, py - 14);
       }
     }
     // Start marker
-    ctx.strokeStyle = 'rgba(38,35,32,0.5)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.5)';
     ctx.lineWidth = 1.5;
     ctx.setLineDash([3, 3]);
     ctx.beginPath();
@@ -408,7 +408,7 @@
 
     // Legend for the state-bar widget — bottom-left corner.
     ctx.fillStyle = INK_FADE;
-    ctx.font = '9px "JetBrains Mono", monospace';
+    ctx.font = '9px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'alphabetic';
     ctx.fillText('▮▮ next to a marble = its memory', 8, size.h - 22);
@@ -424,10 +424,10 @@
       const [winK, winStep] = finished[0];
       const w = OPTIMIZERS[winK];
       const txt = `${w.name} reached the minimum first — step ${winStep}`;
-      ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+      ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
       const tw = ctx.measureText(txt).width + 18;
       const tx0 = (size.w - tw) / 2;
-      ctx.fillStyle = 'rgba(255,253,246,0.94)';
+      ctx.fillStyle = 'rgba(252,254,255,0.94)';
       ctx.strokeStyle = w.color;
       ctx.lineWidth = 1;
       ctx.beginPath();
@@ -448,7 +448,7 @@
       const w = Math.min(maxBarLen, Math.abs(b.val) * 6);
       const yy = y - (bars.length - 1) * spacing / 2 + i * spacing - 1;
       // Subtle backing line
-      ctx.fillStyle = 'rgba(38,35,32,0.15)';
+      ctx.fillStyle = 'rgba(15,34,56,0.15)';
       ctx.fillRect(x, yy, maxBarLen, barH);
       // Value
       ctx.fillStyle = b.color;
@@ -482,12 +482,12 @@
     const range = Math.max(0.001, maxLoss - minLoss);
 
     // Axes
-    ctx.strokeStyle = 'rgba(38,35,32,0.2)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.2)';
     ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(40, H - 20); ctx.lineTo(W - 10, H - 20); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(40, 8);      ctx.lineTo(40, H - 20); ctx.stroke();
     ctx.fillStyle = INK_FADE;
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.fillText('loss', 6, 14);
     ctx.fillText('step', W - 30, H - 6);
 

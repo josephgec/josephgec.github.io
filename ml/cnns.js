@@ -188,15 +188,15 @@
   }
 
   function colorMono(t) {
-    const r = Math.round(247 - t * 200);
-    const g = Math.round(244 - t * 200);
-    const b = Math.round(236 - t * 220);
+    const r = Math.round(252 - t * 237);
+    const g = Math.round(254 - t * 220);
+    const b = Math.round(255 - t * 199);
     return `rgb(${r},${g},${b})`;
   }
   function colorOxblood(t) {
-    const r = Math.round(247 - t * 130);
-    const g = Math.round(244 - t * 195);
-    const b = Math.round(236 - t * 195);
+    const r = Math.round(252 - t * 221);
+    const g = Math.round(254 - t * 159);
+    const b = Math.round(255 - t * 51);
     return `rgb(${r},${g},${b})`;
   }
   function drawMap(ctx, map, x0, y0, cell, colorFn = colorMono) {
@@ -210,7 +210,7 @@
         ctx.fillRect(x0 + j * cell, y0 + i * cell, cell + 0.5, cell + 0.5);
       }
     }
-    ctx.strokeStyle = 'rgba(38,35,32,0.30)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.30)';
     ctx.lineWidth = 1;
     ctx.strokeRect(x0, y0, W * cell, H * cell);
   }
@@ -245,10 +245,10 @@
     // dim everything else slightly using a darken pass on the input — actually just leave; box is enough.
 
     ctx.fillStyle = INK_FADE;
-    ctx.font = '11px "JetBrains Mono", monospace';
+    ctx.font = '11px "IBM Plex Mono", monospace';
     ctx.textAlign = 'center';
     ctx.fillText('input · 32×32', inputW / 2, yOff + cellSize * 32 + 18);
-    ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+    ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.fillText(`window @ (${cx}, ${cy})`, inputW / 2, yOff + cellSize * 32 + 32);
 
     // Panel 2: conv+ReLU map, with the just-computed cell highlighted
@@ -259,10 +259,10 @@
     ctx.lineWidth = 2;
     ctx.strokeRect(x1 + cx * cellSize, yOff + cy * cellSize, cellSize, cellSize);
     ctx.fillStyle = INK_FADE;
-    ctx.font = '11px "JetBrains Mono", monospace';
+    ctx.font = '11px "IBM Plex Mono", monospace';
     ctx.textAlign = 'center';
     ctx.fillText('conv + ReLU · 32×32', x1 + inputW / 2, yOff + cellSize * 32 + 18);
-    ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+    ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
     const v = post[cy][cx];
     ctx.fillText(`out[${cx},${cy}] = ${formatNum(v)}`, x1 + inputW / 2, yOff + cellSize * 32 + 32);
 
@@ -273,12 +273,12 @@
     const poolYOff = (size.h - poolDisplayCell * poolH) / 2;
     drawMap(ctx, pool, x2, poolYOff, poolDisplayCell, colorOxblood);
     ctx.fillStyle = INK_FADE;
-    ctx.font = '11px "JetBrains Mono", monospace';
+    ctx.font = '11px "IBM Plex Mono", monospace';
     ctx.textAlign = 'center';
     ctx.fillText('2×2 max-pool · 16×16', x2 + (poolDisplayCell * poolH) / 2, poolYOff + poolDisplayCell * poolH + 18);
 
     // Connecting hint arrow
-    ctx.strokeStyle = 'rgba(38,35,32,0.35)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.35)';
     ctx.lineWidth = 1;
     ctx.setLineDash([3, 3]);
     ctx.beginPath();
@@ -291,13 +291,13 @@
     const story = FILTER_STORY[state.filterKey];
     if (story) {
       ctx.fillStyle = ACCENT;
-      ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+      ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText(story, size.w / 2, 18);
     }
     // Affordance hint: encourage the slider/auto-slide.
     ctx.fillStyle = INK_FADE;
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left';
     ctx.fillText('drag the slider or hit ▷ Auto-slide to scan the kernel', 0, size.h - 4);
   }
@@ -325,14 +325,14 @@
       const ky0 = y + (rowH - ksz * 3) / 2;
       F.k.forEach((row, i) => row.forEach((v, j) => {
         const t = Math.min(1, Math.abs(v) / 2);
-        ctx.fillStyle = v >= 0 ? `rgba(122,31,36,${0.15 + t * 0.7})` : `rgba(38,35,32,${0.15 + t * 0.7})`;
+        ctx.fillStyle = v >= 0 ? `rgba(31,95,204,${0.15 + t * 0.7})` : `rgba(15,34,56,${0.15 + t * 0.7})`;
         ctx.fillRect(kx0 + j * ksz, ky0 + i * ksz, ksz, ksz);
-        ctx.strokeStyle = 'rgba(38,35,32,0.20)';
+        ctx.strokeStyle = 'rgba(15,34,56,0.20)';
         ctx.lineWidth = 0.5;
         ctx.strokeRect(kx0 + j * ksz, ky0 + i * ksz, ksz, ksz);
       }));
       ctx.fillStyle = INK_FADE;
-      ctx.font = '10px "JetBrains Mono", monospace';
+      ctx.font = '10px "IBM Plex Mono", monospace';
       ctx.textAlign = 'left';
       ctx.fillText(F.name, kx0, ky0 - 4);
 
@@ -351,7 +351,7 @@
 
       // Arrow indicators
       ctx.fillStyle = INK_FADE;
-      ctx.font = 'italic 10px "Source Serif 4", Georgia, serif';
+      ctx.font = '10px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'center';
       if (ri === 0) {
         ctx.fillText('kernel', kx0 + ksz * 1.5, y - 14);
@@ -392,16 +392,16 @@
     const baseY = H * 0.55;
 
     ctx.fillStyle = INK_FADE;
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left';
     ctx.fillText('TYPICAL CNN PIPELINE · input → [conv → activation → pool] × N → flatten → dense → output', margin, 16);
 
     stages.forEach((s, i) => {
       const cx = margin + (i + 0.5) * stepW;
       let boxW = 64, boxH = 36;
-      let fill = '#fffdf6';
-      if (s.kind === 'op') { boxW = 38; boxH = 24; fill = 'rgba(38,35,32,0.05)'; }
-      if (s.kind === 'soft' || s.kind === 'dense') fill = 'rgba(122,31,36,0.10)';
+      let fill = '#FCFEFF';
+      if (s.kind === 'op') { boxW = 38; boxH = 24; fill = 'rgba(15,34,56,0.05)'; }
+      if (s.kind === 'soft' || s.kind === 'dense') fill = 'rgba(31,95,204,0.10)';
 
       ctx.fillStyle = fill;
       ctx.strokeStyle = INK;
@@ -409,14 +409,14 @@
       ctx.fillRect(cx - boxW / 2, baseY - boxH / 2, boxW, boxH);
       ctx.strokeRect(cx - boxW / 2, baseY - boxH / 2, boxW, boxH);
       ctx.fillStyle = INK;
-      ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+      ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(s.label, cx, baseY);
       ctx.textBaseline = 'alphabetic';
       // Shape annotation below
       ctx.fillStyle = INK_FADE;
-      ctx.font = '9px "JetBrains Mono", monospace';
+      ctx.font = '9px "IBM Plex Mono", monospace';
       ctx.fillText(s.shape, cx, baseY + boxH / 2 + 14);
 
       // Arrow
@@ -444,7 +444,7 @@
     ctx.lineTo(endX, baseY - 38);
     ctx.stroke();
     ctx.fillStyle = ACCENT;
-    ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+    ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('repeated block', (startX + endX) / 2, baseY - 50);
   }
@@ -473,8 +473,8 @@
         const cell = document.createElement('div');
         const t = kmax > 0 ? Math.min(1, Math.abs(v) / kmax) : 0;
         const bg = v > 0
-          ? `rgba(122,31,36,${0.10 + t * 0.45})`
-          : (v < 0 ? `rgba(38,35,32,${0.10 + t * 0.40})` : 'var(--paper)');
+          ? `rgba(31,95,204,${0.10 + t * 0.45})`
+          : (v < 0 ? `rgba(15,34,56,${0.10 + t * 0.40})` : 'var(--paper)');
         cell.style.cssText = `background:${bg}; border:1px solid var(--rule); padding:6px; text-align:center`;
         cell.textContent = formatNum(v);
         kernelGridEl.appendChild(cell);

@@ -200,7 +200,7 @@
       ctx.setLineDash([]);
 
       if (state.mode === 'project') {
-        ctx.strokeStyle = 'rgba(38,35,32,0.18)';
+        ctx.strokeStyle = 'rgba(15,34,56,0.18)';
         ctx.lineWidth = 0.8;
         for (const [x, y] of pts) {
           const dx = x - mx, dy = y - my;
@@ -216,7 +216,7 @@
     // ── 'explore' mode: candidate axis ──
     if (eigs.length && state.mode === 'explore') {
       const pc1 = eigs[0].vector;
-      ctx.strokeStyle = 'rgba(122,31,36,0.18)';
+      ctx.strokeStyle = 'rgba(31,95,204,0.18)';
       ctx.lineWidth = 1;
       ctx.setLineDash([2, 5]);
       ctx.beginPath();
@@ -228,7 +228,7 @@
       const ax = Math.cos(state.testAngle);
       const ay = Math.sin(state.testAngle);
 
-      ctx.strokeStyle = 'rgba(38,35,32,0.22)';
+      ctx.strokeStyle = 'rgba(15,34,56,0.22)';
       ctx.lineWidth = 0.8;
       for (const [x, y] of pts) {
         const dx = x - mx, dy = y - my;
@@ -255,7 +255,7 @@
       let sumSq = 0;
       // After the slide settles (tt ≥ 1) draw thin residuals — what was lost.
       if (tt >= 1) {
-        ctx.strokeStyle = 'rgba(38,35,32,0.22)';
+        ctx.strokeStyle = 'rgba(15,34,56,0.22)';
         ctx.lineWidth = 0.8;
         for (const [x, y] of pts) {
           const dx = x - mx, dy = y - my;
@@ -285,7 +285,7 @@
       const tt = state.projT;
       // Originals (faded, only after the slide so it doesn't double up at start)
       if (tt >= 1) {
-        ctx.fillStyle = 'rgba(38,35,32,0.30)';
+        ctx.fillStyle = 'rgba(15,34,56,0.30)';
         for (const [x, y] of pts) {
           const [px, py] = toPx([x, y]);
           ctx.beginPath();
@@ -330,14 +330,14 @@
       const s2 = Math.sqrt(Math.max(0, eigs[1].value)) * 2;
       arrow(ctx, toPx([mx, my]), toPx([mx + pc1[0]*s1, my + pc1[1]*s1]), ACCENT, 3, 11);
       arrow(ctx, toPx([mx, my]), toPx([mx + pc2[0]*s2, my + pc2[1]*s2]),
-            'rgba(122,31,36,0.55)', 2.5, 9);
+            'rgba(31,95,204,0.55)', 2.5, 9);
       ctx.fillStyle = ACCENT;
       ctx.font = SERIF_LABEL_SM;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(`PC₁  λ=${formatNum(eigs[0].value)}`,
         ...toPx([mx + pc1[0]*(s1+0.45), my + pc1[1]*(s1+0.45)]));
-      ctx.fillStyle = 'rgba(122,31,36,0.7)';
+      ctx.fillStyle = 'rgba(31,95,204,0.7)';
       ctx.fillText(`PC₂  λ=${formatNum(eigs[1].value)}`,
         ...toPx([mx + pc2[0]*(s2+0.45), my + pc2[1]*(s2+0.45)]));
 
@@ -354,7 +354,7 @@
         ctx.translate(eqPx, eqPy);
         ctx.rotate(ang);
         ctx.fillStyle = ACCENT;
-        ctx.font = 'italic 14px "Source Serif 4", Georgia, serif';
+        ctx.font = '14px "Bricolage Grotesque", system-ui, sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText('cov · v = λ · v', 0, 0);
@@ -374,27 +374,27 @@
       const legY = 116; // SCREE ends at 16+92=108
       const legW = 170;
       const legH = 76;
-      ctx.fillStyle = 'rgba(255,253,246,0.92)';
-      ctx.strokeStyle = 'rgba(38,35,32,0.30)';
+      ctx.fillStyle = 'rgba(252,254,255,0.92)';
+      ctx.strokeStyle = 'rgba(15,34,56,0.30)';
       ctx.lineWidth = 1;
       ctx.fillRect(legX, legY, legW, legH);
       ctx.strokeRect(legX, legY, legW, legH);
       ctx.fillStyle = INK_FADE;
-      ctx.font = '10px "JetBrains Mono", monospace';
+      ctx.font = '10px "IBM Plex Mono", monospace';
       ctx.textAlign = 'left';
       ctx.textBaseline = 'alphabetic';
       ctx.fillText('LEGEND', legX + 8, legY + 14);
       // PC1 swatch (full accent arrow)
       arrow(ctx, [legX + 12, legY + 28], [legX + 36, legY + 28], ACCENT, 3, 10);
       ctx.fillStyle = ACCENT;
-      ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+      ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.fillText('PC₁  (most variance)', legX + 44, legY + 31);
       // PC2 swatch (faint accent)
-      arrow(ctx, [legX + 12, legY + 44], [legX + 32, legY + 44], 'rgba(122,31,36,0.55)', 2, 8);
-      ctx.fillStyle = 'rgba(122,31,36,0.7)';
+      arrow(ctx, [legX + 12, legY + 44], [legX + 32, legY + 44], 'rgba(31,95,204,0.55)', 2, 8);
+      ctx.fillStyle = 'rgba(31,95,204,0.7)';
       ctx.fillText('PC₂  (perpendicular)', legX + 44, legY + 47);
       // residual swatch
-      ctx.strokeStyle = 'rgba(38,35,32,0.6)';
+      ctx.strokeStyle = 'rgba(15,34,56,0.6)';
       ctx.lineWidth = 0.8;
       ctx.beginPath();
       ctx.moveTo(legX + 12, legY + 60); ctx.lineTo(legX + 36, legY + 60);
@@ -436,26 +436,26 @@
     const w = 130, h = 92;
     const x = 16;
     const y = 16;
-    ctx.fillStyle = 'rgba(255,253,246,0.92)';
-    ctx.strokeStyle = 'rgba(38,35,32,0.30)';
+    ctx.fillStyle = 'rgba(252,254,255,0.92)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.30)';
     ctx.lineWidth = 1;
     ctx.fillRect(x, y, w, h);
     ctx.strokeRect(x, y, w, h);
 
     ctx.fillStyle = INK_FADE;
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'alphabetic';
     ctx.fillText('SCREE', x + 8, y + 14);
 
     const total = Math.max(1e-9, eigs[0].value + eigs[1].value);
     const baseY = y + h - 18;
-    const maxBarH = h - 32;
+    const maxBarH = h - 46;   // leave room for the title and the % label above the tallest bar
     const barW = 28;
     const gap = 14;
     const startX = x + (w - 2*barW - gap) / 2;
     const lambdas = [eigs[0].value, eigs[1].value];
-    const colors = [ACCENT, 'rgba(122,31,36,0.55)'];
+    const colors = [ACCENT, 'rgba(31,95,204,0.55)'];
     for (let i = 0; i < 2; i++) {
       const frac = Math.max(0, lambdas[i]) / total;
       const barH = maxBarH * (lambdas[i] / total);
@@ -464,10 +464,10 @@
       ctx.fillRect(bx, baseY - barH, barW, barH);
       // Label: PCi underneath, % above
       ctx.fillStyle = INK;
-      ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+      ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText(`PC${i+1}`, bx + barW/2, baseY + 12);
-      ctx.font = '10px "JetBrains Mono", monospace';
+      ctx.font = '10px "IBM Plex Mono", monospace';
       ctx.fillStyle = colors[i];
       ctx.fillText(`${(frac*100).toFixed(0)}%`, bx + barW/2, baseY - barH - 4);
     }
@@ -478,13 +478,13 @@
     const w = 150, h = 110;
     const x = size.w - w - 16;
     const y = 16;
-    ctx.fillStyle = 'rgba(255,253,246,0.92)';
-    ctx.strokeStyle = 'rgba(38,35,32,0.30)';
+    ctx.fillStyle = 'rgba(252,254,255,0.92)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.30)';
     ctx.lineWidth = 1;
     ctx.fillRect(x, y, w, h);
     ctx.strokeRect(x, y, w, h);
     ctx.fillStyle = INK_FADE;
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left';
     ctx.fillText('PC₁ / PC₂ FRAME', x + 8, y + 14);
 
@@ -508,7 +508,7 @@
     const scale = plotR / maxR;
 
     // Axes
-    ctx.strokeStyle = 'rgba(38,35,32,0.20)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.20)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(cx - plotR, cy); ctx.lineTo(cx + plotR, cy);
@@ -524,10 +524,10 @@
     }
     // Axis labels
     ctx.fillStyle = ACCENT;
-    ctx.font = 'italic 10px "Source Serif 4", Georgia, serif';
+    ctx.font = '10px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'right';
     ctx.fillText('PC₁', cx + plotR - 2, cy + 12);
-    ctx.fillStyle = 'rgba(122,31,36,0.7)';
+    ctx.fillStyle = 'rgba(31,95,204,0.7)';
     ctx.textAlign = 'left';
     ctx.fillText('PC₂', cx + 4, cy - plotR + 4);
   }

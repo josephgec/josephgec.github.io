@@ -7,7 +7,7 @@
   <title>Backpropagation · ML, Visualized · Joseph Thomas</title>
   <meta name="description" content="The signal flows forward; the error flows back. Chain rule applied recursively — the engine that learns." />
   <link rel="canonical" href="https://jthomas.site/ml/backprop.html" />
-  <meta name="theme-color" content="#7a1f24" />
+  <meta name="theme-color" content="#F4F9FE" />
   <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
 
   <meta property="og:type" content="article" />
@@ -15,27 +15,24 @@
   <meta property="og:description" content="Chain rule, applied recursively. The engine that taught a generation of networks how to learn." />
   <meta property="og:url" content="https://jthomas.site/ml/backprop.html" />
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;1,8..60,300;1,8..60,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-
+  <link rel="preload" href="/fonts/bricolage-grotesque.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="/css/fonts.css" />
   <link rel="stylesheet" href="../styles.css" />
   <link rel="stylesheet" href="shared.css" />
+  <link rel="stylesheet" href="/css/site.css" />
 </head>
 <body>
 
-<header class="nb-nav">
-  <div class="brand-block">
-    <a class="brand" href="../index.html">jthomas.site</a><span class="brand-meta">// notebook · v.4.2026</span>
-  </div>
-  <nav>
-    <a href="../blog/index.html">writing</a>
-    <a href="index.html" style="color:var(--ink)">tutorial</a>
-    <a href="../index.html#research">research</a>
-    <a href="../index.html#work">work</a>
-    <a href="../index.html#projects">projects</a>
-    <a href="../consulting.html">consulting</a>
-    <a href="../index.html#contact" class="contact">→ contact</a>
+<header class="site-top">
+  <a class="brand" href="../index.html">Joseph Thomas</a>
+  <nav aria-label="Primary">
+    <a href="../blog/index.html">Writing</a>
+    <a href="../ml/index.html" aria-current="true">Tutorial</a>
+    <a href="../index.html#work">Work</a>
+    <a href="../index.html#research">Research</a>
+    <a href="../index.html#projects">Projects</a>
+    <a href="../consulting.html">Consulting</a>
+    <a class="pill-cta" href="../index.html#contact">Contact</a>
   </nav>
 </header>
 
@@ -125,16 +122,16 @@
         <p class="quiet">Before backpropagation (Werbos 1974, Rumelhart-Hinton-Williams 1986), nobody knew how to train multi-layer networks at scale. Each weight got an arbitrary little nudge; learning was glacial. Backprop computed every gradient in one efficient pass — the engine of every deep model since.</p>
         <div class="ml-margin-rule thin"></div>
         <div class="ml-margin-h">Chain rule</div>
-        <div class="ml-equation" style="font-size:14px; line-height:1.4">∂L/∂wᵢⱼ = <span style="color:#3a6b5e">∂L/∂outⱼ</span> · <span style="color:#7a1f24">ƒ′(zⱼ)</span> · <span style="color:#262320">xᵢ</span></div>
+        <div class="ml-equation" style="font-size:14px; line-height:1.4">∂L/∂wᵢⱼ = <span style="color:#3a6b5e">∂L/∂outⱼ</span> · <span style="color:#1f5fcc">ƒ′(zⱼ)</span> · <span style="color:#0f2238">xᵢ</span></div>
         <p style="font-family:var(--serif); font-style:italic; font-size:13px; line-height:1.55; color:var(--ml-ink-fade); margin-top: 6px">
-          The gradient on a single weight is three things multiplied: the <span style="color:#3a6b5e">upstream error</span> coming back through the network, the <span style="color:#7a1f24">local derivative</span> of the activation at that neuron, and the <span style="color:#262320">input</span> that flowed through that weight.
+          The gradient on a single weight is three things multiplied: the <span style="color:#3a6b5e">upstream error</span> coming back through the network, the <span style="color:#1f5fcc">local derivative</span> of the activation at that neuron, and the <span style="color:#0f2238">input</span> that flowed through that weight.
         </p>
         <p>Why three? Each weight gets blamed in proportion to <em>(a)</em> how much its neuron's output mattered downstream, <em>(b)</em> how responsive the neuron was to a nudge (its slope), and <em>(c)</em> how big the input it scaled was. Multiply, and you've assigned blame all the way down.</p>
         <p class="quiet">The error δ at each layer is the upstream error multiplied by the local derivative — that's it. Backprop is just the chain rule applied recursively, output → input.</p>
         <div class="ml-margin-rule thin"></div>
         <div class="ml-margin-h sm">Reading the picture</div>
         <div style="display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:11px; color:var(--ml-ink-fade); margin-bottom:4px">
-          <span style="width:14px; height:2px; background:#7a1f24; display:inline-block"></span>
+          <span style="width:14px; height:2px; background:#1f5fcc; display:inline-block"></span>
           <span>weight will <b>increase</b> (gradient is negative, so −η·∇ pushes up)</span>
         </div>
         <div style="display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:11px; color:var(--ml-ink-fade); margin-bottom:4px">
@@ -142,7 +139,7 @@
           <span>weight will <b>decrease</b></span>
         </div>
         <div style="display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:11px; color:var(--ml-ink-fade); margin-bottom:4px">
-          <span style="width:14px; height:2px; background:rgba(122,31,36,0.8); display:inline-block; box-shadow: 0 2px 0 rgba(122,31,36,0.8)"></span>
+          <span style="width:14px; height:2px; background:rgba(31,95,204,0.8); display:inline-block; box-shadow: 0 2px 0 rgba(31,95,204,0.8)"></span>
           <span>thicker line = bigger blame ( |∂L/∂w| )</span>
         </div>
         <div style="display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:11px; color:var(--ml-ink-fade); margin-bottom:4px">

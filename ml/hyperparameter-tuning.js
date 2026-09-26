@@ -214,7 +214,7 @@
 
     // Title
     ctx.fillStyle = INK_FADE;
-    ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+    ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'left';
     ctx.fillText(`three search strategies racing on the same landscape · ${state.landscapeKey}`, padX, 14);
 
@@ -227,17 +227,17 @@
       const steps = 24;
       for (let s = 0; s < steps; s++) {
         const t = s / (steps - 1);
-        const r = Math.round(247 - t * 130);
-        const g = Math.round(244 - t * 195);
-        const b = Math.round(236 - t * 195);
+        const r = Math.round(252 - t * 221);
+        const g = Math.round(254 - t * 159);
+        const b = Math.round(255 - t * 51);
         ctx.fillStyle = `rgb(${r},${g},${b})`;
         ctx.fillRect(legX + (s * legW) / steps, legY, legW / steps + 0.5, legH);
       }
-      ctx.strokeStyle = 'rgba(38,35,32,0.30)';
+      ctx.strokeStyle = 'rgba(15,34,56,0.30)';
       ctx.lineWidth = 0.6;
       ctx.strokeRect(legX, legY, legW, legH);
       ctx.fillStyle = INK_FADE;
-      ctx.font = '9px "JetBrains Mono", monospace';
+      ctx.font = '9px "IBM Plex Mono", monospace';
       ctx.textAlign = 'right';
       ctx.fillText('low f(θ)', legX - 4, legY + legH);
       ctx.textAlign = 'left';
@@ -260,8 +260,8 @@
         .map((s) => ({ s, b: bestOf(s) }))
         .sort((a, b) => b.b - a.b);
       const lead = ranking[0];
-      ctx.fillStyle = 'rgba(38,35,32,0.65)';
-      ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+      ctx.fillStyle = 'rgba(15,34,56,0.65)';
+      ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'left';
       ctx.fillText(
         `${state.cursor}/${state.trials} trials in — ${lead.s} leading at ${formatNum(lead.b)}; watch how each method spends the remaining budget.`,
@@ -286,14 +286,14 @@
         const yy = (i + 0.5) / cells;
         const v = f(xx, yy);
         const t = Math.max(0, Math.min(1, v));
-        const r = Math.round(247 - t * 130);
-        const g = Math.round(244 - t * 195);
-        const b = Math.round(236 - t * 195);
+        const r = Math.round(252 - t * 221);
+        const g = Math.round(254 - t * 159);
+        const b = Math.round(255 - t * 51);
         ctx.fillStyle = `rgb(${r},${g},${b})`;
         ctx.fillRect(x0 + j * W / cells, y0 + (cells - 1 - i) * H / cells, W / cells + 1, H / cells + 1);
       }
     }
-    ctx.strokeStyle = 'rgba(38,35,32,0.30)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.30)';
     ctx.lineWidth = 1;
     ctx.strokeRect(x0, y0, W, H);
 
@@ -302,7 +302,7 @@
       const px = x0 + p.x * W;
       const py = y0 + (1 - p.y) * H;
       const isLatest = i === state.points[strat].length - 1 && state.running;
-      ctx.fillStyle = isLatest ? ACCENT : '#262320';
+      ctx.fillStyle = isLatest ? ACCENT : '#0f2238';
       ctx.beginPath();
       ctx.arc(px, py, isLatest ? 4 : 2.6, 0, Math.PI * 2);
       ctx.fill();
@@ -323,7 +323,7 @@
 
     // Panel label
     ctx.fillStyle = INK;
-    ctx.font = 'italic 13px "Source Serif 4", Georgia, serif';
+    ctx.font = '13px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'left';
     const niceLabel = { grid: 'grid · lattice', random: 'random · scattered', bayesian: 'Bayesian · smart' }[strat];
     ctx.fillText(niceLabel, x0, y0 - 6);
@@ -332,7 +332,7 @@
     // label the leftmost panel (where x0 is smallest) to avoid clutter.
     if (strat === 'grid') {
       ctx.fillStyle = INK_FADE;
-      ctx.font = '9px "JetBrains Mono", monospace';
+      ctx.font = '9px "IBM Plex Mono", monospace';
       ctx.textAlign = 'left';
       ctx.fillText('θ₁ (e.g., learning rate) →', x0 + 2, y0 + H - 4);
       ctx.save();
@@ -345,19 +345,19 @@
     // Budget bar
     const barY = y0 + H + 10;
     const barH = 8;
-    ctx.fillStyle = 'rgba(38,35,32,0.10)';
+    ctx.fillStyle = 'rgba(15,34,56,0.10)';
     ctx.fillRect(x0, barY, W, barH);
     const minutesUsed = state.points[strat].length * MIN_PER_TRIAL[strat];
     const minutesBudget = state.trials * Math.max(...Object.values(MIN_PER_TRIAL));
     const fillW = Math.min(1, minutesUsed / minutesBudget) * W;
     ctx.fillStyle = ACCENT;
     ctx.fillRect(x0, barY, fillW, barH);
-    ctx.strokeStyle = 'rgba(38,35,32,0.30)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.30)';
     ctx.lineWidth = 0.6;
     ctx.strokeRect(x0, barY, W, barH);
     // Numbers
     ctx.fillStyle = INK_FADE;
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left';
     ctx.fillText(`${state.points[strat].length}/${state.trials} trials`, x0, barY + barH + 12);
     ctx.textAlign = 'right';
@@ -370,7 +370,7 @@
     const plotW = W - 50 - 10;
     const plotH = H - 16;
 
-    ctx.strokeStyle = 'rgba(38,35,32,0.30)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.30)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(plotX0, y0); ctx.lineTo(plotX0, y0 + plotH);
@@ -378,12 +378,12 @@
     ctx.stroke();
 
     ctx.fillStyle = INK_FADE;
-    ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+    ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'left';
     ctx.fillText('best score so far · vs · GPU minutes spent', plotX0, y0 - 6);
 
     // Y axis
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'right';
     [0, 0.5, 1].forEach((y) => {
       ctx.fillText(y.toFixed(1), plotX0 - 6, y0 + plotH - y * plotH + 3);
@@ -396,7 +396,7 @@
       ctx.fillText((tx * maxMinutes).toFixed(0) + ' min', plotX0 + tx * plotW, y0 + plotH + 14);
     });
 
-    const colorOf = { grid: '#262320', random: '#3a6b5e', bayesian: ACCENT };
+    const colorOf = { grid: '#0f2238', random: '#3a6b5e', bayesian: ACCENT };
 
     STRATEGIES.forEach((strat) => {
       const dim = state.focus === 'all' || state.focus === strat ? 1 : 0.25;
@@ -422,7 +422,7 @@
       // End label
       if (state.points[strat].length > 0) {
         ctx.fillStyle = colorOf[strat];
-        ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+        ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
         ctx.textAlign = 'left';
         ctx.fillText(strat, prevX + 4, prevY + 3);
       }

@@ -12,7 +12,7 @@
   <link rel="canonical" href="https://jthomas.site/blog/finetuning" />
     <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
   <link rel="apple-touch-icon" href="../photo.jpg" />
-  <meta name="theme-color" content="#7a1f24" />
+  <meta name="theme-color" content="#F4F9FE" />
 
   <meta property="og:type" content="article" />
   <meta property="og:url" content="https://jthomas.site/blog/finetuning" />
@@ -55,26 +55,24 @@
   }
   </script>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,400;1,8..60,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-
+  <link rel="preload" href="/fonts/bricolage-grotesque.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="/css/fonts.css" />
   <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="/css/site.css" />
   <link rel="alternate" type="application/rss+xml" title="Joseph Thomas — Writing" href="feed.xml" />
 </head>
 <body>
 
-<header class="nb-nav">
-  <div class="brand-block">
-    <a class="brand" href="../index.html">jthomas.site</a><span class="brand-meta">// notebook · v.4.2026</span>
-  </div>
-  <nav>
-    <a href="../blog/index.html" style="color:var(--ink);">writing</a>
-    <a href="../index.html#research">research</a>
-    <a href="../index.html#work">work</a>
-    <a href="../index.html#projects">projects</a>
-    <a href="../consulting.html">consulting</a>
-    <a href="../index.html#contact" class="contact">→ contact</a>
+<header class="site-top">
+  <a class="brand" href="../index.html">Joseph Thomas</a>
+  <nav aria-label="Primary">
+    <a href="../blog/index.html" aria-current="true">Writing</a>
+    <a href="../ml/index.html">Tutorial</a>
+    <a href="../index.html#work">Work</a>
+    <a href="../index.html#research">Research</a>
+    <a href="../index.html#projects">Projects</a>
+    <a href="../consulting.html">Consulting</a>
+    <a class="pill-cta" href="../index.html#contact">Contact</a>
   </nav>
 </header>
 
@@ -128,70 +126,70 @@
             <path d="M0,0 L8,3 L0,6 z" fill="#566068"/>
           </marker>
           <marker id="arrow-lora-accent" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
-            <path d="M0,0 L8,3 L0,6 z" fill="#7a1f24"/>
+            <path d="M0,0 L8,3 L0,6 z" fill="#1f5fcc"/>
           </marker>
         </defs>
 
         <!-- Input -->
-        <text x="40" y="180" font-family="Source Serif 4, serif" font-style="italic" font-size="16" fill="#262320">x</text>
+        <text x="40" y="180" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="16" fill="#0f2238">x</text>
         <line x1="55" y1="176" x2="120" y2="176" stroke="#566068" stroke-width="1.5" marker-end="url(#arrow-lora)"/>
 
         <!-- Frozen W (large) -->
         <rect x="130" y="80" width="180" height="180" rx="6" fill="#f5f3ff" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 3"/>
-        <text x="220" y="60" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="600" fill="#566068" letter-spacing="1.2">FROZEN · PRETRAINED</text>
-        <text x="220" y="170" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="42" font-weight="600" fill="#5b21b6">W</text>
-        <text x="220" y="200" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#7c3aed">d × d</text>
-        <text x="220" y="220" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068">~13B params total</text>
-        <text x="220" y="238" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068">4-bit quantized · no grads</text>
+        <text x="220" y="60" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" font-weight="600" fill="#566068" letter-spacing="1.2">FROZEN · PRETRAINED</text>
+        <text x="220" y="170" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="42" font-weight="600" fill="#5b21b6">W</text>
+        <text x="220" y="200" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="#7c3aed">d × d</text>
+        <text x="220" y="220" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#566068">~13B params total</text>
+        <text x="220" y="238" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#566068">4-bit quantized · no grads</text>
 
         <!-- Splitter (input goes both ways) -->
-        <circle cx="120" cy="176" r="3" fill="#262320"/>
+        <circle cx="120" cy="176" r="3" fill="#0f2238"/>
         <line x1="120" y1="176" x2="120" y2="320" stroke="#566068" stroke-width="1.5"/>
         <line x1="120" y1="320" x2="370" y2="320" stroke="#566068" stroke-width="1.5"/>
 
         <!-- A matrix (skinny tall) -->
-        <rect x="370" y="290" width="40" height="60" rx="4" fill="#fffbeb" stroke="#7a1f24" stroke-width="1.8"/>
-        <text x="390" y="325" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="20" font-weight="600" fill="#7a1f24">A</text>
-        <text x="390" y="368" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#7a1f24">d × r</text>
+        <rect x="370" y="290" width="40" height="60" rx="4" fill="#fffbeb" stroke="#1f5fcc" stroke-width="1.8"/>
+        <text x="390" y="325" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="20" font-weight="600" fill="#1f5fcc">A</text>
+        <text x="390" y="368" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#1f5fcc">d × r</text>
 
         <!-- arrow A -> B -->
-        <line x1="412" y1="320" x2="450" y2="320" stroke="#7a1f24" stroke-width="1.5" marker-end="url(#arrow-lora-accent)"/>
+        <line x1="412" y1="320" x2="450" y2="320" stroke="#1f5fcc" stroke-width="1.5" marker-end="url(#arrow-lora-accent)"/>
 
         <!-- B matrix (squat wide) -->
-        <rect x="452" y="305" width="60" height="30" rx="4" fill="#fffbeb" stroke="#7a1f24" stroke-width="1.8"/>
-        <text x="482" y="328" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="20" font-weight="600" fill="#7a1f24">B</text>
-        <text x="482" y="356" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#7a1f24">r × d</text>
+        <rect x="452" y="305" width="60" height="30" rx="4" fill="#fffbeb" stroke="#1f5fcc" stroke-width="1.8"/>
+        <text x="482" y="328" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="20" font-weight="600" fill="#1f5fcc">B</text>
+        <text x="482" y="356" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#1f5fcc">r × d</text>
 
         <!-- LoRA box label -->
-        <rect x="355" y="276" width="180" height="84" rx="8" fill="none" stroke="#7a1f24" stroke-width="1.2" stroke-dasharray="3 3"/>
-        <text x="540" y="290" text-anchor="start" font-family="JetBrains Mono, monospace" font-size="10" font-weight="600" fill="#7a1f24" letter-spacing="1.2">TRAINABLE</text>
-        <text x="540" y="306" text-anchor="start" font-family="JetBrains Mono, monospace" font-size="10" fill="#7a1f24">ΔW = A·B</text>
-        <text x="540" y="322" text-anchor="start" font-family="JetBrains Mono, monospace" font-size="10" fill="#7a1f24">rank r ≈ 16</text>
-        <text x="540" y="338" text-anchor="start" font-family="JetBrains Mono, monospace" font-size="10" fill="#7a1f24">~8M params</text>
+        <rect x="355" y="276" width="180" height="84" rx="8" fill="none" stroke="#1f5fcc" stroke-width="1.2" stroke-dasharray="3 3"/>
+        <text x="540" y="290" text-anchor="start" font-family="IBM Plex Mono, monospace" font-size="10" font-weight="600" fill="#1f5fcc" letter-spacing="1.2">TRAINABLE</text>
+        <text x="540" y="306" text-anchor="start" font-family="IBM Plex Mono, monospace" font-size="10" fill="#1f5fcc">ΔW = A·B</text>
+        <text x="540" y="322" text-anchor="start" font-family="IBM Plex Mono, monospace" font-size="10" fill="#1f5fcc">rank r ≈ 16</text>
+        <text x="540" y="338" text-anchor="start" font-family="IBM Plex Mono, monospace" font-size="10" fill="#1f5fcc">~8M params</text>
 
         <!-- W output -->
         <line x1="310" y1="170" x2="450" y2="170" stroke="#566068" stroke-width="1.5" marker-end="url(#arrow-lora)"/>
-        <text x="380" y="160" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="13" fill="#566068">Wx</text>
+        <text x="380" y="160" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="13" fill="#566068">Wx</text>
 
         <!-- B output back up -->
-        <line x1="514" y1="320" x2="560" y2="320" stroke="#7a1f24" stroke-width="1.5"/>
-        <line x1="560" y1="320" x2="560" y2="200" stroke="#7a1f24" stroke-width="1.5"/>
-        <line x1="560" y1="200" x2="500" y2="200" stroke="#7a1f24" stroke-width="1.5" marker-end="url(#arrow-lora-accent)"/>
-        <text x="535" y="190" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="13" fill="#7a1f24">ABx</text>
+        <line x1="514" y1="320" x2="560" y2="320" stroke="#1f5fcc" stroke-width="1.5"/>
+        <line x1="560" y1="320" x2="560" y2="200" stroke="#1f5fcc" stroke-width="1.5"/>
+        <line x1="560" y1="200" x2="500" y2="200" stroke="#1f5fcc" stroke-width="1.5" marker-end="url(#arrow-lora-accent)"/>
+        <text x="535" y="190" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="13" fill="#1f5fcc">ABx</text>
 
         <!-- Sum node -->
-        <circle cx="475" cy="170" r="14" fill="#fffdf6" stroke="#262320" stroke-width="1.8"/>
-        <text x="475" y="176" text-anchor="middle" font-family="Source Serif 4, serif" font-size="20" fill="#262320">+</text>
+        <circle cx="475" cy="170" r="14" fill="#FCFEFF" stroke="#0f2238" stroke-width="1.8"/>
+        <text x="475" y="176" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-size="20" fill="#0f2238">+</text>
 
         <!-- Output -->
         <line x1="490" y1="170" x2="630" y2="170" stroke="#566068" stroke-width="1.5" marker-end="url(#arrow-lora)"/>
-        <text x="640" y="175" font-family="Source Serif 4, serif" font-style="italic" font-size="16" fill="#262320">y</text>
-        <text x="558" y="160" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="13" fill="#262320">y = Wx + ABx</text>
+        <text x="640" y="175" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="16" fill="#0f2238">y</text>
+        <text x="558" y="160" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="13" fill="#0f2238">y = Wx + ABx</text>
 
         <!-- Param count callout -->
-        <text x="20" y="30" font-family="JetBrains Mono, monospace" font-size="11" font-weight="600" fill="#7a1f24" letter-spacing="1.2">PARAMETER BUDGET</text>
-        <text x="20" y="48" font-family="JetBrains Mono, monospace" font-size="11" fill="#566068">full fine-tune: 13,000,000,000 trainable</text>
-        <text x="20" y="64" font-family="JetBrains Mono, monospace" font-size="11" fill="#7a1f24">LoRA rank 16:        ~8,000,000 trainable  (1600x fewer)</text>
+        <text x="20" y="30" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="600" fill="#1f5fcc" letter-spacing="1.2">PARAMETER BUDGET</text>
+        <text x="20" y="48" font-family="IBM Plex Mono, monospace" font-size="11" fill="#566068">full fine-tune: 13,000,000,000 trainable</text>
+        <text x="20" y="64" font-family="IBM Plex Mono, monospace" font-size="11" fill="#1f5fcc">LoRA rank 16:        ~8,000,000 trainable  (1600x fewer)</text>
       </svg>
       <figcaption>LoRA in one picture. The pretrained matrix <em>W</em> is huge and frozen; the trainable update <em>ΔW = A·B</em> is forced to live in a rank-<em>r</em> subspace. At inference, both branches are added.</figcaption>
     </figure>
@@ -297,15 +295,15 @@ accum = <span class="ck-flag">8</span>
         <!-- ServiceClient -->
         <rect x="240" y="20" width="200" height="58" rx="10" fill="#ecfeff" stroke="#67e8f9" stroke-width="1.5"/>
         <text x="340" y="46" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="14" fill="#0e7490">ServiceClient</text>
-        <text x="340" y="64" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#0891b2">entry point · hardware discovery</text>
+        <text x="340" y="64" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#0891b2">entry point · hardware discovery</text>
 
         <line x1="340" y1="80" x2="340" y2="112" stroke="#566068" stroke-width="1.5" marker-end="url(#arrow-ft)"/>
-        <text x="352" y="100" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068">creates</text>
+        <text x="352" y="100" font-family="IBM Plex Mono, monospace" font-size="10" fill="#566068">creates</text>
 
         <!-- TrainingClient -->
         <rect x="160" y="118" width="360" height="62" rx="10" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.5"/>
         <text x="340" y="146" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="14" fill="#5b21b6">TrainingClient</text>
-        <text x="340" y="164" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#7c3aed">LoRA adapter on a frozen quantized base</text>
+        <text x="340" y="164" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#7c3aed">LoRA adapter on a frozen quantized base</text>
 
         <!-- Split arrows to phases -->
         <path d="M230,180 L180,226" stroke="#566068" stroke-width="1.5" fill="none" marker-end="url(#arrow-ft)"/>
@@ -313,23 +311,23 @@ accum = <span class="ck-flag">8</span>
 
         <!-- Phase 1 -->
         <rect x="60" y="232" width="240" height="122" rx="10" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.5"/>
-        <text x="180" y="258" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="600" fill="#92400e" letter-spacing="1.2">PHASE 1</text>
+        <text x="180" y="258" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" font-weight="600" fill="#92400e" letter-spacing="1.2">PHASE 1</text>
         <text x="180" y="282" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="14" fill="#92400e">forward_backward()</text>
-        <text x="180" y="306" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#d97706">compute loss</text>
-        <text x="180" y="322" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#d97706">accumulate LoRA grads</text>
-        <text x="180" y="340" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#d97706">call N times per batch</text>
+        <text x="180" y="306" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#d97706">compute loss</text>
+        <text x="180" y="322" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#d97706">accumulate LoRA grads</text>
+        <text x="180" y="340" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#d97706">call N times per batch</text>
 
         <!-- Phase 2 -->
         <rect x="380" y="232" width="240" height="122" rx="10" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.5"/>
-        <text x="500" y="258" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="600" fill="#92400e" letter-spacing="1.2">PHASE 2</text>
+        <text x="500" y="258" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" font-weight="600" fill="#92400e" letter-spacing="1.2">PHASE 2</text>
         <text x="500" y="282" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="14" fill="#92400e">optim_step()</text>
-        <text x="500" y="306" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#d97706">apply accumulated grads</text>
-        <text x="500" y="322" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#d97706">clip + advance optimizer</text>
-        <text x="500" y="340" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#d97706">call once per batch</text>
+        <text x="500" y="306" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#d97706">apply accumulated grads</text>
+        <text x="500" y="322" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#d97706">clip + advance optimizer</text>
+        <text x="500" y="340" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#d97706">call once per batch</text>
 
         <!-- Dashed arrow Phase 1 → Phase 2 -->
         <path d="M300,292 L380,292" stroke="#0891b2" stroke-width="1.5" stroke-dasharray="4 3" fill="none" marker-end="url(#arrow-ft-cyan)"/>
-        <text x="340" y="284" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#0891b2">accumulate</text>
+        <text x="340" y="284" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#0891b2">accumulate</text>
 
         <!-- Down arrow from Phase 2 area to SamplingClient -->
         <path d="M500,354 C 500,390 440,395 420,405" stroke="#566068" stroke-width="1.5" fill="none" marker-end="url(#arrow-ft)"/>
@@ -337,7 +335,7 @@ accum = <span class="ck-flag">8</span>
         <!-- SamplingClient -->
         <rect x="240" y="406" width="200" height="58" rx="10" fill="#ecfeff" stroke="#67e8f9" stroke-width="1.5"/>
         <text x="340" y="432" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="14" fill="#0e7490">SamplingClient</text>
-        <text x="340" y="450" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#0891b2">generate completions from current weights</text>
+        <text x="340" y="450" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#0891b2">generate completions from current weights</text>
       </svg>
       <figcaption>Four objects, two phases. Phase 1 runs many times to accumulate gradients; Phase 2 applies them once per effective batch.</figcaption>
     </figure>
@@ -360,80 +358,80 @@ accum = <span class="ck-flag">8</span>
         </defs>
 
         <!-- Header row -->
-        <text x="60"  y="34" font-family="JetBrains Mono, monospace" font-size="11" font-weight="600" fill="#566068" letter-spacing="1.4">STEP</text>
-        <text x="195" y="34" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-weight="700" font-size="14" fill="#5b21b6">SFT</text>
-        <text x="320" y="34" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-weight="700" font-size="14" fill="#0e7490">DPO</text>
-        <text x="445" y="34" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-weight="700" font-size="14" fill="#92400e">PPO</text>
-        <text x="595" y="34" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-weight="700" font-size="14" fill="#7a1f24">GRPO</text>
+        <text x="60"  y="34" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="600" fill="#566068" letter-spacing="1.4">STEP</text>
+        <text x="195" y="34" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-weight="700" font-size="14" fill="#5b21b6">SFT</text>
+        <text x="320" y="34" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-weight="700" font-size="14" fill="#0e7490">DPO</text>
+        <text x="445" y="34" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-weight="700" font-size="14" fill="#92400e">PPO</text>
+        <text x="595" y="34" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-weight="700" font-size="14" fill="#1f5fcc">GRPO</text>
 
-        <line x1="20" y1="48" x2="680" y2="48" stroke="#262320" stroke-width="1"/>
+        <line x1="20" y1="48" x2="680" y2="48" stroke="#0f2238" stroke-width="1"/>
 
         <!-- Row 1: input -->
-        <text x="20"  y="84" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068">1. input</text>
+        <text x="20"  y="84" font-family="IBM Plex Mono, monospace" font-size="10" fill="#566068">1. input</text>
         <rect x="135" y="64" width="120" height="36" rx="4" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.2"/>
-        <text x="195" y="80" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#5b21b6">(prompt,</text>
-        <text x="195" y="93" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#5b21b6">target answer)</text>
+        <text x="195" y="80" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#5b21b6">(prompt,</text>
+        <text x="195" y="93" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#5b21b6">target answer)</text>
 
         <rect x="260" y="64" width="120" height="36" rx="4" fill="#ecfeff" stroke="#67e8f9" stroke-width="1.2"/>
-        <text x="320" y="80" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#0e7490">(prompt, chosen,</text>
-        <text x="320" y="93" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#0e7490">rejected)</text>
+        <text x="320" y="80" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#0e7490">(prompt, chosen,</text>
+        <text x="320" y="93" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#0e7490">rejected)</text>
 
         <rect x="385" y="64" width="120" height="36" rx="4" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.2"/>
-        <text x="445" y="80" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#92400e">prompt only</text>
-        <text x="445" y="93" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#92400e">(roll out 1)</text>
+        <text x="445" y="80" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#92400e">prompt only</text>
+        <text x="445" y="93" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#92400e">(roll out 1)</text>
 
         <rect x="535" y="64" width="120" height="36" rx="4" fill="#fef2f2" stroke="#fca5a5" stroke-width="1.2"/>
-        <text x="595" y="80" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#7a1f24">prompt only</text>
-        <text x="595" y="93" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#7a1f24">(roll out N)</text>
+        <text x="595" y="80" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#1f5fcc">prompt only</text>
+        <text x="595" y="93" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#1f5fcc">(roll out N)</text>
 
         <!-- Row 2: signal -->
-        <text x="20"  y="146" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068">2. signal</text>
+        <text x="20"  y="146" font-family="IBM Plex Mono, monospace" font-size="10" fill="#566068">2. signal</text>
         <rect x="135" y="126" width="120" height="36" rx="4" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.2"/>
-        <text x="195" y="142" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#5b21b6">teacher tokens</text>
-        <text x="195" y="155" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#5b21b6">are gold</text>
+        <text x="195" y="142" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#5b21b6">teacher tokens</text>
+        <text x="195" y="155" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#5b21b6">are gold</text>
 
         <rect x="260" y="126" width="120" height="36" rx="4" fill="#ecfeff" stroke="#67e8f9" stroke-width="1.2"/>
-        <text x="320" y="142" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#0e7490">human preference</text>
-        <text x="320" y="155" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#0e7490">(implicit reward)</text>
+        <text x="320" y="142" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#0e7490">human preference</text>
+        <text x="320" y="155" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#0e7490">(implicit reward)</text>
 
         <rect x="385" y="126" width="120" height="36" rx="4" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.2"/>
-        <text x="445" y="142" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#92400e">scalar reward</text>
-        <text x="445" y="155" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#92400e">+ value baseline</text>
+        <text x="445" y="142" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#92400e">scalar reward</text>
+        <text x="445" y="155" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#92400e">+ value baseline</text>
 
         <rect x="535" y="126" width="120" height="36" rx="4" fill="#fef2f2" stroke="#fca5a5" stroke-width="1.2"/>
-        <text x="595" y="142" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#7a1f24">scalar reward,</text>
-        <text x="595" y="155" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#7a1f24">group-normalized</text>
+        <text x="595" y="142" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#1f5fcc">scalar reward,</text>
+        <text x="595" y="155" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#1f5fcc">group-normalized</text>
 
         <!-- Row 3: loss -->
-        <text x="20"  y="208" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068">3. loss</text>
+        <text x="20"  y="208" font-family="IBM Plex Mono, monospace" font-size="10" fill="#566068">3. loss</text>
         <rect x="135" y="188" width="120" height="36" rx="4" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.2"/>
-        <text x="195" y="210" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#5b21b6">−log p(target)</text>
+        <text x="195" y="210" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#5b21b6">−log p(target)</text>
 
         <rect x="260" y="188" width="120" height="36" rx="4" fill="#ecfeff" stroke="#67e8f9" stroke-width="1.2"/>
-        <text x="320" y="204" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#0e7490">log-ratio gap</text>
-        <text x="320" y="217" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#0e7490">(chosen − rejected)</text>
+        <text x="320" y="204" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#0e7490">log-ratio gap</text>
+        <text x="320" y="217" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#0e7490">(chosen − rejected)</text>
 
         <rect x="385" y="188" width="120" height="36" rx="4" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.2"/>
-        <text x="445" y="204" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#92400e">clipped surrogate</text>
-        <text x="445" y="217" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#92400e">× advantage</text>
+        <text x="445" y="204" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#92400e">clipped surrogate</text>
+        <text x="445" y="217" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#92400e">× advantage</text>
 
         <rect x="535" y="188" width="120" height="36" rx="4" fill="#fef2f2" stroke="#fca5a5" stroke-width="1.2"/>
-        <text x="595" y="204" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#7a1f24">clipped surrogate</text>
-        <text x="595" y="217" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#7a1f24">× group advantage</text>
+        <text x="595" y="204" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#1f5fcc">clipped surrogate</text>
+        <text x="595" y="217" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#1f5fcc">× group advantage</text>
 
         <!-- Row 4: forward_backward -->
-        <text x="20"  y="270" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068">4. fwd_bwd</text>
-        <rect x="135" y="250" width="520" height="36" rx="4" fill="#fffdf6" stroke="#262320" stroke-width="1.4"/>
-        <text x="395" y="273" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="600" fill="#262320">trainer.forward_backward(batch, loss_fn="…")</text>
+        <text x="20"  y="270" font-family="IBM Plex Mono, monospace" font-size="10" fill="#566068">4. fwd_bwd</text>
+        <rect x="135" y="250" width="520" height="36" rx="4" fill="#FCFEFF" stroke="#0f2238" stroke-width="1.4"/>
+        <text x="395" y="273" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="600" fill="#0f2238">trainer.forward_backward(batch, loss_fn="…")</text>
 
         <!-- Row 5: optim_step -->
-        <text x="20"  y="332" font-family="JetBrains Mono, monospace" font-size="10" fill="#566068">5. step</text>
-        <rect x="135" y="312" width="520" height="36" rx="4" fill="#fffdf6" stroke="#262320" stroke-width="1.4"/>
-        <text x="395" y="335" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="600" fill="#262320">trainer.optim_step()</text>
+        <text x="20"  y="332" font-family="IBM Plex Mono, monospace" font-size="10" fill="#566068">5. step</text>
+        <rect x="135" y="312" width="520" height="36" rx="4" fill="#FCFEFF" stroke="#0f2238" stroke-width="1.4"/>
+        <text x="395" y="335" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="600" fill="#0f2238">trainer.optim_step()</text>
 
         <!-- Caption row -->
-        <line x1="20" y1="368" x2="680" y2="368" stroke="#cfc6b3" stroke-width="1"/>
-        <text x="350" y="392" text-anchor="middle" font-family="Source Serif 4, serif" font-style="italic" font-size="13" fill="#566068">Steps 1–3 differ across objectives. Steps 4–5 are identical: the same two primitives carry every loss.</text>
+        <line x1="20" y1="368" x2="680" y2="368" stroke="#c9d6e3" stroke-width="1"/>
+        <text x="350" y="392" text-anchor="middle" font-family="Bricolage Grotesque, serif" font-style="italic" font-size="13" fill="#566068">Steps 1–3 differ across objectives. Steps 4–5 are identical: the same two primitives carry every loss.</text>
       </svg>
       <figcaption>Same skeleton, four objectives. SFT learns from gold answers; DPO from preference pairs; PPO from a reward model + value baseline; GRPO from a group of rollouts whose rewards are normalized within the group.</figcaption>
     </figure>

@@ -6,25 +6,25 @@
   <title>Bias-Variance Tradeoff · ML, Visualized · Joseph Thomas</title>
   <meta name="description" content="Too simple a model misses the signal; too complex, it memorizes the noise. The dial every model has." />
   <link rel="canonical" href="https://jthomas.site/ml/bias-variance.html" />
-  <meta name="theme-color" content="#7a1f24" />
+  <meta name="theme-color" content="#F4F9FE" />
   <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;1,8..60,300;1,8..60,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="preload" href="/fonts/bricolage-grotesque.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="/css/fonts.css" />
   <link rel="stylesheet" href="../styles.css" />
   <link rel="stylesheet" href="shared.css" />
+  <link rel="stylesheet" href="/css/site.css" />
 </head>
 <body>
-<header class="nb-nav">
-  <div class="brand-block"><a class="brand" href="../index.html">jthomas.site</a><span class="brand-meta">// notebook · v.4.2026</span></div>
-  <nav>
-    <a href="../blog/index.html">writing</a>
-    <a href="index.html" style="color:var(--ink)">tutorial</a>
-    <a href="../index.html#research">research</a>
-    <a href="../index.html#work">work</a>
-    <a href="../index.html#projects">projects</a>
-    <a href="../consulting.html">consulting</a>
-    <a href="../index.html#contact" class="contact">→ contact</a>
+<header class="site-top">
+  <a class="brand" href="../index.html">Joseph Thomas</a>
+  <nav aria-label="Primary">
+    <a href="../blog/index.html">Writing</a>
+    <a href="../ml/index.html" aria-current="true">Tutorial</a>
+    <a href="../index.html#work">Work</a>
+    <a href="../index.html#research">Research</a>
+    <a href="../index.html#projects">Projects</a>
+    <a href="../consulting.html">Consulting</a>
+    <a class="pill-cta" href="../index.html#contact">Contact</a>
   </nav>
 </header>
 
@@ -59,7 +59,7 @@
       </ol>
     </div>
 
-    <div class="ml-try" style="margin-top:14px; background: rgba(38,35,32,0.025); border-left: 2px solid rgba(38,35,32,0.18); padding-left: 14px">
+    <div class="ml-try" style="margin-top:14px; background: rgba(15,34,56,0.025); border-left: 2px solid rgba(15,34,56,0.18); padding-left: 14px">
       <div class="ml-eyebrow">The decomposition, in plain English</div>
       <div class="ml-equation" style="font-size:14px; margin: 8px 0 6px">Error(x) = bias²(x) + variance(x) + σ²</div>
       <ul style="font-family:var(--serif); font-style:italic; font-size:14px; line-height:1.65; color:var(--ink); margin:6px 0 0; padding-left:18px">
@@ -120,68 +120,68 @@
           <!-- 2x2 grid of targets: rows = bias (low/high), cols = variance (low/high) -->
           <!-- Top-left: low bias, low variance -->
           <g transform="translate(10,18)">
-            <circle cx="40" cy="40" r="36" fill="none" stroke="rgba(38,35,32,0.25)" stroke-width="0.6"/>
-            <circle cx="40" cy="40" r="24" fill="none" stroke="rgba(38,35,32,0.30)" stroke-width="0.6"/>
-            <circle cx="40" cy="40" r="12" fill="rgba(122,31,36,0.10)" stroke="rgba(38,35,32,0.40)" stroke-width="0.6"/>
-            <circle cx="40" cy="40" r="3"  fill="#7a1f24"/>
+            <circle cx="40" cy="40" r="36" fill="none" stroke="rgba(15,34,56,0.25)" stroke-width="0.6"/>
+            <circle cx="40" cy="40" r="24" fill="none" stroke="rgba(15,34,56,0.30)" stroke-width="0.6"/>
+            <circle cx="40" cy="40" r="12" fill="rgba(31,95,204,0.10)" stroke="rgba(15,34,56,0.40)" stroke-width="0.6"/>
+            <circle cx="40" cy="40" r="3"  fill="#1f5fcc"/>
             <!-- shots tightly clustered on bullseye -->
-            <circle cx="38" cy="38" r="1.6" fill="#262320"/>
-            <circle cx="42" cy="41" r="1.6" fill="#262320"/>
-            <circle cx="40" cy="42" r="1.6" fill="#262320"/>
-            <circle cx="41" cy="38" r="1.6" fill="#262320"/>
-            <circle cx="39" cy="40" r="1.6" fill="#262320"/>
+            <circle cx="38" cy="38" r="1.6" fill="#0f2238"/>
+            <circle cx="42" cy="41" r="1.6" fill="#0f2238"/>
+            <circle cx="40" cy="42" r="1.6" fill="#0f2238"/>
+            <circle cx="41" cy="38" r="1.6" fill="#0f2238"/>
+            <circle cx="39" cy="40" r="1.6" fill="#0f2238"/>
           </g>
           <!-- Top-right: low bias, high variance -->
           <g transform="translate(110,18)">
-            <circle cx="40" cy="40" r="36" fill="none" stroke="rgba(38,35,32,0.25)" stroke-width="0.6"/>
-            <circle cx="40" cy="40" r="24" fill="none" stroke="rgba(38,35,32,0.30)" stroke-width="0.6"/>
-            <circle cx="40" cy="40" r="12" fill="rgba(122,31,36,0.10)" stroke="rgba(38,35,32,0.40)" stroke-width="0.6"/>
-            <circle cx="40" cy="40" r="3"  fill="#7a1f24"/>
+            <circle cx="40" cy="40" r="36" fill="none" stroke="rgba(15,34,56,0.25)" stroke-width="0.6"/>
+            <circle cx="40" cy="40" r="24" fill="none" stroke="rgba(15,34,56,0.30)" stroke-width="0.6"/>
+            <circle cx="40" cy="40" r="12" fill="rgba(31,95,204,0.10)" stroke="rgba(15,34,56,0.40)" stroke-width="0.6"/>
+            <circle cx="40" cy="40" r="3"  fill="#1f5fcc"/>
             <!-- shots scattered around bullseye, centered on it -->
-            <circle cx="28" cy="38" r="1.6" fill="#262320"/>
-            <circle cx="50" cy="44" r="1.6" fill="#262320"/>
-            <circle cx="44" cy="28" r="1.6" fill="#262320"/>
-            <circle cx="36" cy="56" r="1.6" fill="#262320"/>
-            <circle cx="55" cy="34" r="1.6" fill="#262320"/>
-            <circle cx="32" cy="48" r="1.6" fill="#262320"/>
+            <circle cx="28" cy="38" r="1.6" fill="#0f2238"/>
+            <circle cx="50" cy="44" r="1.6" fill="#0f2238"/>
+            <circle cx="44" cy="28" r="1.6" fill="#0f2238"/>
+            <circle cx="36" cy="56" r="1.6" fill="#0f2238"/>
+            <circle cx="55" cy="34" r="1.6" fill="#0f2238"/>
+            <circle cx="32" cy="48" r="1.6" fill="#0f2238"/>
           </g>
           <!-- Bottom-left: high bias, low variance -->
           <g transform="translate(10,118)">
-            <circle cx="40" cy="40" r="36" fill="none" stroke="rgba(38,35,32,0.25)" stroke-width="0.6"/>
-            <circle cx="40" cy="40" r="24" fill="none" stroke="rgba(38,35,32,0.30)" stroke-width="0.6"/>
-            <circle cx="40" cy="40" r="12" fill="rgba(122,31,36,0.10)" stroke="rgba(38,35,32,0.40)" stroke-width="0.6"/>
-            <circle cx="40" cy="40" r="3"  fill="#7a1f24"/>
+            <circle cx="40" cy="40" r="36" fill="none" stroke="rgba(15,34,56,0.25)" stroke-width="0.6"/>
+            <circle cx="40" cy="40" r="24" fill="none" stroke="rgba(15,34,56,0.30)" stroke-width="0.6"/>
+            <circle cx="40" cy="40" r="12" fill="rgba(31,95,204,0.10)" stroke="rgba(15,34,56,0.40)" stroke-width="0.6"/>
+            <circle cx="40" cy="40" r="3"  fill="#1f5fcc"/>
             <!-- shots tightly clustered, off-center -->
-            <circle cx="60" cy="22" r="1.6" fill="#262320"/>
-            <circle cx="62" cy="24" r="1.6" fill="#262320"/>
-            <circle cx="58" cy="20" r="1.6" fill="#262320"/>
-            <circle cx="61" cy="20" r="1.6" fill="#262320"/>
-            <circle cx="59" cy="23" r="1.6" fill="#262320"/>
+            <circle cx="60" cy="22" r="1.6" fill="#0f2238"/>
+            <circle cx="62" cy="24" r="1.6" fill="#0f2238"/>
+            <circle cx="58" cy="20" r="1.6" fill="#0f2238"/>
+            <circle cx="61" cy="20" r="1.6" fill="#0f2238"/>
+            <circle cx="59" cy="23" r="1.6" fill="#0f2238"/>
           </g>
           <!-- Bottom-right: high bias, high variance -->
           <g transform="translate(110,118)">
-            <circle cx="40" cy="40" r="36" fill="none" stroke="rgba(38,35,32,0.25)" stroke-width="0.6"/>
-            <circle cx="40" cy="40" r="24" fill="none" stroke="rgba(38,35,32,0.30)" stroke-width="0.6"/>
-            <circle cx="40" cy="40" r="12" fill="rgba(122,31,36,0.10)" stroke="rgba(38,35,32,0.40)" stroke-width="0.6"/>
-            <circle cx="40" cy="40" r="3"  fill="#7a1f24"/>
+            <circle cx="40" cy="40" r="36" fill="none" stroke="rgba(15,34,56,0.25)" stroke-width="0.6"/>
+            <circle cx="40" cy="40" r="24" fill="none" stroke="rgba(15,34,56,0.30)" stroke-width="0.6"/>
+            <circle cx="40" cy="40" r="12" fill="rgba(31,95,204,0.10)" stroke="rgba(15,34,56,0.40)" stroke-width="0.6"/>
+            <circle cx="40" cy="40" r="3"  fill="#1f5fcc"/>
             <!-- shots scattered, off-center -->
-            <circle cx="62" cy="14" r="1.6" fill="#262320"/>
-            <circle cx="50" cy="26" r="1.6" fill="#262320"/>
-            <circle cx="68" cy="32" r="1.6" fill="#262320"/>
-            <circle cx="56" cy="10" r="1.6" fill="#262320"/>
-            <circle cx="72" cy="22" r="1.6" fill="#262320"/>
-            <circle cx="46" cy="18" r="1.6" fill="#262320"/>
+            <circle cx="62" cy="14" r="1.6" fill="#0f2238"/>
+            <circle cx="50" cy="26" r="1.6" fill="#0f2238"/>
+            <circle cx="68" cy="32" r="1.6" fill="#0f2238"/>
+            <circle cx="56" cy="10" r="1.6" fill="#0f2238"/>
+            <circle cx="72" cy="22" r="1.6" fill="#0f2238"/>
+            <circle cx="46" cy="18" r="1.6" fill="#0f2238"/>
           </g>
           <!-- Axis labels -->
-          <text x="50"  y="13" font-family="JetBrains Mono, monospace" font-size="7" fill="#262320" text-anchor="middle">low variance</text>
-          <text x="150" y="13" font-family="JetBrains Mono, monospace" font-size="7" fill="#262320" text-anchor="middle">high variance</text>
-          <text x="6" y="60"  font-family="JetBrains Mono, monospace" font-size="7" fill="#262320" text-anchor="middle" transform="rotate(-90 6 60)">low bias</text>
-          <text x="6" y="160" font-family="JetBrains Mono, monospace" font-size="7" fill="#262320" text-anchor="middle" transform="rotate(-90 6 160)">high bias</text>
+          <text x="50"  y="13" font-family="IBM Plex Mono, monospace" font-size="7" fill="#0f2238" text-anchor="middle">low variance</text>
+          <text x="150" y="13" font-family="IBM Plex Mono, monospace" font-size="7" fill="#0f2238" text-anchor="middle">high variance</text>
+          <text x="6" y="60"  font-family="IBM Plex Mono, monospace" font-size="7" fill="#0f2238" text-anchor="middle" transform="rotate(-90 6 60)">low bias</text>
+          <text x="6" y="160" font-family="IBM Plex Mono, monospace" font-size="7" fill="#0f2238" text-anchor="middle" transform="rotate(-90 6 160)">high bias</text>
           <!-- Small caption labels per quadrant -->
-          <text x="50"  y="106" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="8" fill="rgba(38,35,32,0.65)" text-anchor="middle">ideal</text>
-          <text x="150" y="106" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="8" fill="rgba(38,35,32,0.65)" text-anchor="middle">overfit</text>
-          <text x="50"  y="206" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="8" fill="rgba(38,35,32,0.65)" text-anchor="middle">underfit</text>
-          <text x="150" y="206" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-size="8" fill="rgba(38,35,32,0.65)" text-anchor="middle">worst</text>
+          <text x="50"  y="106" font-family="Bricolage Grotesque, Georgia, serif" font-style="italic" font-size="8" fill="rgba(15,34,56,0.65)" text-anchor="middle">ideal</text>
+          <text x="150" y="106" font-family="Bricolage Grotesque, Georgia, serif" font-style="italic" font-size="8" fill="rgba(15,34,56,0.65)" text-anchor="middle">overfit</text>
+          <text x="50"  y="206" font-family="Bricolage Grotesque, Georgia, serif" font-style="italic" font-size="8" fill="rgba(15,34,56,0.65)" text-anchor="middle">underfit</text>
+          <text x="150" y="206" font-family="Bricolage Grotesque, Georgia, serif" font-style="italic" font-size="8" fill="rgba(15,34,56,0.65)" text-anchor="middle">worst</text>
         </svg>
         <p class="quiet" style="margin-top:6px">Each target is one model class. The red dot is truth; the ink dots are predictions from many imagined training datasets. Off-center cluster = bias. Spread of cluster = variance. You want the top-left quadrant.</p>
 

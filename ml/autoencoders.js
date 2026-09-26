@@ -152,14 +152,14 @@
       for (let j = 0; j < M; j++) {
         const v = Math.max(-1, Math.min(2, map[i][j]));
         const t = Math.max(0, Math.min(1, v));
-        const r = Math.round(247 - t * 200);
-        const g = Math.round(244 - t * 200);
-        const b = Math.round(236 - t * 220);
+        const r = Math.round(252 - t * 237);
+        const g = Math.round(254 - t * 220);
+        const b = Math.round(255 - t * 199);
         ctx.fillStyle = `rgb(${r},${g},${b})`;
         ctx.fillRect(x0 + j * cell, y0 + i * cell, cell + 0.5, cell + 0.5);
       }
     }
-    ctx.strokeStyle = 'rgba(38,35,32,0.30)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.30)';
     ctx.lineWidth = 1;
     ctx.strokeRect(x0, y0, M * cell, N * cell);
   }
@@ -197,18 +197,18 @@
     // 1. INPUT grid
     drawGrid(ctx, input, inputX, funnelY, inputCell);
     ctx.fillStyle = INK_FADE;
-    ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+    ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('input · 8×8 = 64', inputX + inputW / 2, funnelY + inputW + 16);
-    ctx.font = 'italic 14px "Source Serif 4", Georgia, serif';
+    ctx.font = '14px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.fillStyle = INK;
     ctx.fillText('x', inputX + inputW / 2, funnelY - 8);
 
     // 2. ENCODER funnel — wide left → narrow right
     const encWidthLeft = inputW;
     const waistH = Math.max(state.k * 4, 12);
-    ctx.fillStyle = 'rgba(122,31,36,0.07)';
-    ctx.strokeStyle = 'rgba(122,31,36,0.45)';
+    ctx.fillStyle = 'rgba(31,95,204,0.07)';
+    ctx.strokeStyle = 'rgba(31,95,204,0.45)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(encX1, funnelY);
@@ -220,7 +220,7 @@
     ctx.stroke();
 
     // Tier markers (suggesting layers)
-    ctx.strokeStyle = 'rgba(122,31,36,0.18)';
+    ctx.strokeStyle = 'rgba(31,95,204,0.18)';
     ctx.setLineDash([2, 3]);
     for (let t = 0.25; t < 1; t += 0.25) {
       const x = encX1 + (encX2 - encX1) * t;
@@ -234,7 +234,7 @@
     ctx.setLineDash([]);
 
     ctx.fillStyle = INK_FADE;
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'center';
     ctx.fillText('ENCODER', (encX1 + encX2) / 2, funnelY + funnelH + 28);
 
@@ -247,25 +247,25 @@
     coeffs.slice(0, state.k).forEach((c, i) => {
       const intensity = Math.min(1, Math.abs(c) / latMax);
       ctx.fillStyle = c >= 0
-        ? `rgba(122,31,36,${0.18 + intensity * 0.7})`
-        : `rgba(38,35,32,${0.18 + intensity * 0.7})`;
+        ? `rgba(31,95,204,${0.18 + intensity * 0.7})`
+        : `rgba(15,34,56,${0.18 + intensity * 0.7})`;
       ctx.fillRect(latX, latY + i * latCellH, 12, latCellH - 1);
     });
-    ctx.strokeStyle = 'rgba(38,35,32,0.45)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.45)';
     ctx.lineWidth = 1;
     ctx.strokeRect(latX, latY, 12, latH);
 
     ctx.fillStyle = ACCENT;
-    ctx.font = 'italic 13px "Source Serif 4", Georgia, serif';
+    ctx.font = '13px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('z', bX, latY - 6);
     ctx.fillStyle = INK_FADE;
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.fillText(`k = ${state.k}`, bX, latY + latH + 14);
 
     // 4. DECODER funnel — narrow → wide
-    ctx.fillStyle = 'rgba(122,31,36,0.07)';
-    ctx.strokeStyle = 'rgba(122,31,36,0.45)';
+    ctx.fillStyle = 'rgba(31,95,204,0.07)';
+    ctx.strokeStyle = 'rgba(31,95,204,0.45)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(decX1, yMid - waistH / 2);
@@ -275,7 +275,7 @@
     ctx.closePath();
     ctx.fill();
     ctx.stroke();
-    ctx.strokeStyle = 'rgba(122,31,36,0.18)';
+    ctx.strokeStyle = 'rgba(31,95,204,0.18)';
     ctx.setLineDash([2, 3]);
     for (let t = 0.25; t < 1; t += 0.25) {
       const x = decX1 + (decX2 - decX1) * t;
@@ -288,7 +288,7 @@
     }
     ctx.setLineDash([]);
     ctx.fillStyle = INK_FADE;
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'center';
     ctx.fillText('DECODER', (decX1 + decX2) / 2, funnelY + funnelH + 28);
 
@@ -298,10 +298,10 @@
     drawGrid(ctx, recon, reconX, funnelY, inputCell);
     ctx.restore();
     ctx.fillStyle = INK_FADE;
-    ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+    ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('reconstruction', reconX + inputW / 2, funnelY + inputW + 16);
-    ctx.font = 'italic 14px "Source Serif 4", Georgia, serif';
+    ctx.font = '14px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.fillStyle = INK;
     ctx.fillText('x̂', reconX + inputW / 2, funnelY - 8);
 
@@ -340,14 +340,14 @@
       }
       const r = phase > 0.5 && phase < 0.55 ? 1.6 : 2.6;
       const alpha = phase < 0.5 ? 0.35 + phase * 0.7 : 0.85 - (phase - 0.5) * 0.4;
-      ctx.fillStyle = `rgba(122,31,36,${Math.max(0.15, alpha)})`;
+      ctx.fillStyle = `rgba(31,95,204,${Math.max(0.15, alpha)})`;
       ctx.beginPath();
       ctx.arc(px, py, r, 0, Math.PI * 2);
       ctx.fill();
     }
 
     // 7. Loss anchor: draw faint dotted bracket from x to x̂ with L = ‖x − x̂‖²
-    ctx.strokeStyle = 'rgba(38,35,32,0.35)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.35)';
     ctx.setLineDash([3, 3]);
     ctx.lineWidth = 1;
     const lossY = funnelY + inputW + 36;
@@ -359,17 +359,17 @@
     ctx.stroke();
     ctx.setLineDash([]);
     ctx.fillStyle = INK_FADE;
-    ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+    ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     const lossMidX = (inputX + inputW / 2 + reconX + inputW / 2) / 2;
     ctx.fillText('L = ‖x − x̂‖²', lossMidX, lossY + 24);
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.fillStyle = INK_FADE;
     ctx.fillText('SQUARED PIXEL DISTANCE — TRAINING MINIMIZES THIS', lossMidX, lossY + 38);
 
     // Squeeze ratio annotation pinned near the bottleneck
     ctx.fillStyle = INK_FADE;
-    ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+    ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText(`64 → ${state.k}  (${(64 / state.k).toFixed(1)}× squeeze)`, bX, latY + latH + 30);
   }
@@ -392,15 +392,15 @@
     maps.forEach((m, i) => {
       drawGrid(ctx, m, xs[i], yOff, cell);
       ctx.fillStyle = i === 2 ? ACCENT : INK_FADE;
-      ctx.font = i === 2 ? 'italic 13px "Source Serif 4", Georgia, serif'
-                          : 'italic 12px "Source Serif 4", Georgia, serif';
+      ctx.font = i === 2 ? '13px "Bricolage Grotesque", system-ui, sans-serif'
+                          : '12px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText(labels[i], xs[i] + panelW / 2, yOff + panelW + 22);
     });
 
     // Connector arrows: noisy → AE → reconstruction
     ctx.fillStyle = INK_FADE;
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'center';
     ctx.fillText('+ noise', xs[0] + panelW + gap / 2, yOff + panelW / 2 - 8);
     drawArrow(ctx, xs[0] + panelW + 4, yOff + panelW / 2, xs[1] - 4, yOff + panelW / 2);
@@ -409,19 +409,19 @@
 
     // Caption-equation
     ctx.fillStyle = INK;
-    ctx.font = 'italic 14px "Source Serif 4", Georgia, serif';
+    ctx.font = '14px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('latent has room for the signal — not the noise', size.w / 2, yOff + panelW + 56);
   }
 
   function drawArrow(ctx, x1, y1, x2, y2) {
-    ctx.strokeStyle = 'rgba(38,35,32,0.45)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.45)';
     ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
     ctx.stroke();
     const ang = Math.atan2(y2 - y1, x2 - x1);
-    ctx.fillStyle = 'rgba(38,35,32,0.45)';
+    ctx.fillStyle = 'rgba(15,34,56,0.45)';
     ctx.beginPath();
     ctx.moveTo(x2, y2);
     ctx.lineTo(x2 - 8 * Math.cos(ang - 0.4), y2 - 8 * Math.sin(ang - 0.4));
@@ -445,12 +445,12 @@
 
     // Title
     ctx.fillStyle = INK_FADE;
-    ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+    ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('each preset → its (z₁, z₂) latent · classes separate without labels', size.w / 2, 22);
 
     // Axes
-    ctx.strokeStyle = 'rgba(38,35,32,0.18)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.18)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(margin - 12, size.h - margin); ctx.lineTo(size.w - margin + 12, size.h - margin);
@@ -459,7 +459,7 @@
     ctx.moveTo(margin, margin - 12); ctx.lineTo(margin, size.h - margin + 12);
     ctx.stroke();
     ctx.fillStyle = INK_FADE;
-    ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+    ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'left';
     ctx.fillText('z₁', size.w - margin + 4, size.h - margin + 4);
     ctx.fillText('z₂', margin - 16, margin - 4);
@@ -487,15 +487,15 @@
       // Label
       ctx.fillStyle = isCurrent ? ACCENT : INK_FADE;
       ctx.font = isCurrent
-        ? 'italic 13px "Source Serif 4", Georgia, serif'
-        : 'italic 12px "Source Serif 4", Georgia, serif';
+        ? '13px "Bricolage Grotesque", system-ui, sans-serif'
+        : '12px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText(p.name, px, py + 18);
     });
 
     // Annotation
     ctx.fillStyle = INK_FADE;
-    ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+    ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('no labels needed — the bottleneck found this organization on its own',
       size.w / 2, size.h - 18);

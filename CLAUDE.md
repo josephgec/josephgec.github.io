@@ -4,8 +4,13 @@ Static personal site (no framework, no build step), served from the repo root
 via GitHub Pages at https://jthomas.site. Sections: `/` (home), `/blog/`,
 `/ml/` (interactive encyclopedia), `/consulting.html`, `blog/feed.xml` (RSS).
 
-Only the home page uses the design below. `/blog/`, `/ml/` and
-`/consulting.html` still use the older "Notebook" stylesheet (`styles.css`).
+Every page uses the Sky palette and Bricolage type below. The home page has
+its own stylesheet (`css/home.css`). The older pages (`/blog/`, `/ml/`,
+`/consulting.html`) still use the "Notebook" markup and `styles.css`, re-skinned
+by `css/site.css`, which loads last and overrides the Notebook tokens (`--bg`,
+`--ink`, `--accent`, `--serif`, …) and a few component shapes. All pages load
+`css/fonts.css` and share one generated header (`.site-top` on sub-pages).
+When adding a sub-page, copy the `<head>` and header from an existing one.
 
 ## Home page design: "Swarm stage"
 
@@ -47,8 +52,8 @@ Palette “Sky”:
 
 | Token          | Value     | Use                                    |
 |----------------|-----------|----------------------------------------|
-| `--bg`         | `#EAF3FB` | page                                   |
-| `--surface`    | `#F6FAFE` | cards                                  |
+| `--bg`         | `#F4F9FE` | page (lightened from #EAF3FB, Sep 2026) |
+| `--surface`    | `#FCFEFF` | cards (`--paper` on sub-pages)         |
 | `--ink`        | `#0F2238` | text, 14.3:1                           |
 | `--ink-2`      | `#4A5E75` | secondary text, 5.9:1                  |
 | `--accent`     | `#1F5FCC` | links, buttons, 5.2:1 (white on it 5.9:1) |
@@ -65,6 +70,11 @@ Type:
 
 Shape: buttons have a 10px radius (`--radius`), cards and the photo 16px
 (`--radius-card`), and tags are fully rounded.
+
+/ml/ diagram scripts hard-code colors and fonts (no CSS variables). They use
+ink `#0f2238` / `rgba(15,34,56,…)`, accent `#1f5fcc` / `rgba(31,95,204,…)`,
+panel `#fcfeff`, heatmap ramps from `252,254,255`, and canvas fonts
+"Bricolage Grotesque" and "IBM Plex Mono". Keep new diagrams on these.
 
 ### Don't
 - change the palette or fonts without asking; the user picked Sky +

@@ -225,14 +225,14 @@
         const x = -4 + (j + 0.5) / cells * 8;
         const y = 4 - (i + 0.5) / cells * 8;
         const z = state.w1 * x + state.w2 * y + state.b;
-        ctx.fillStyle = z > 0 ? 'rgba(122,31,36,0.10)' : 'rgba(38,35,32,0.04)';
+        ctx.fillStyle = z > 0 ? 'rgba(31,95,204,0.10)' : 'rgba(15,34,56,0.04)';
         ctx.fillRect(j * size.w / cells, i * size.h / cells,
                      size.w / cells + 1, size.h / cells + 1);
       }
     }
 
     // Grid
-    ctx.strokeStyle = 'rgba(38,35,32,0.08)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.08)';
     ctx.lineWidth = 1;
     for (let i = -3; i <= 3; i++) {
       ctx.beginPath();
@@ -247,7 +247,7 @@
       const t = (i + 1) / H.length; // 0..1, newer = larger t
       const alpha = 0.04 + t * 0.14;
       drawLine(ctx, H[i].w1, H[i].w2, H[i].b, toPx,
-               `rgba(122,31,36,${alpha.toFixed(3)})`, 1.2, false);
+               `rgba(31,95,204,${alpha.toFixed(3)})`, 1.2, false);
     }
 
     // Current decision line
@@ -267,7 +267,7 @@
       const ux = state.w1 / wLen, uy = state.w2 / wLen;
       const tipx = fx + ux * tipMag, tipy = fy + uy * tipMag;
       arrow(ctx, toPx([fx, fy]), toPx([tipx, tipy]),
-                'rgba(38,35,32,0.7)', 2, 9);
+                'rgba(15,34,56,0.7)', 2, 9);
       // Right-angle ⊥ marker: small square at the foot, oriented along (u, n_along_line).
       const lx = -uy, ly = ux; // along-line tangent (rotate (u) by 90°)
       const s = 0.18; // size in world units
@@ -275,14 +275,14 @@
       const bPx = toPx([fx + lx * s, fy + ly * s]);
       const cPx = toPx([fx + lx * s + ux * s, fy + ly * s + uy * s]);
       const dPx = toPx([fx + ux * s, fy + uy * s]);
-      ctx.strokeStyle = 'rgba(38,35,32,0.55)';
+      ctx.strokeStyle = 'rgba(15,34,56,0.55)';
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(...aPx); ctx.lineTo(...bPx); ctx.lineTo(...cPx); ctx.lineTo(...dPx);
       ctx.stroke();
       // Tiny "w" label at arrow tip.
-      ctx.fillStyle = 'rgba(38,35,32,0.7)';
-      ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+      ctx.fillStyle = 'rgba(15,34,56,0.7)';
+      ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
       const [tipPxX, tipPxY] = toPx([tipx, tipy]);
       ctx.fillText('w', tipPxX + 6, tipPxY - 6);
@@ -296,7 +296,7 @@
       drawLine(ctx, 1, 1,  1.0, toPx, 'rgba(58,107,94,0.9)', 2, true);
       drawLine(ctx, 1, 1, -1.0, toPx, 'rgba(58,107,94,0.9)', 2, true);
       ctx.fillStyle = 'rgba(58,107,94,0.9)';
-      ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+      ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'left'; ctx.textBaseline = 'top';
       const [tx, ty] = toPx([-3.6, 3.6]);
       ctx.fillText('two lines, hidden layer combines them', tx, ty);
@@ -323,8 +323,8 @@
 
     // XOR "linearly inseparable" annotation on the always-misclassified corners.
     if (state.datasetKey === 'xor' && !state.showMlpSolution) {
-      ctx.fillStyle = 'rgba(38,35,32,0.65)';
-      ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+      ctx.fillStyle = 'rgba(15,34,56,0.65)';
+      ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
       const [lx, ly] = toPx([-3.7, 3.6]);
       ctx.fillText('linearly inseparable —', lx, ly);
@@ -334,10 +334,10 @@
     // Convergence annotation — top-center, only when not training and converged.
     if (state.convergedAt != null && !state.training && state.datasetKey !== 'xor') {
       const txt = `Converged after ${state.convergedAt} step${state.convergedAt === 1 ? '' : 's'} — line found a separator.`;
-      ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+      ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
       const tw = ctx.measureText(txt).width + 16;
       const tx0 = (size.w - tw) / 2;
-      ctx.fillStyle = 'rgba(255,253,246,0.92)';
+      ctx.fillStyle = 'rgba(252,254,255,0.92)';
       ctx.strokeStyle = 'rgba(58,107,94,0.7)';
       ctx.lineWidth = 1;
       ctx.beginPath();
@@ -356,24 +356,24 @@
       const txt1 = 'Δw = η · err · x';
       const txt2 = `(${formatNum(lc.dw1)}, ${formatNum(lc.dw2)})`;
       const txt3 = 'this point pushed the weights this way';
-      ctx.font = '11px "JetBrains Mono", monospace';
+      ctx.font = '11px "IBM Plex Mono", monospace';
       const w1 = ctx.measureText(txt1).width;
       const w2 = ctx.measureText(txt2).width;
-      ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+      ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
       const w3 = ctx.measureText(txt3).width;
       const boxW = Math.max(w1, w2, w3) + 16;
       const boxH = 52;
       let bx = px + 14, by = py - boxH - 8;
       if (bx + boxW > size.w - 4) bx = px - boxW - 14;
       if (by < 4) by = py + 14;
-      ctx.fillStyle = 'rgba(255,253,246,0.92)';
-      ctx.strokeStyle = 'rgba(122,31,36,0.7)';
+      ctx.fillStyle = 'rgba(252,254,255,0.92)';
+      ctx.strokeStyle = 'rgba(31,95,204,0.7)';
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.rect(bx, by, boxW, boxH);
       ctx.fill(); ctx.stroke();
       // Connector to the point
-      ctx.strokeStyle = 'rgba(122,31,36,0.45)';
+      ctx.strokeStyle = 'rgba(31,95,204,0.45)';
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(px, py); ctx.lineTo(bx + boxW / 2, by + boxH);
@@ -386,13 +386,13 @@
       ctx.stroke();
       // Text
       ctx.fillStyle = ACCENT;
-      ctx.font = '11px "JetBrains Mono", monospace';
+      ctx.font = '11px "IBM Plex Mono", monospace';
       ctx.textAlign = 'left'; ctx.textBaseline = 'top';
       ctx.fillText(txt1, bx + 8, by + 6);
       ctx.fillStyle = INK;
       ctx.fillText(txt2, bx + 8, by + 20);
       ctx.fillStyle = INK_FADE;
-      ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+      ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.fillText(txt3, bx + 8, by + 35);
     }
   }

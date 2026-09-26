@@ -128,14 +128,14 @@
     for (let i = 0; i < 8; i++) {
       for (let j = 0; j < 8; j++) {
         const t = Math.max(0, Math.min(1, map[i][j]));
-        const r = Math.round(247 - t * 200);
-        const g = Math.round(244 - t * 200);
-        const b = Math.round(236 - t * 220);
+        const r = Math.round(252 - t * 237);
+        const g = Math.round(254 - t * 220);
+        const b = Math.round(255 - t * 199);
         ctx.fillStyle = `rgb(${r},${g},${b})`;
         ctx.fillRect(x0 + j * cell, y0 + i * cell, cell + 0.5, cell + 0.5);
       }
     }
-    ctx.strokeStyle = 'rgba(38,35,32,0.25)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.25)';
     ctx.lineWidth = 1;
     ctx.strokeRect(x0, y0, cell * 8, cell * 8);
   }
@@ -162,24 +162,24 @@
 
     // Title
     ctx.fillStyle = INK_FADE;
-    ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+    ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('encoder distribution q(z|x) vs prior N(0, I)', size.w / 2, 22);
 
     // Light grid
-    ctx.strokeStyle = 'rgba(38,35,32,0.06)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.06)';
     ctx.lineWidth = 1;
     for (let g = -3; g <= 3; g++) {
       ctx.beginPath(); ctx.moveTo(tx(g), ty(-3)); ctx.lineTo(tx(g), ty(3)); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(tx(-3), ty(g)); ctx.lineTo(tx(3), ty(g)); ctx.stroke();
     }
     // Axes
-    ctx.strokeStyle = 'rgba(38,35,32,0.18)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.18)';
     ctx.beginPath(); ctx.moveTo(tx(-3), cy); ctx.lineTo(tx(3), cy); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(cx, ty(-3)); ctx.lineTo(cx, ty(3)); ctx.stroke();
 
     // Prior N(0,I): unit-radius dashed circle (one std)
-    ctx.strokeStyle = 'rgba(38,35,32,0.55)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.55)';
     ctx.setLineDash([4, 4]);
     ctx.lineWidth = 1.2;
     ctx.beginPath();
@@ -187,32 +187,32 @@
     ctx.stroke();
     // 2σ outer
     ctx.setLineDash([2, 4]);
-    ctx.strokeStyle = 'rgba(38,35,32,0.25)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.25)';
     ctx.beginPath();
     ctx.ellipse(cx, cy, sx * 2, sy * 2, 0, 0, Math.PI * 2);
     ctx.stroke();
     ctx.setLineDash([]);
     // Prior label
     ctx.fillStyle = INK_FADE;
-    ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+    ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'left';
     ctx.fillText('N(0, I)  prior', cx + sx + 6, cy - sy - 6);
     // Origin dot
-    ctx.fillStyle = 'rgba(38,35,32,0.55)';
+    ctx.fillStyle = 'rgba(15,34,56,0.55)';
     ctx.beginPath(); ctx.arc(cx, cy, 2.5, 0, Math.PI * 2); ctx.fill();
 
     // Encoder ellipse: filled at 1σ (orange tinted)
     const muX = tx(state.encMu[0]), muY = ty(state.encMu[1]);
     const eSx = state.encSigma[0] * sx;
     const eSy = state.encSigma[1] * sy;
-    ctx.fillStyle = 'rgba(122,31,36,0.18)';
+    ctx.fillStyle = 'rgba(31,95,204,0.18)';
     ctx.strokeStyle = ACCENT;
     ctx.lineWidth = 1.4;
     ctx.beginPath();
     ctx.ellipse(muX, muY, eSx, eSy, 0, 0, Math.PI * 2);
     ctx.fill(); ctx.stroke();
     // 2σ
-    ctx.strokeStyle = 'rgba(122,31,36,0.30)';
+    ctx.strokeStyle = 'rgba(31,95,204,0.30)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.ellipse(muX, muY, eSx * 2, eSy * 2, 0, 0, Math.PI * 2);
@@ -223,11 +223,11 @@
 
     // μ label
     ctx.fillStyle = ACCENT;
-    ctx.font = 'italic 13px "Source Serif 4", Georgia, serif';
+    ctx.font = '13px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'left';
     ctx.fillText('μ', muX + 8, muY - 8);
     // q(z|x) label
-    ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+    ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.fillText('q(z|x) = N(μ, σ²)', muX + eSx + 8, muY + eSy + 14);
 
     // Spring/arrow from encoder mean → origin (the "KL pull")
@@ -237,26 +237,26 @@
     const midX = (muX + cx) / 2;
     const midY = (muY + cy) / 2;
     ctx.fillStyle = INK;
-    ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+    ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText(`KL = ${formatNum(klVal)}`, midX + 18, midY - 6);
     ctx.fillStyle = INK_FADE;
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.fillText('KULLBACK–LEIBLER', midX + 18, midY + 8);
     // Math anchored to the picture: the closed-form KL for diag-Gauss vs N(0,I)
-    ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+    ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.fillStyle = INK_FADE;
     ctx.fillText('½ Σ ( σ² + μ² − 1 − log σ² )', midX + 18, midY + 24);
 
     // Hint
-    ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+    ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.fillStyle = INK_FADE;
     ctx.textAlign = 'center';
     ctx.fillText('press ⇨ Improve KL — watch the orange ellipse get pulled onto the dashed prior',
       size.w / 2, size.h - 10);
 
     // Symbol gloss (small inline)
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left';
     ctx.fillStyle = INK_FADE;
     ctx.fillText('μ MEAN · σ SPREAD · q(z|x) ENCODER OUTPUT', 12, size.h - 28);
@@ -280,7 +280,7 @@
     const ux = dx / len, uy = dy / len;
     const px = -uy, py = ux;
     const amp = 5;
-    ctx.strokeStyle = 'rgba(38,35,32,0.45)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.45)';
     ctx.lineWidth = 1.2;
     ctx.beginPath();
     ctx.moveTo(x1, y1);
@@ -294,7 +294,7 @@
     ctx.stroke();
     // Arrowhead at origin end
     const ang = Math.atan2(-uy, -ux);
-    ctx.fillStyle = 'rgba(38,35,32,0.55)';
+    ctx.fillStyle = 'rgba(15,34,56,0.55)';
     ctx.beginPath();
     ctx.moveTo(x2, y2);
     ctx.lineTo(x2 - 7 * Math.cos(ang - 0.4), y2 - 7 * Math.sin(ang - 0.4));
@@ -306,7 +306,7 @@
   function drawReparam(ctx, size) {
     // Title
     ctx.fillStyle = INK_FADE;
-    ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+    ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('reparameterization · z = μ + σ · ε', size.w / 2, 22);
 
@@ -318,7 +318,7 @@
     const yTop = 80;
 
     const labels = ['μ', 'σ · ε', 'z = μ + σ · ε'];
-    const colors = [ACCENT, 'rgba(38,35,32,0.85)', INK];
+    const colors = [ACCENT, 'rgba(15,34,56,0.85)', INK];
 
     // Compute the two vectors per dim
     const dim = 2;
@@ -333,12 +333,12 @@
     for (let p = 0; p < 3; p++) {
       const x0 = padX + p * (panelW + padX);
       // panel border
-      ctx.strokeStyle = 'rgba(38,35,32,0.20)';
+      ctx.strokeStyle = 'rgba(15,34,56,0.20)';
       ctx.lineWidth = 1;
       ctx.strokeRect(x0, yTop, panelW, panelH);
       // header label
       ctx.fillStyle = colors[p];
-      ctx.font = 'italic 18px "Source Serif 4", Georgia, serif';
+      ctx.font = '18px "Bricolage Grotesque", system-ui, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText(labels[p], x0 + panelW / 2, yTop - 14);
       // bars for each entry
@@ -347,7 +347,7 @@
       for (let i = 0; i < dim; i++) {
         const cy = yTop + 24 + i * 32;
         // axis line
-        ctx.strokeStyle = 'rgba(38,35,32,0.18)';
+        ctx.strokeStyle = 'rgba(15,34,56,0.18)';
         ctx.beginPath();
         ctx.moveTo(x0 + 12, cy);
         ctx.lineTo(x0 + panelW - 12, cy);
@@ -364,7 +364,7 @@
         ctx.fillRect(midX, cy - 5, blen, 10);
         // value
         ctx.fillStyle = INK_FADE;
-        ctx.font = '10px "JetBrains Mono", monospace';
+        ctx.font = '10px "IBM Plex Mono", monospace';
         ctx.textAlign = 'left';
         ctx.fillText(`${i === 0 ? 'z₁' : 'z₂'}`, x0 + 6, cy + 3);
         ctx.textAlign = 'right';
@@ -374,7 +374,7 @@
 
     // Plus / equals between panels
     ctx.fillStyle = INK_FADE;
-    ctx.font = 'italic 22px "Source Serif 4", Georgia, serif';
+    ctx.font = '22px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('+', padX + panelW + padX / 2, yTop + panelH / 2 + 6);
     ctx.fillText('=', padX * 2 + panelW * 2 + padX / 2, yTop + panelH / 2 + 6);
@@ -393,55 +393,55 @@
     const ty = (z) => pcy - z * sy;
 
     // grid + axes
-    ctx.strokeStyle = 'rgba(38,35,32,0.06)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.06)';
     for (let g = -3; g <= 3; g++) {
       ctx.beginPath(); ctx.moveTo(tx(g), ty(-3)); ctx.lineTo(tx(g), ty(3)); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(tx(-3), ty(g)); ctx.lineTo(tx(3), ty(g)); ctx.stroke();
     }
-    ctx.strokeStyle = 'rgba(38,35,32,0.18)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.18)';
     ctx.beginPath(); ctx.moveTo(tx(-3), pcy); ctx.lineTo(tx(3), pcy); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(pcx, ty(-3)); ctx.lineTo(pcx, ty(3)); ctx.stroke();
 
     // prior N(0,I) circle
-    ctx.strokeStyle = 'rgba(38,35,32,0.45)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.45)';
     ctx.setLineDash([3, 3]);
     ctx.beginPath(); ctx.ellipse(pcx, pcy, sx, sy, 0, 0, Math.PI * 2); ctx.stroke();
     ctx.setLineDash([]);
 
     // ε dot in left side of the plot at small scale (we draw it twice — once at "raw" location, once shown being scaled)
     const epsX = tx(epsVec[0]), epsY = ty(epsVec[1]);
-    ctx.fillStyle = 'rgba(38,35,32,0.7)';
+    ctx.fillStyle = 'rgba(15,34,56,0.7)';
     ctx.beginPath(); ctx.arc(epsX, epsY, 3, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = INK_FADE;
-    ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+    ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'left';
     ctx.fillText('ε ~ N(0, I)', epsX + 6, epsY - 4);
 
     // arrow from origin → μ
     drawArrow(ctx, pcx, pcy, tx(muVec[0]), ty(muVec[1]), ACCENT);
     ctx.fillStyle = ACCENT;
-    ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+    ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.fillText('μ', tx(muVec[0]) + 6, ty(muVec[1]) - 4);
 
     // arrow from μ → z (this is + σ·ε)
-    drawArrow(ctx, tx(muVec[0]), ty(muVec[1]), tx(zVec[0]), ty(zVec[1]), 'rgba(38,35,32,0.70)');
+    drawArrow(ctx, tx(muVec[0]), ty(muVec[1]), tx(zVec[0]), ty(zVec[1]), 'rgba(15,34,56,0.70)');
     ctx.fillStyle = INK;
     ctx.beginPath(); ctx.arc(tx(zVec[0]), ty(zVec[1]), 4, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = INK;
-    ctx.font = 'italic 13px "Source Serif 4", Georgia, serif';
+    ctx.font = '13px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.fillText('z', tx(zVec[0]) + 8, ty(zVec[1]) + 4);
     ctx.fillStyle = INK_FADE;
-    ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+    ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.fillText('  ← μ + σ·ε', tx(zVec[0]) + 8, ty(zVec[1]) + 18);
 
     // hint
     ctx.fillStyle = INK_FADE;
-    ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+    ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('press ↻ Sample to draw a fresh ε from the prior', size.w / 2, size.h - 10);
 
     // glossary
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left';
     ctx.fillStyle = INK_FADE;
     ctx.fillText('ε EPSILON · NOISE FROM PRIOR  ·  σ ⊙ ε STRETCH NOISE BY ENCODER SPREAD', 12, size.h - 42);
@@ -467,7 +467,7 @@
   function drawWalk(ctx, size) {
     // Title
     ctx.fillStyle = INK_FADE;
-    ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+    ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('latent-space line · decode each step', size.w / 2, 22);
 
@@ -483,7 +483,7 @@
     const ty = (z) => cy - z * sy;
 
     // grid
-    ctx.strokeStyle = 'rgba(38,35,32,0.06)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.06)';
     for (let g = -3; g <= 3; g++) {
       ctx.beginPath(); ctx.moveTo(tx(g), ty(-2)); ctx.lineTo(tx(g), ty(2)); ctx.stroke();
     }
@@ -491,12 +491,12 @@
       ctx.beginPath(); ctx.moveTo(tx(-3), ty(g)); ctx.lineTo(tx(3), ty(g)); ctx.stroke();
     }
     // axes
-    ctx.strokeStyle = 'rgba(38,35,32,0.18)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.18)';
     ctx.beginPath(); ctx.moveTo(tx(-3), cy); ctx.lineTo(tx(3), cy); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(cx, ty(-2)); ctx.lineTo(cx, ty(2)); ctx.stroke();
 
     // prior dashed circle
-    ctx.strokeStyle = 'rgba(38,35,32,0.40)';
+    ctx.strokeStyle = 'rgba(15,34,56,0.40)';
     ctx.setLineDash([3, 3]);
     ctx.beginPath(); ctx.ellipse(cx, cy, sx, sy, 0, 0, Math.PI * 2); ctx.stroke();
     ctx.setLineDash([]);
@@ -516,7 +516,7 @@
     ctx.beginPath(); ctx.arc(Ax, Ay, 5, 0, Math.PI * 2); ctx.fill();
     ctx.beginPath(); ctx.arc(Bx, By, 5, 0, Math.PI * 2); ctx.fill();
     // labels
-    ctx.font = 'italic 12px "Source Serif 4", Georgia, serif';
+    ctx.font = '12px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.fillStyle = ACCENT;
     ctx.textAlign = 'right';
     ctx.fillText(`A · ${ENDPOINTS.A.name}`, Ax - 8, Ay + 4);
@@ -529,7 +529,7 @@
     const curX = tx(cur[0]), curY = ty(cur[1]);
     ctx.fillStyle = INK;
     ctx.beginPath(); ctx.arc(curX, curY, 5, 0, Math.PI * 2); ctx.fill();
-    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.font = '10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left';
     ctx.fillStyle = INK;
     ctx.fillText(`t = ${formatNum(t)}`, curX + 8, curY + 14);
@@ -557,14 +557,14 @@
         ctx.strokeRect(x0 - 2, y0 - 2, tileSize + 4, tileSize + 4);
       }
       ctx.fillStyle = INK_FADE;
-      ctx.font = '10px "JetBrains Mono", monospace';
+      ctx.font = '10px "IBM Plex Mono", monospace';
       ctx.textAlign = 'center';
       ctx.fillText(`t=${formatNum(ti)}`, x0 + tileSize / 2, y0 + tileSize + 14);
     }
 
     // hint
     ctx.fillStyle = INK_FADE;
-    ctx.font = 'italic 11px "Source Serif 4", Georgia, serif';
+    ctx.font = '11px "Bricolage Grotesque", system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('every intermediate decode is plausible — that\'s the smoothness KL bought you',
       size.w / 2, size.h - 8);
